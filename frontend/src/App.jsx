@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useThemeStore } from './stores/useThemeStore';
 import { useAuthStore } from './stores/useAuthStore';
 import Navbar from './components/common/Navbar';
@@ -84,7 +84,7 @@ export default function App() {
     }, 60);
   };
 
-  // If Admin View is active — gate behind authentication
+  // If Admin View is active - gate behind authentication
   if (currentView === 'admin') {
     if (!isAuthenticated) {
       return <AdminLoginPage onBackToHome={() => handleNavigate('home')} onLoginSuccess={() => setCurrentView('admin')} />;
@@ -94,8 +94,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 transition-colors duration-300 relative selection:bg-brand-600 selection:text-white bg-grid-pattern">
-      {/* Sticky / Floating Dynamic Navbar */}
-      <Navbar onNavigate={handleNavigate} currentView={currentView} />
+      {/* Sticky / Floating Dynamic Navbar - Displayed ONLY on Homepage */}
+      {currentView === 'home' && (
+        <Navbar onNavigate={handleNavigate} currentView={currentView} />
+      )}
 
       {/* Main Content Areas */}
       {currentView === 'translator' ? (
