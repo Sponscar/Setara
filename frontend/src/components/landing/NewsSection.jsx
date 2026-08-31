@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
   Newspaper, 
@@ -17,6 +18,29 @@ export default function NewsSection() {
   const [activeNewsModal, setActiveNewsModal] = useState(null);
 
   const categories = ['Semua', 'Edukasi', 'Teknologi', 'Komunitas', 'Event'];
+
+  // Lock body scroll when news modal is open
+  useEffect(() => {
+    if (activeNewsModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [activeNewsModal]);
+
+  // Close modal on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && activeNewsModal) {
+        setActiveNewsModal(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeNewsModal]);
 
   const filteredNews = selectedCategory === 'Semua'
     ? newsList
@@ -106,23 +130,30 @@ export default function NewsSection() {
           ))}
         </div>
 
-        {/* News Detail Modal */}
-        {activeNewsModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md overflow-y-auto">
-            <div className="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border p-6 sm:p-8 shadow-2xl space-y-5 my-8">
+        {/* News Detail Modal Portal (Mounted directly to document.body) */}
+        {activeNewsModal && typeof document !== 'undefined' && createPortal(
+          <div 
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setActiveNewsModal(null);
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto"
+          >
+            <div className="relative w-full max-w-2xl rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border p-6 sm:p-8 shadow-2xl space-y-5 my-auto max-h-[90vh] overflow-y-auto animate-page-enter">
               {/* Close Button */}
               <button
+                type="button"
                 onClick={() => setActiveNewsModal(null)}
-                className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors"
+                title="Tutup Modal"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="space-y-3">
+              <div className="space-y-3 pr-6">
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
                   {activeNewsModal.kategori}
                 </span>
-                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white pr-8">
+                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">
                   {activeNewsModal.judul}
                 </h3>
                 <div className="flex items-center gap-4 text-xs text-slate-400">
@@ -152,13 +183,14 @@ export default function NewsSection() {
                 <span className="text-xs text-slate-400">Platform Bahasa Isyarat SETARA</span>
                 <button
                   onClick={() => setActiveNewsModal(null)}
-                  className="px-5 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold cursor-pointer hover:opacity-90 transition-opacity"
                 >
                   Tutup
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </section>

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   INITIAL_COMMUNITY_ACTIVITIES, 
   INITIAL_TESTIMONIALS 
@@ -26,6 +27,34 @@ export default function CommunitySection() {
     alasan: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const nameInputRef = useRef(null);
+
+  // Lock body scroll when modal is active
+  useEffect(() => {
+    if (showJoinModal) {
+      document.body.style.overflow = 'hidden';
+      // Auto focus first input
+      setTimeout(() => {
+        nameInputRef.current?.focus();
+      }, 100);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showJoinModal]);
+
+  // Handle ESC key to close modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showJoinModal) {
+        setShowJoinModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showJoinModal]);
 
   const handleSubmitJoin = (e) => {
     e.preventDefault();
@@ -72,7 +101,7 @@ export default function CommunitySection() {
             </h3>
             <button
               onClick={() => setShowJoinModal(true)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
               <span>Gabung Komunitas</span>
@@ -168,13 +197,20 @@ export default function CommunitySection() {
           </div>
         </div>
 
-        {/* Join Community Modal */}
-        {showJoinModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-            <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border p-6 sm:p-8 shadow-2xl space-y-5">
+        {/* Join Community Modal Portal (Mounted directly to document.body for instant centering) */}
+        {showJoinModal && typeof document !== 'undefined' && createPortal(
+          <div 
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowJoinModal(false);
+            }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto"
+          >
+            <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border p-6 sm:p-8 shadow-2xl space-y-5 animate-page-enter my-auto max-h-[90vh] overflow-y-auto">
               <button
+                type="button"
                 onClick={() => setShowJoinModal(false)}
-                className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer transition-colors"
+                title="Tutup Modal"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -193,14 +229,14 @@ export default function CommunitySection() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmitJoin} className="space-y-4">
-                  <div className="space-y-1">
-                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400">
+                  <div className="space-y-1 pr-6">
+                    <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-600 dark:text-amber-400">
                       Formulir Anggota
                     </span>
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       Gabung Komunitas SETARA
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       Mari bersama memperluas ruang inklusivitas bahasa isyarat di Indonesia.
                     </p>
                   </div>
@@ -208,21 +244,22 @@ export default function CommunitySection() {
                   <div className="space-y-3 text-xs">
                     <div>
                       <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                        Nama Lengkap
+                        Nama Lengkap <span className="text-brand-500">*</span>
                       </label>
                       <input
+                        ref={nameInputRef}
                         type="text"
                         required
                         value={formData.nama}
                         onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
                         placeholder="Contoh: Sarah Anindita"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                       />
                     </div>
 
                     <div>
                       <label className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                        Alamat Email
+                        Alamat Email <span className="text-brand-500">*</span>
                       </label>
                       <input
                         type="email"
@@ -230,7 +267,7 @@ export default function CommunitySection() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="nama@email.com"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                       />
                     </div>
 
@@ -241,7 +278,7 @@ export default function CommunitySection() {
                       <select
                         value={formData.peran}
                         onChange={(e) => setFormData({ ...formData, peran: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all"
                       >
                         <option value="Masyarakat Umum">Masyarakat Umum / Peminat Isyarat</option>
                         <option value="Teman Tuli / Tunawicara">Teman Tuli / Tunawicara</option>
@@ -260,14 +297,14 @@ export default function CommunitySection() {
                         value={formData.alasan}
                         onChange={(e) => setFormData({ ...formData, alasan: e.target.value })}
                         placeholder="Ceritakan motivasi Anda..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all resize-none"
                       />
                     </div>
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg cursor-pointer"
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-500 hover:to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
                     <span>Kirim Pendaftaran</span>
@@ -275,7 +312,8 @@ export default function CommunitySection() {
                 </form>
               )}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </section>

@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -136,16 +136,16 @@
 @keyframes pageEnter {
   0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.98);
+    transform: translateY(16px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0px) scale(1);
+    transform: none;
   }
 }
 
 .animate-page-enter {
-  animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: pageEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes pulseGlowButton {
