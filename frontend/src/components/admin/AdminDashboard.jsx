@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useContentStore } from '../../stores/useContentStore';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useThemeStore } from '../../stores/useThemeStore';
 import { 
   LayoutDashboard, 
   Newspaper, 
@@ -17,13 +19,16 @@ import {
   ShieldCheck, 
   Search, 
   LogOut,
-  ArrowLeft,
-  FileText
+  FileText,
+  Sun,
+  Moon
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function AdminDashboard({ onBackToHome }) {
+export default function AdminDashboard({ onBackToHome, onLogout }) {
   const { user, logout } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const {
     newsList,
     addNews,
@@ -40,6 +45,31 @@ export default function AdminDashboard({ onBackToHome }) {
   } = useContentStore();
 
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'berita' | 'video' | 'timeline' | 'komunitas'
+
+  // Handle browser Back button to show logout confirmation modal
+  useEffect(() => {
+    window.history.pushState({ adminSession: true }, '', '/admin');
+
+    const handlePopState = () => {
+      window.history.pushState({ adminSession: true }, '', '/admin');
+      setShowLogoutConfirm(true);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  const handleConfirmLogout = () => {
+    setShowLogoutConfirm(false);
+    logout();
+    if (onLogout) {
+      onLogout();
+    } else if (onBackToHome) {
+      onBackToHome();
+    }
+  };
 
   // News Form State
   const [newsForm, setNewsForm] = useState({
@@ -124,35 +154,34 @@ export default function AdminDashboard({ onBackToHome }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-white py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-white py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Top Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-card border border-slate-200 dark:border-dark-border">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onBackToHome}
-              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer"
-              title="Kembali ke Beranda"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-3xl glass-card border border-slate-200 dark:border-dark-border shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-amber-500 p-0.5 shadow-lg shadow-brand-500/20 flex-shrink-0">
+              <div className="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-amber-400 text-base">
+                S
+              </div>
+            </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-extrabold tracking-tight">
+                <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                   Dashboard Administrator SETARA
                 </h1>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-500/20 text-brand-400 border border-brand-500/30">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/25">
                   Lokal Mode
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Kelola konten berita, kamus video isyarat, milestone, dan keanggotaan komunitas.
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 text-xs text-slate-400 border-r border-slate-200 dark:border-slate-800 pr-3">
+            {/* User Profile */}
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 border-r border-slate-200 dark:border-slate-800 pr-3">
               <img
                 src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"}
                 alt="Avatar"
@@ -160,11 +189,28 @@ export default function AdminDashboard({ onBackToHome }) {
               />
               <span className="font-semibold text-slate-900 dark:text-white">{user?.nama || 'Admin'}</span>
             </div>
+
+            {/* Dark / Light Mode Toggle Button */}
             <button
-              onClick={onBackToHome}
-              className="px-3 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold cursor-pointer"
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+              title={theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
             >
-              Lihat Website
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600" />
+              )}
+            </button>
+
+            {/* Dedicated Logout Button (Replaces back button) */}
+            <button
+              onClick={() => setShowLogoutConfirm(true)}
+              className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/20 hover:border-red-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105 active:scale-95 shadow-sm"
+              title="Keluar dari sesi Administrator"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Keluar</span>
             </button>
           </div>
         </div>
@@ -692,6 +738,65 @@ export default function AdminDashboard({ onBackToHome }) {
           </div>
         )}
       </div>
+
+      {/* Logout Confirmation Card Modal Dialog (Rendered via Portal) */}
+      {showLogoutConfirm && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in"
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <div 
+            className="w-full max-w-md p-6 sm:p-8 rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border shadow-2xl relative animate-scale-up space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Icon Badge & Title */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-red-500/15 text-red-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-red-500/10">
+                <LogOut className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Konfirmasi Keluar
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Dashboard Administrator SETARA
+                </p>
+              </div>
+            </div>
+
+            {/* Description Card */}
+            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+              <p>
+                Apakah Anda yakin ingin <strong>keluar / logout</strong> dari sesi Administrator? Anda perlu memasukkan kredensial kembali untuk mengakses dashboard ini.
+              </p>
+              <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-400">
+                <ShieldCheck className="w-3.5 h-3.5 text-brand-500" />
+                <span>Akun aktif: <strong className="text-slate-700 dark:text-slate-200">{user?.email || 'admin@setara.id'}</strong></span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmLogout}
+                className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 shadow-lg shadow-red-600/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Ya, Keluar</span>
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useThemeStore } from '../../stores/useThemeStore';
 import {
   ShieldCheck,
   Eye,
@@ -9,11 +10,14 @@ import {
   AlertCircle,
   Sparkles,
   Lock,
-  Mail
+  Mail,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
   const { login } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -54,10 +58,25 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
       <div className="absolute top-6 left-6 z-10">
         <button
           onClick={onBackToHome}
-          className="flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:bg-brand-500/10 hover:text-brand-600 dark:hover:text-brand-400 hover:border-brand-500/30 transition-all duration-300 cursor-pointer"
+          className="flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:bg-brand-500/10 hover:text-brand-600 dark:hover:text-brand-400 hover:border-brand-500/30 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Beranda</span>
+        </button>
+      </div>
+
+      {/* Theme Toggle */}
+      <div className="absolute top-6 right-6 z-10">
+        <button
+          onClick={toggleTheme}
+          className="p-2.5 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:bg-brand-500/10 hover:border-brand-500/30 text-slate-700 dark:text-slate-200 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+          title={theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-600" />
+          )}
         </button>
       </div>
 

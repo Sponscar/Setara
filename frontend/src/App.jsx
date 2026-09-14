@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useThemeStore } from './stores/useThemeStore';
 import { useAuthStore } from './stores/useAuthStore';
 import Navbar from './components/common/Navbar';
@@ -89,7 +89,7 @@ export default function App() {
     if (!isAuthenticated) {
       return <AdminLoginPage onBackToHome={() => handleNavigate('home')} onLoginSuccess={() => setCurrentView('admin')} />;
     }
-    return <AdminDashboard onBackToHome={() => handleNavigate('home')} />;
+    return <AdminDashboard onBackToHome={() => handleNavigate('home')} onLogout={() => handleNavigate('home')} />;
   }
 
   return (

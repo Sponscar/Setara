@@ -92,15 +92,6 @@ export default function Footer({ onNavigate }) {
               <li>
                 <span className="text-slate-500">YOLO 11 Hand Pose 21 Keypoints</span>
               </li>
-              <li className="pt-2">
-                <button 
-                  onClick={() => onNavigate('admin')}
-                  className="font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Portal Administrator</span>
-                </button>
-              </li>
             </ul>
           </div>
         </div>

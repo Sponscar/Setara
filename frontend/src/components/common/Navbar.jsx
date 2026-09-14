@@ -126,16 +126,11 @@ export default function Navbar({ onNavigate, currentView }) {
               </div>
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className={`font-black tracking-tight text-slate-900 dark:text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                  isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
-                }`}>
-                  SETARA
-                </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-                  v2.0
-                </span>
-              </div>
+              <span className={`font-black tracking-tight text-slate-900 dark:text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
+              }`}>
+                SETARA
+              </span>
               <div className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 isScrolled ? 'max-h-0 opacity-0' : 'max-h-6 opacity-100'
               }`}>
