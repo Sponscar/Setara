@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useContentStore } from '../../stores/useContentStore';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -68,6 +68,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
     submitCommunity,
     approveCommunity,
     rejectCommunity,
+    updateCommunity,
     deleteCommunity
   } = useContentStore();
 
@@ -134,7 +135,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
     kategori: 'Organisasi Tuli',
     platform: 'WhatsApp',
     link: '',
-    logo: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80',
+    logo: '',
     anggota: '500+ Anggota',
     kontak: '',
     emailKontak: '',
@@ -142,6 +143,124 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
     deskripsiLengkap: ''
   });
   const [communitySearch, setCommunitySearch] = useState('');
+  const adminLogoInputRef = useRef(null);
+  const [adminLogoError, setAdminLogoError] = useState('');
+
+  const handleAdminLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setAdminLogoError('Format file harus berupa foto/gambar (JPG, PNG, WEBP, dll).');
+      return;
+    }
+
+    const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+    if (file.size > MAX_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      setAdminLogoError(`Ukuran foto ${sizeMB} MB melebihi batas maksimal 2 MB.`);
+      if (adminLogoInputRef.current) adminLogoInputRef.current.value = '';
+      return;
+    }
+
+    setAdminLogoError('');
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setCommunityForm((prev) => ({ ...prev, logo: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAdminRemoveLogo = () => {
+    setCommunityForm((prev) => ({ ...prev, logo: '' }));
+    setAdminLogoError('');
+    if (adminLogoInputRef.current) adminLogoInputRef.current.value = '';
+  };
+
+  // Edit Community State & Handlers
+  const [editingCommunity, setEditingCommunity] = useState(null);
+  const [editCommunityForm, setEditCommunityForm] = useState({
+    nama: '',
+    kategori: 'Organisasi Tuli',
+    platform: 'WhatsApp',
+    link: '',
+    logo: '',
+    anggota: '',
+    kontak: '',
+    emailKontak: '',
+    deskripsi: '',
+    deskripsiLengkap: ''
+  });
+  const editLogoInputRef = useRef(null);
+  const [editLogoError, setEditLogoError] = useState('');
+
+  const handleOpenEditModal = (com) => {
+    setEditingCommunity(com);
+    setEditCommunityForm({
+      nama: com.nama || '',
+      kategori: com.kategori || 'Organisasi Tuli',
+      platform: com.platform || 'WhatsApp',
+      link: com.link || '',
+      logo: com.logo || '',
+      anggota: com.anggota || '',
+      kontak: com.kontak || '',
+      emailKontak: com.emailKontak || '',
+      deskripsi: com.deskripsi || '',
+      deskripsiLengkap: com.deskripsiLengkap || ''
+    });
+    setEditLogoError('');
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingCommunity(null);
+    setEditLogoError('');
+    if (editLogoInputRef.current) editLogoInputRef.current.value = '';
+  };
+
+  const handleEditLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setEditLogoError('Format file harus berupa foto/gambar (JPG, PNG, WEBP, dll).');
+      return;
+    }
+
+    const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+    if (file.size > MAX_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      setEditLogoError(`Ukuran foto ${sizeMB} MB melebihi batas maksimal 2 MB.`);
+      if (editLogoInputRef.current) editLogoInputRef.current.value = '';
+      return;
+    }
+
+    setEditLogoError('');
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setEditCommunityForm((prev) => ({ ...prev, logo: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleEditRemoveLogo = () => {
+    setEditCommunityForm((prev) => ({ ...prev, logo: '' }));
+    setEditLogoError('');
+    if (editLogoInputRef.current) editLogoInputRef.current.value = '';
+  };
+
+  const handleSaveEditCommunity = (e) => {
+    e.preventDefault();
+    if (!editCommunityForm.nama || !editCommunityForm.link || !editCommunityForm.kontak) return;
+
+    updateCommunity(editingCommunity.id, {
+      ...editCommunityForm,
+      logo: editCommunityForm.logo || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80',
+      deskripsiLengkap: editCommunityForm.deskripsiLengkap || editCommunityForm.deskripsi
+    });
+
+    showToast(`Komunitas "${editCommunityForm.nama}" berhasil diperbarui!`);
+    handleCloseEditModal();
+  };
 
   const [toastMsg, setToastMsg] = useState('');
 
@@ -203,12 +322,14 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
       logo: communityForm.logo || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80',
       deskripsiLengkap: communityForm.deskripsiLengkap || communityForm.deskripsi
     });
+    setAdminLogoError('');
+    if (adminLogoInputRef.current) adminLogoInputRef.current.value = '';
     setCommunityForm({
       nama: '',
       kategori: 'Organisasi Tuli',
       platform: 'WhatsApp',
       link: '',
-      logo: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80',
+      logo: '',
       anggota: '500+ Anggota',
       kontak: '',
       emailKontak: '',
@@ -867,28 +988,72 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-semibold block mb-1">Estimasi Anggota</label>
-                      <input
-                        type="text"
-                        value={communityForm.anggota}
-                        onChange={(e) => setCommunityForm({ ...communityForm, anggota: e.target.value })}
-                        placeholder="Contoh: 1.000+ Anggota"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
-                      />
-                    </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Estimasi Anggota</label>
+                    <input
+                      type="text"
+                      value={communityForm.anggota}
+                      onChange={(e) => setCommunityForm({ ...communityForm, anggota: e.target.value })}
+                      placeholder="Contoh: 1.000+ Anggota"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
 
-                    <div>
-                      <label className="font-semibold block mb-1">URL Logo (Opsional)</label>
-                      <input
-                        type="url"
-                        value={communityForm.logo}
-                        onChange={(e) => setCommunityForm({ ...communityForm, logo: e.target.value })}
-                        placeholder="https://..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]"
-                      />
-                    </div>
+                  <div>
+                    <label className="font-semibold block mb-1">
+                      Upload Foto / Logo Komunitas (Maks. 2 MB)
+                    </label>
+                    <input
+                      type="file"
+                      ref={adminLogoInputRef}
+                      accept="image/*"
+                      onChange={handleAdminLogoUpload}
+                      className="hidden"
+                      id="admin-community-logo-upload"
+                    />
+
+                    {communityForm.logo ? (
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700">
+                        <img
+                          src={communityForm.logo}
+                          alt="Preview Logo"
+                          className="w-11 h-11 rounded-xl object-cover border border-slate-200 dark:border-slate-600 shadow-sm shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">Foto siap diunggah</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 block truncate">Format valid (Maks. 2 MB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleAdminRemoveLogo}
+                          className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-colors shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          <span>Hapus</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="admin-community-logo-upload"
+                        className="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-dark-bg border border-dashed border-slate-300 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 transition-colors cursor-pointer group text-center"
+                      >
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 group-hover:text-brand-500 transition-colors">
+                          <Upload className="w-4 h-4" />
+                          <span className="font-semibold text-[11px]">Pilih File Foto / Logo</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 mt-0.5">Format: JPG, PNG, WEBP, SVG (Maksimal 2 MB)</span>
+                      </label>
+                    )}
+
+                    {adminLogoError && (
+                      <p className="text-[11px] text-rose-500 font-semibold flex items-center gap-1 mt-1.5 animate-fade-in">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{adminLogoError}</span>
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -1080,16 +1245,25 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
                             </div>
                           </div>
 
-                          <button
-                            onClick={() => {
-                              deleteCommunity(c.id);
-                              showToast(`Komunitas "${c.nama}" berhasil dihapus.`);
-                            }}
-                            className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors"
-                            title="Hapus Komunitas"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              onClick={() => handleOpenEditModal(c)}
+                              className="p-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 cursor-pointer transition-colors"
+                              title="Edit Komunitas"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                deleteCommunity(c.id);
+                                showToast(`Komunitas "${c.nama}" berhasil dihapus.`);
+                              }}
+                              className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors"
+                              title="Hapus Komunitas"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                   </div>
@@ -1154,6 +1328,233 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
                 <span>Ya, Keluar</span>
               </button>
             </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Edit Verified Community Modal Dialog (Rendered via Portal) */}
+      {editingCommunity && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-fade-in"
+          onClick={handleCloseEditModal}
+        >
+          <div
+            className="w-full max-w-lg p-6 sm:p-8 rounded-3xl bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border shadow-2xl relative animate-scale-up space-y-5 max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button
+              onClick={handleCloseEditModal}
+              className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3 pr-8">
+              <div className="p-2.5 rounded-2xl bg-amber-500/15 text-amber-500">
+                <Edit3 className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Edit Komunitas Terverifikasi
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Perbarui informasi untuk {editingCommunity.nama}
+                </p>
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSaveEditCommunity} className="space-y-3.5 text-xs text-slate-700 dark:text-slate-300">
+              <div>
+                <label className="font-semibold block mb-1">Nama Komunitas *</label>
+                <input
+                  type="text"
+                  required
+                  value={editCommunityForm.nama}
+                  onChange={(e) => setEditCommunityForm({ ...editCommunityForm, nama: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold block mb-1">Platform *</label>
+                  <select
+                    value={editCommunityForm.platform}
+                    onChange={(e) => setEditCommunityForm({ ...editCommunityForm, platform: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 cursor-pointer"
+                  >
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Telegram">Telegram</option>
+                    <option value="Discord">Discord</option>
+                    <option value="Website">Website</option>
+                    <option value="Instagram">Instagram</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-semibold block mb-1">Kategori *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editCommunityForm.kategori}
+                    onChange={(e) => setEditCommunityForm({ ...editCommunityForm, kategori: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">Link URL *</label>
+                <input
+                  type="url"
+                  required
+                  value={editCommunityForm.link}
+                  onChange={(e) => setEditCommunityForm({ ...editCommunityForm, link: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">Estimasi Anggota</label>
+                <input
+                  type="text"
+                  value={editCommunityForm.anggota}
+                  onChange={(e) => setEditCommunityForm({ ...editCommunityForm, anggota: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">
+                  Upload Foto / Logo Komunitas (Maks. 2 MB)
+                </label>
+                <input
+                  type="file"
+                  ref={editLogoInputRef}
+                  accept="image/*"
+                  onChange={handleEditLogoUpload}
+                  className="hidden"
+                  id="edit-community-logo-upload"
+                />
+
+                {editCommunityForm.logo ? (
+                  <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700">
+                    <img
+                      src={editCommunityForm.logo}
+                      alt="Preview Logo"
+                      className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-600 shadow-sm shrink-0"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80';
+                      }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">Foto terpasang</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 block truncate">Klik ganti untuk mengunggah foto baru</span>
+                    </div>
+                    <label
+                      htmlFor="edit-community-logo-upload"
+                      className="px-2.5 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-[10px] font-semibold cursor-pointer transition-colors"
+                    >
+                      Ganti
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleEditRemoveLogo}
+                      className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-colors shrink-0"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="edit-community-logo-upload"
+                    className="flex flex-col items-center justify-center p-3.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-dashed border-slate-300 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 transition-colors cursor-pointer group text-center"
+                  >
+                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 group-hover:text-brand-500 transition-colors">
+                      <Upload className="w-4 h-4" />
+                      <span className="font-semibold text-[11px]">Pilih File Foto Baru</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Format: JPG, PNG, WEBP, SVG (Maksimal 2 MB)</span>
+                  </label>
+                )}
+
+                {editLogoError && (
+                  <p className="text-[11px] text-rose-500 font-semibold flex items-center gap-1 mt-1.5 animate-fade-in">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{editLogoError}</span>
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-semibold block mb-1">PIC / Kontak *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editCommunityForm.kontak}
+                    onChange={(e) => setEditCommunityForm({ ...editCommunityForm, kontak: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-semibold block mb-1">Email PIC</label>
+                  <input
+                    type="email"
+                    value={editCommunityForm.emailKontak}
+                    onChange={(e) => setEditCommunityForm({ ...editCommunityForm, emailKontak: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">Deskripsi Singkat *</label>
+                <textarea
+                  rows="2"
+                  required
+                  value={editCommunityForm.deskripsi}
+                  onChange={(e) => setEditCommunityForm({ ...editCommunityForm, deskripsi: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-1">Deskripsi Lengkap</label>
+                <textarea
+                  rows="3"
+                  value={editCommunityForm.deskripsiLengkap}
+                  onChange={(e) => setEditCommunityForm({ ...editCommunityForm, deskripsiLengkap: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleCloseEditModal}
+                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-brand-500 hover:from-amber-400 hover:to-brand-400 text-white font-bold text-xs shadow-lg shadow-amber-500/20 hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>Simpan Perubahan</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>,
         document.body

@@ -22,7 +22,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   Search,
-  Filter
+  Filter,
+  Upload,
+  AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -104,9 +106,42 @@ export default function CommunitySection() {
   });
   const [testiSuccess, setTestiSuccess] = useState(false);
 
-  // Refs for modal auto-focus
+  // Refs for modal auto-focus & file upload
   const submitNameRef = useRef(null);
   const testiNameRef = useRef(null);
+  const logoInputRef = useRef(null);
+  const [logoError, setLogoError] = useState('');
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setLogoError('Format file harus berupa foto/gambar (JPG, PNG, WEBP, dll).');
+      return;
+    }
+
+    const MAX_SIZE = 2 * 1024 * 1024; // 2 MB
+    if (file.size > MAX_SIZE) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+      setLogoError(`Ukuran foto ${sizeMB} MB melebihi batas maksimal 2 MB.`);
+      if (logoInputRef.current) logoInputRef.current.value = '';
+      return;
+    }
+
+    setLogoError('');
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSubmitForm((prev) => ({ ...prev, logo: reader.result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setSubmitForm((prev) => ({ ...prev, logo: '' }));
+    setLogoError('');
+    if (logoInputRef.current) logoInputRef.current.value = '';
+  };
 
   // Only approved communities are displayed on landing page
   const approvedCommunities = (communityList || []).filter(c => c.status === 'approved');
@@ -170,6 +205,8 @@ export default function CommunitySection() {
     setTimeout(() => {
       setSubmitSuccess(false);
       setShowSubmitModal(false);
+      setLogoError('');
+      if (logoInputRef.current) logoInputRef.current.value = '';
       setSubmitForm({
         nama: '',
         kategori: 'Komunitas Tuli',
@@ -645,28 +682,72 @@ export default function CommunitySection() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="font-semibold block mb-1">Estimasi Anggota</label>
-                      <input
-                        type="text"
-                        value={submitForm.anggota}
-                        onChange={(e) => setSubmitForm({ ...submitForm, anggota: e.target.value })}
-                        placeholder="Contoh: 350+ Anggota"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
-                      />
-                    </div>
+                  <div>
+                    <label className="font-semibold block mb-1">Estimasi Anggota</label>
+                    <input
+                      type="text"
+                      value={submitForm.anggota}
+                      onChange={(e) => setSubmitForm({ ...submitForm, anggota: e.target.value })}
+                      placeholder="Contoh: 350+ Anggota"
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                    />
+                  </div>
 
-                    <div>
-                      <label className="font-semibold block mb-1">URL Logo (Opsional)</label>
-                      <input
-                        type="url"
-                        value={submitForm.logo}
-                        onChange={(e) => setSubmitForm({ ...submitForm, logo: e.target.value })}
-                        placeholder="https://..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]"
-                      />
-                    </div>
+                  <div>
+                    <label className="font-semibold block mb-1">
+                      Upload Foto / Logo Komunitas (Maks. 2 MB)
+                    </label>
+                    <input
+                      type="file"
+                      ref={logoInputRef}
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                      id="community-logo-upload"
+                    />
+
+                    {submitForm.logo ? (
+                      <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700">
+                        <img
+                          src={submitForm.logo}
+                          alt="Preview Logo"
+                          className="w-12 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-600 shadow-sm shrink-0"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate">Foto berhasil dipilih</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400 block truncate">Format valid (Maks. 2 MB)</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRemoveLogo}
+                          className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition-colors shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          <span>Hapus</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        htmlFor="community-logo-upload"
+                        className="flex flex-col items-center justify-center p-3.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-dashed border-slate-300 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-500 transition-colors cursor-pointer group text-center"
+                      >
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 group-hover:text-brand-500 transition-colors">
+                          <Upload className="w-4 h-4" />
+                          <span className="font-semibold text-[11px]">Pilih File Foto / Logo</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 mt-0.5">Format: JPG, PNG, WEBP, SVG (Maksimal 2 MB)</span>
+                      </label>
+                    )}
+
+                    {logoError && (
+                      <p className="text-[11px] text-rose-500 font-semibold flex items-center gap-1 mt-1.5 animate-fade-in">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{logoError}</span>
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">

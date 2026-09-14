@@ -149,6 +149,16 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  updateCommunity: (id, updatedData) => {
+    set((state) => {
+      const updated = state.communityList.map(c => 
+        c.id === id ? { ...c, ...updatedData } : c
+      );
+      if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
+      return { communityList: updated };
+    });
+  },
+
   deleteCommunity: (id) => {
     set((state) => {
       const updated = state.communityList.filter(c => c.id !== id);
