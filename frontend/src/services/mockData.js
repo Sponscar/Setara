@@ -167,36 +167,90 @@ export const INITIAL_TIMELINE = [
   }
 ];
 
-export const INITIAL_COMMUNITY_ACTIVITIES = [
+export const INITIAL_COMMUNITIES = [
   {
-    id: "act-1",
-    judul: "Workshop Isyarat Dasar untuk Tenaga Medis",
-    tipe: "Pelatihan",
-    tanggal: "5 September 2026",
-    lokasi: "Online via Zoom & Praktik Offline",
-    peserta: "120 Peserta",
-    status: "Pendaftaran Dibuka",
-    gambar: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=600&q=80"
+    id: "com-1",
+    nama: "Gerkatin (Gerakan untuk Kesejahteraan Tunarungu Indonesia)",
+    deskripsi: "Organisasi nasional yang memperjuangkan hak dan kesejahteraan komunitas Tuli di Indonesia.",
+    deskripsiLengkap: "Gerkatin adalah organisasi nirlaba nasional yang telah berdiri sejak 1981 dan menjadi wadah utama bagi komunitas Tuli Indonesia. Gerkatin aktif dalam advokasi hak-hak penyandang disabilitas pendengaran, penyelenggaraan pelatihan bahasa isyarat, serta pemberdayaan ekonomi dan sosial anggota komunitas Tuli di seluruh provinsi.",
+    kategori: "Organisasi Tuli",
+    platform: "Website",
+    link: "https://gerkatin.or.id",
+    logo: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80",
+    anggota: "5.000+ Anggota",
+    status: "approved",
+    kontak: "Sekretariat Gerkatin",
+    emailKontak: "info@gerkatin.or.id"
   },
   {
-    id: "act-2",
-    judul: "Kopi Darat & Sesi Isyarat Santai (Sign Cafe)",
-    tipe: "Komunitas",
-    tanggal: "12 September 2026",
-    lokasi: "Ruang Kreatif Jakarta Selatan",
-    peserta: "50 Peserta",
-    status: "Segera Hadir",
-    gambar: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=80"
+    id: "com-2",
+    nama: "Sign Language Indonesia Community",
+    deskripsi: "Komunitas belajar bahasa isyarat BISINDO & SIBI untuk masyarakat umum via WhatsApp Group.",
+    deskripsiLengkap: "Sign Language Indonesia Community adalah grup WhatsApp yang didirikan oleh para relawan dan fasilitator Tuli untuk memperkenalkan bahasa isyarat kepada masyarakat umum. Di sini, anggota bisa belajar kosa kata isyarat harian, berlatih melalui video challenge mingguan, dan berdiskusi seputar budaya Tuli Indonesia.",
+    kategori: "Belajar Isyarat",
+    platform: "WhatsApp",
+    link: "https://chat.whatsapp.com/example-slic",
+    logo: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=200&q=80",
+    anggota: "1.200+ Anggota",
+    status: "approved",
+    kontak: "Rina Mulyani",
+    emailKontak: "rina.slic@gmail.com"
   },
   {
-    id: "act-3",
-    judul: "Webinar Etika Berinteraksi dengan Teman Tuli",
-    tipe: "Edukasi",
-    tanggal: "20 September 2026",
-    lokasi: "Live Streaming YouTube SETARA",
-    peserta: "350 Peserta",
-    status: "Pendaftaran Dibuka",
-    gambar: "https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80"
+    id: "com-3",
+    nama: "Deaf Tech Indonesia",
+    deskripsi: "Forum teknologi & inovasi aksesibilitas untuk komunitas Tuli di platform Telegram.",
+    deskripsiLengkap: "Deaf Tech Indonesia adalah komunitas Telegram yang mempertemukan developer, desainer, dan inovator yang peduli pada aksesibilitas digital untuk Tuli. Topik diskusi mencakup AI untuk penerjemahan isyarat, UX aksesibel, captioning otomatis, dan peluang karir teknologi bagi penyandang disabilitas pendengaran.",
+    kategori: "Teknologi & Inovasi",
+    platform: "Telegram",
+    link: "https://t.me/deaftechid",
+    logo: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=200&q=80",
+    anggota: "850+ Anggota",
+    status: "approved",
+    kontak: "Ahmad Fauzi",
+    emailKontak: "ahmad@deaftech.id"
+  },
+  {
+    id: "com-4",
+    nama: "Isyarat Nusantara",
+    deskripsi: "Channel Discord untuk diskusi dialek BISINDO dari berbagai daerah di Indonesia.",
+    deskripsiLengkap: "Isyarat Nusantara adalah server Discord yang menjadi ruang perkumpulan bagi penggiat bahasa isyarat dari berbagai provinsi di Indonesia. Server ini memiliki channel khusus untuk setiap dialek daerah (Jakarta, Yogyakarta, Bali, Padang, Makassar), serta channel tutorial video, sharing pengalaman, dan event virtual bulanan.",
+    kategori: "Komunitas Daerah",
+    platform: "Discord",
+    link: "https://discord.gg/isyarat-nusantara",
+    logo: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=200&q=80",
+    anggota: "600+ Anggota",
+    status: "approved",
+    kontak: "Dewi Lestari",
+    emailKontak: "dewi@isyaratnusantara.com"
+  },
+  {
+    id: "com-5",
+    nama: "Teman Tuli Bandung",
+    deskripsi: "Komunitas lokal Bandung yang aktif mengadakan kelas isyarat gratis dan sign cafe.",
+    deskripsiLengkap: "Teman Tuli Bandung adalah komunitas berbasis kota yang rutin mengadakan kelas bahasa isyarat gratis setiap akhir pekan, sign cafe bulanan, dan kampanye kesadaran inklusi di ruang publik. Dikelola oleh gabungan relawan dengar dan Tuli yang ingin menjembatani komunikasi di Kota Bandung.",
+    kategori: "Komunitas Lokal",
+    platform: "Instagram",
+    link: "https://instagram.com/temantulibdg",
+    logo: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=200&q=80",
+    anggota: "2.300+ Followers",
+    status: "approved",
+    kontak: "Bayu Pratama",
+    emailKontak: "temantulibdg@gmail.com"
+  },
+  {
+    id: "com-6",
+    nama: "Komunitas Guru SLB Nusantara",
+    deskripsi: "Grup WhatsApp khusus guru SLB untuk berbagi materi dan metode pengajaran isyarat.",
+    deskripsiLengkap: "Komunitas Guru SLB Nusantara adalah wadah bagi para guru Sekolah Luar Biasa dari seluruh Indonesia untuk saling berbagi materi ajar, metode pengajaran bahasa isyarat, dan solusi tantangan pendidikan inklusif. Grup ini juga rutin mengadakan webinar dan diskusi tematik bersama pakar pendidikan khusus.",
+    kategori: "Pendidikan",
+    platform: "WhatsApp",
+    link: "https://chat.whatsapp.com/example-guruslb",
+    logo: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=200&q=80",
+    anggota: "780+ Anggota",
+    status: "approved",
+    kontak: "Siti Nurhaliza, S.Pd.",
+    emailKontak: "guruslbnusantara@gmail.com"
   }
 ];
 

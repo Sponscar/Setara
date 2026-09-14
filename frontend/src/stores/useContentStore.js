@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { 
   INITIAL_NEWS, 
   INITIAL_TIMELINE, 
-  INITIAL_COMMUNITY_ACTIVITIES,
+  INITIAL_COMMUNITIES,
   INITIAL_TESTIMONIALS,
   SIGN_DICTIONARY 
 } from '../services/mockData';
@@ -102,23 +102,84 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
-  // Community Members for Moderation
-  communityMembers: [
-    { id: 'cm-1', nama: 'Siti Rahmawati', email: 'siti@example.com', peran: 'Guru SLB', status: 'approved', tanggal: '2026-08-20' },
-    { id: 'cm-2', nama: 'Bambang Wicaksono', email: 'bambang@example.com', peran: 'Relawan Isyarat', status: 'approved', tanggal: '2026-08-22' },
-    { id: 'cm-3', nama: 'Fajar Nugraha', email: 'fajar@example.com', peran: 'Mahasiswa', status: 'pending', tanggal: '2026-08-28' },
-    { id: 'cm-4', nama: 'Anisa Putri', email: 'anisa@example.com', peran: 'Penerjemah Lepas', status: 'pending', tanggal: '2026-08-29' }
-  ],
+  // ─── Community Directory (SETARA as Bridge) ───
+  communityList: typeof window !== 'undefined' && localStorage.getItem('setara_communities')
+    ? JSON.parse(localStorage.getItem('setara_communities'))
+    : INITIAL_COMMUNITIES,
 
-  approveMember: (id) => {
-    set((state) => ({
-      communityMembers: state.communityMembers.map(m => m.id === id ? { ...m, status: 'approved' } : m)
-    }));
+  addCommunity: (community) => {
+    const newItem = {
+      ...community,
+      id: `com-${Date.now()}`,
+      status: 'approved'
+    };
+    set((state) => {
+      const updated = [newItem, ...state.communityList];
+      if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
+      return { communityList: updated };
+    });
   },
 
-  rejectMember: (id) => {
-    set((state) => ({
-      communityMembers: state.communityMembers.map(m => m.id === id ? { ...m, status: 'rejected' } : m)
-    }));
+  submitCommunity: (community) => {
+    const newItem = {
+      ...community,
+      id: `com-${Date.now()}`,
+      status: 'pending'
+    };
+    set((state) => {
+      const updated = [newItem, ...state.communityList];
+      if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
+      return { communityList: updated };
+    });
+  },
+
+  approveCommunity: (id) => {
+    set((state) => {
+      const updated = state.communityList.map(c => c.id === id ? { ...c, status: 'approved' } : c);
+      if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
+      return { communityList: updated };
+    });
+  },
+
+  rejectCommunity: (id) => {
+    set((state) => {
+      const updated = state.communityList.map(c => c.id === id ? { ...c, status: 'rejected' } : c);
+      if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
+      return { communityList: updated };
+    });
+  },
+
+  deleteCommunity: (id) => {
+    set((state) => {
+      const updated = state.communityList.filter(c => c.id !== id);
+      if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
+      return { communityList: updated };
+    });
+  },
+
+  // ─── Testimonials ───
+  testimonialList: typeof window !== 'undefined' && localStorage.getItem('setara_testimonials')
+    ? JSON.parse(localStorage.getItem('setara_testimonials'))
+    : INITIAL_TESTIMONIALS,
+
+  addTestimonial: (testimonial) => {
+    const newItem = {
+      ...testimonial,
+      id: `testi-${Date.now()}`,
+      avatar: testimonial.avatar || 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80'
+    };
+    set((state) => {
+      const updated = [newItem, ...state.testimonialList];
+      if (typeof window !== 'undefined') localStorage.setItem('setara_testimonials', JSON.stringify(updated));
+      return { testimonialList: updated };
+    });
+  },
+
+  deleteTestimonial: (id) => {
+    set((state) => {
+      const updated = state.testimonialList.filter(t => t.id !== id);
+      if (typeof window !== 'undefined') localStorage.setItem('setara_testimonials', JSON.stringify(updated));
+      return { testimonialList: updated };
+    });
   }
 }));
