@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { Users, ShieldCheck, ArrowUpRight } from 'lucide-react';
-import { getPlatformMeta } from '../../utils/communityHelpers';
+import { getPlatformMeta } from '../../helpers/communityHelpers';
 
 /**
  * Komponen Kartu Komunitas.

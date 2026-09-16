@@ -17,7 +17,7 @@ import {
   Mail, 
   ArrowUpRight 
 } from 'lucide-react';
-import { getPlatformMeta } from '../../utils/communityHelpers';
+import { getPlatformMeta } from '../../helpers/communityHelpers';
 
 /**
  * Komponen Modal Dialog Detail Komunitas.

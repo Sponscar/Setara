@@ -24,7 +24,7 @@ import {
   Search, 
   ExternalLink 
 } from 'lucide-react';
-import { getPlatformBadge } from '../../utils/adminHelpers';
+import { getPlatformBadge } from '../../helpers/adminHelpers';
 
 /**
  * Komponen Tab Manajemen Komunitas.
