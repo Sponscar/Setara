@@ -1,0 +1,16 @@
+﻿{
+  "name": "setara",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SETARA - Platform Penerjemah Bahasa Isyarat SIBI & BISINDO",
+  "scripts": {
+    "dev": "concurrently -k -n \"FRONTEND,BACKEND\" -c \"cyan,green\" \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "cd backend && venv\\Scripts\\python manage.py runserver 8000",
+    "migrate": "cd backend && venv\\Scripts\\python manage.py migrate",
+    "makemigrations": "cd backend && venv\\Scripts\\python manage.py makemigrations"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
