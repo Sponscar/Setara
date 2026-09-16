@@ -1,3 +1,16 @@
+/**
+ * ==============================================================================
+ * File: Footer.jsx
+ * Direktori: src/components/common/
+ * Deskripsi: Komponen Footer Navigasi Global Platform SETARA.
+ *            Menyediakan informasi ringkasan platform, kepatuhan aksesibilitas WCAG 2.1 AA,
+ *            tautan navigasi cepat antar-section, informasi sistem bahasa, dan tombol kembali ke atas (back to top).
+ * Pattern:
+ *   - Presentational Component: Menerima callback navigasi `onNavigate`.
+ *   - Smooth Scroll to Top: Menggunakan API window.scrollTo dengan behavior 'smooth'.
+ * ==============================================================================
+ */
+
 import React from 'react';
 import { 
   Heart, 
@@ -5,12 +18,19 @@ import {
   Sparkles, 
   Github, 
   Instagram, 
-  Twitter,
-  Mail,
-  ArrowUp
+  Twitter, 
+  Mail, 
+  ArrowUp 
 } from 'lucide-react';
 
+/**
+ * Komponen Footer Global Platform SETARA.
+ * 
+ * @param {Object} props
+ * @param {Function} props.onNavigate - Callback navigasi antar section/view
+ */
 export default function Footer({ onNavigate }) {
+  /** Menggulirkan jendela browser kembali ke puncak halaman dengan animasi halus */
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -19,7 +39,9 @@ export default function Footer({ onNavigate }) {
     <footer className="border-t border-slate-200 dark:border-dark-border bg-slate-100/60 dark:bg-dark-bg/90 pt-16 pb-12 text-slate-600 dark:text-slate-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand Col */}
+          {/* ===================================================================
+           * 1. BRAND COLUMN — Logo, Tagline, & Kepatuhan Aksesibilitas
+           * =================================================================== */}
           <div className="md:col-span-2 space-y-4">
             <div 
               onClick={() => onNavigate('home')}
@@ -43,7 +65,9 @@ export default function Footer({ onNavigate }) {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* ===================================================================
+           * 2. QUICK LINKS — Navigasi Cepat Antar-Section
+           * =================================================================== */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
               Navigasi Cepat
@@ -77,7 +101,9 @@ export default function Footer({ onNavigate }) {
             </ul>
           </div>
 
-          {/* Systems & Admin */}
+          {/* ===================================================================
+           * 3. SYSTEMS & ARCHITECTURE — Sistem Bahasa & Model AI
+           * =================================================================== */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
               Sistem & Kelola
@@ -96,7 +122,9 @@ export default function Footer({ onNavigate }) {
           </div>
         </div>
 
-        {/* Bottom Bar */}
+        {/* ===================================================================
+         * 4. BOTTOM BAR — Hak Cipta & Tombol Kembali ke Atas
+         * =================================================================== */}
         <div className="pt-8 border-t border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <p className="text-slate-500">
             © 2026 <strong>SETARA</strong>. Dibuat dengan cinta untuk inklusivitas Indonesia.

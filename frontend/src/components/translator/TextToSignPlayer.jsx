@@ -1,3 +1,25 @@
+/**
+ * @file TextToSignPlayer.jsx
+ * @description Komponen utama pemutar animasi isyarat dari teks (Text-to-Sign).
+ *
+ * ## Arsitektur & Pattern
+ * - **FSM Sequential Playback**: Menggunakan Finite State Machine dengan state
+ *   'IDLE' | 'PLAYING' | 'PAUSED' | 'COMPLETED' untuk mengontrol transisi kata.
+ * - **Timer-Driven Sequencing**: setTimeout berulang yang dijadwalkan berdasarkan
+ *   durasi tiap token kata, diskalakan oleh playbackSpeed.
+ * - **Store-Driven State**: Semua state playback dikelola oleh useTranslatorStore (Zustand),
+ *   komponen ini hanya membaca dan men-dispatch action ke store.
+ *
+ * ## Alur Utama
+ * 1. User mengetik kalimat → klik "Terjemahkan" → store.translateText() tokenisasi kalimat.
+ * 2. Tokens di-render sebagai chip navigasi di sidebar kanan.
+ * 3. Timer FSM memutar kata satu per satu, memanggil nextWord() per interval.
+ * 4. SignCanvasAnimator menerima currentWord & gesturePattern untuk render animasi canvas.
+ * 5. Saat kata terakhir selesai: loop (replay) atau selesai (confetti celebration).
+ *
+ * @module TextToSignPlayer
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslatorStore } from '../../stores/useTranslatorStore';
 import SignCanvasAnimator from './SignCanvasAnimator';
@@ -16,6 +38,11 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+/**
+ * Daftar kalimat contoh yang ditampilkan sebagai quick-chip
+ * agar user dapat langsung mencoba tanpa mengetik manual.
+ * @constant {string[]}
+ */
 const SAMPLE_SENTENCES = [
   "aku sayang ibu",
   "terima kasih",
@@ -24,12 +51,29 @@ const SAMPLE_SENTENCES = [
   "semua manusia memiliki hak setara"
 ];
 
+/**
+ * TextToSignPlayer — Komponen pemutar animasi isyarat kata demi kata.
+ *
+ * Menggabungkan form input teks, canvas animator (SignCanvasAnimator),
+ * kontrol playback (play/pause/prev/next/replay/loop/speed),
+ * dan sidebar urutan kata interaktif.
+ *
+ * @returns {JSX.Element} Komponen pemutar Text-to-Sign lengkap.
+ */
 export default function TextToSignPlayer() {
+  /* ===================================================================
+   * 1. ZUSTAND STORE SELECTORS — Membaca state & action dari translator store
+   * =================================================================== */
   const {
+    /** @type {string} Sistem isyarat aktif ('SIBI' | 'BISINDO') */
     languageSystem,
+    /** @type {string} Teks input yang tersimpan di store */
     textInput,
+    /** @param {string} text — Setter teks input ke store */
     setTextInput,
+    /** @type {Array<Object>} Array token hasil tokenisasi kalimat */
     tokens,
+    /** @type {number} Indeks kata yang sedang aktif/diputar */
     currentWordIndex,
     playbackState,
     playbackSpeed,
@@ -46,17 +90,41 @@ export default function TextToSignPlayer() {
     toggleLooping
   } = useTranslatorStore();
 
+  /* ===================================================================
+   * 2. STATE LOKAL & REF — Dikelola di level komponen, bukan store
+   * =================================================================== */
+  /** @state {string} inputVal — Nilai input lokal yang dikontrol oleh form */
   const [inputVal, setInputVal] = useState(textInput || 'aku sayang ibu');
+  /** @ref {number|null} timerRef — ID timeout untuk FSM sequential timer */
   const timerRef = useRef(null);
 
-  // Auto-translate on mount if tokens empty
+  /* ===================================================================
+   * 3. SIDE EFFECTS — Lifecycle hooks komponen
+   * =================================================================== */
+
+  /**
+   * Effect: Auto-translate saat mount jika belum ada token.
+   * Memastikan user langsung melihat hasil terjemahan contoh kalimat default.
+   */
   useEffect(() => {
     if (tokens.length === 0 && inputVal) {
       translateText(inputVal);
     }
   }, []);
 
-  // FSM Sequential Timer
+  /**
+   * Effect: FSM Sequential Timer — Jantung mekanisme playback.
+   *
+   * Cara kerja:
+   * 1. Hanya aktif saat playbackState === 'PLAYING' dan tokens > 0.
+   * 2. Menghitung durasi per-kata dari token.matchedData.durasi (detik),
+   *    lalu diskalakan oleh playbackSpeed (misal 1.5x → lebih cepat).
+   * 3. Setelah durasi habis: panggil nextWord() untuk maju ke kata berikutnya.
+   * 4. Jika sudah di kata terakhir:
+   *    - isLooping=true → replay() dari awal.
+   *    - isLooping=false → pause() + trigger confetti celebration.
+   * 5. Cleanup: clearTimeout saat unmount atau dependency berubah.
+   */
   useEffect(() => {
     if (playbackState !== 'PLAYING' || tokens.length === 0) {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -95,6 +163,15 @@ export default function TextToSignPlayer() {
     };
   }, [playbackState, currentWordIndex, tokens, playbackSpeed, isLooping]);
 
+  /* ===================================================================
+   * 4. EVENT HANDLERS — Aksi user pada form & chip
+   * =================================================================== */
+
+  /**
+   * Handler submit form input teks.
+   * Menyimpan teks ke store dan menjalankan tokenisasi.
+   * @param {Event} e — Form submit event
+   */
   const handleSubmit = (e) => {
     e?.preventDefault();
     if (!inputVal.trim()) return;
@@ -102,20 +179,35 @@ export default function TextToSignPlayer() {
     translateText(inputVal);
   };
 
+  /**
+   * Handler klik chip kalimat contoh.
+   * Langsung mengisi input, menyimpan ke store, dan men-trigger terjemahan.
+   * @param {string} sentence — Kalimat contoh yang dipilih user
+   */
   const handleSampleClick = (sentence) => {
     setInputVal(sentence);
     setTextInput(sentence);
     translateText(sentence);
   };
 
+  /* ===================================================================
+   * 5. DERIVED VALUES — Nilai turunan dari state untuk render
+   * =================================================================== */
+  /** @type {Object|null} Token kata yang sedang aktif diputar */
   const currentToken = tokens[currentWordIndex] || null;
+  /** @type {string} Kata aktif untuk dikirim ke canvas animator */
   const currentWord = currentToken?.word || 'siap';
+  /** @type {string} Pattern gestur isyarat untuk animasi canvas */
   const currentPattern = currentToken?.matchedData?.gesture_pattern || 'hand_wave_forehead';
+  /** @type {string} Deskripsi gerakan isyarat untuk info panel */
   const currentDescription = currentToken?.matchedData?.deskripsi_gerakan || '';
 
+  /* ===================================================================
+   * 6. JSX RENDER — Tampilan utama komponen
+   * =================================================================== */
   return (
     <div className="space-y-6">
-      {/* Input Section */}
+      {/* --- 6A. INPUT SECTION: Form ketik kalimat + chip contoh --- */}
       <div className="glass-card rounded-2xl p-5 border border-slate-200 dark:border-dark-border">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="flex flex-col sm:flex-row items-stretch gap-3">

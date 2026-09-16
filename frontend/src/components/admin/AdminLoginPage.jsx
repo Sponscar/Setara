@@ -1,3 +1,16 @@
+/**
+ * ==============================================================================
+ * File: AdminLoginPage.jsx
+ * Direktori: src/components/admin/
+ * Deskripsi: Halaman autentikasi login khusus Administrator SETARA.
+ * Pattern: Controlled Component Pattern & Authentication Guard Flow.
+ * Fitur:
+ *   - Form login dengan input email dan password (toggle lihat/sembunyikan password).
+ *   - Simulasi verifikasi delay jaringan dan validasi kredensial via useAuthStore.
+ *   - Tampilan glassmorphism modern dengan tombol kembali ke beranda dan toggle tema.
+ * ==============================================================================
+ */
+
 import React, { useState } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useThemeStore } from '../../stores/useThemeStore';
@@ -15,19 +28,33 @@ import {
   Moon
 } from 'lucide-react';
 
+/**
+ * Komponen Halaman Login Administrator.
+ * 
+ * @param {Object} props
+ * @param {Function} props.onBackToHome - Callback navigasi kembali ke halaman utama / landing page
+ * @param {Function} props.onLoginSuccess - Callback setelah login berhasil divalidasi
+ */
 export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
+  // Global auth & theme store
   const { login } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
+
+  // Local state form login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Handler submit autentikasi login
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
 
+    // Validasi input kosong
     if (!email.trim() || !password.trim()) {
       setError('Silakan isi email dan kata sandi.');
       return;
@@ -35,7 +62,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
 
     setLoading(true);
 
-    // Simulate network delay
+    // Simulasi delay verifikasi jaringan (800ms)
     setTimeout(() => {
       const result = login(email, password);
       setLoading(false);
@@ -50,27 +77,31 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex flex-col items-center justify-center px-4 relative overflow-hidden bg-grid-pattern transition-colors duration-300">
-      {/* Decorative Background Blurs */}
+      {/* Elemen Dekoratif Efek Blur Latar Belakang */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      {/* Back to Home */}
+      {/* Tombol Navigasi Kembali ke Beranda */}
       <div className="absolute top-6 left-6 z-10">
         <button
+          type="button"
           onClick={onBackToHome}
           className="flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:bg-brand-500/10 hover:text-brand-600 dark:hover:text-brand-400 hover:border-brand-500/30 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
+          title="Kembali ke Beranda"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Beranda</span>
         </button>
       </div>
 
-      {/* Theme Toggle */}
+      {/* Tombol Pengubah Tema Light/Dark */}
       <div className="absolute top-6 right-6 z-10">
         <button
+          type="button"
           onClick={toggleTheme}
           className="p-2.5 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-slate-200 dark:border-slate-700 hover:bg-brand-500/10 hover:border-brand-500/30 text-slate-700 dark:text-slate-200 transition-all duration-300 cursor-pointer hover:scale-105 active:scale-95"
           title={theme === 'dark' ? 'Ganti ke Mode Terang' : 'Ganti ke Mode Gelap'}
+          aria-label="Toggle Theme"
         >
           {theme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400" />
@@ -80,9 +111,9 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
         </button>
       </div>
 
-      {/* Login Card */}
+      {/* Kartu Formulir Login Utama */}
       <div className="w-full max-w-md animate-page-enter">
-        {/* Logo & Title */}
+        {/* Header Logo & Judul */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-brand-600 to-amber-600 text-white shadow-xl shadow-brand-600/25 mb-4">
             <ShieldCheck className="w-8 h-8" />
@@ -95,10 +126,10 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
           </p>
         </div>
 
-        {/* Form Card */}
+        {/* Kontainer Form Card */}
         <div className="p-8 rounded-3xl glass-card border border-slate-200 dark:border-dark-border shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Error Alert */}
+            {/* Pesan Error Login */}
             {error && (
               <div className="flex items-center gap-2.5 p-3.5 rounded-2xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 text-red-700 dark:text-red-400 text-xs font-medium animate-page-enter">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -106,7 +137,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
               </div>
             )}
 
-            {/* Email Field */}
+            {/* Field Input Email */}
             <div className="space-y-1.5">
               <label htmlFor="admin-email" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Email Administrator
@@ -125,7 +156,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Field Input Kata Sandi */}
             <div className="space-y-1.5">
               <label htmlFor="admin-password" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Kata Sandi
@@ -146,13 +177,14 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
                   tabIndex={-1}
+                  aria-label="Lihat Kata Sandi"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Tombol Submit Login */}
             <button
               type="submit"
               disabled={loading}
@@ -172,7 +204,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
             </button>
           </form>
 
-          {/* Hint */}
+          {/* Catatan Hint Akun Demo */}
           <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700/60">
             <div className="flex items-start gap-2 text-xs text-slate-400 dark:text-slate-500">
               <Sparkles className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500/60" />
@@ -183,7 +215,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
           </div>
         </div>
 
-        {/* Footer Note */}
+        {/* Footer Hak Cipta */}
         <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
           © 2026 SETARA · Hanya administrator yang memiliki akses ke halaman ini
         </p>

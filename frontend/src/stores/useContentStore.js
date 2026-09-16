@@ -1,18 +1,40 @@
+/**
+ * ==============================================================================
+ * File: useContentStore.js
+ * Direktori: src/stores/
+ * Deskripsi: Global Content Management State (CMS) untuk platform SETARA.
+ * Pattern:
+ *   - Repository Pattern: Abstraksi layer data untuk operasi CRUD (Create, Read,
+ *     Update, Delete) pada Berita, Milestone Linimasa, Kamus Isyarat, Komunitas, dan Testimoni.
+ *   - Data Persistence: Sinkronisasi otomatis dua arah ke localStorage browser
+ *     sebagai simulasi basis data persisten sebelum integrasi backend Django.
+ * ==============================================================================
+ */
+
 import { create } from 'zustand';
 import { 
   INITIAL_NEWS, 
   INITIAL_TIMELINE, 
-  INITIAL_COMMUNITIES,
-  INITIAL_TESTIMONIALS,
-  SIGN_DICTIONARY 
+  INITIAL_COMMUNITIES, 
+  INITIAL_TESTIMONIALS 
 } from '../services/mockData';
 
 export const useContentStore = create((set, get) => ({
-  // News Data & CRUD
+  // ============================================================================
+  // 1. DATA & OPERASI CRUD BERITA (NEWS REPOSITORY)
+  // ============================================================================
+  /**
+   * Daftar berita aktif. Mengambil data dari localStorage jika ada,
+   * atau fallback ke INITIAL_NEWS dari mockData.
+   */
   newsList: typeof window !== 'undefined' && localStorage.getItem('setara_news')
     ? JSON.parse(localStorage.getItem('setara_news'))
     : INITIAL_NEWS,
 
+  /**
+   * Menambahkan artikel berita baru ke daftar.
+   * @param {Object} newsItem - Data berita (judul, kategori, ringkasan, author, konten)
+   */
   addNews: (newsItem) => {
     const newItem = {
       ...newsItem,
@@ -34,27 +56,45 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Memperbarui field tertentu dari artikel berita berdasarkan id.
+   * @param {string} id - ID berita yang diupdate
+   * @param {Object} updatedFields - Field baru yang diperbarui
+   */
   updateNews: (id, updatedFields) => {
     set((state) => {
-      const updated = state.newsList.map(n => n.id === id ? { ...n, ...updatedFields } : n);
+      const updated = state.newsList.map((n) => (n.id === id ? { ...n, ...updatedFields } : n));
       if (typeof window !== 'undefined') localStorage.setItem('setara_news', JSON.stringify(updated));
       return { newsList: updated };
     });
   },
 
+  /**
+   * Menghapus artikel berita berdasarkan id.
+   * @param {string} id
+   */
   deleteNews: (id) => {
     set((state) => {
-      const updated = state.newsList.filter(n => n.id !== id);
+      const updated = state.newsList.filter((n) => n.id !== id);
       if (typeof window !== 'undefined') localStorage.setItem('setara_news', JSON.stringify(updated));
       return { newsList: updated };
     });
   },
 
-  // Timeline Milestones
+  // ============================================================================
+  // 2. DATA & OPERASI CRUD LINIMASA MILESTONE (TIMELINE REPOSITORY)
+  // ============================================================================
+  /**
+   * Daftar milestone linimasa sejarah dan pencapaian platform.
+   */
   timelineList: typeof window !== 'undefined' && localStorage.getItem('setara_timeline')
     ? JSON.parse(localStorage.getItem('setara_timeline'))
     : INITIAL_TIMELINE,
 
+  /**
+   * Menambahkan milestone baru ke linimasa.
+   * @param {Object} milestone - Data milestone (judul, tanggal/bulan, kategori, deskripsi)
+   */
   addTimelineMilestone: (milestone) => {
     const newItem = {
       ...milestone,
@@ -67,19 +107,32 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Menghapus milestone dari linimasa berdasarkan id.
+   * @param {string} id
+   */
   deleteTimelineMilestone: (id) => {
     set((state) => {
-      const updated = state.timelineList.filter(t => t.id !== id);
+      const updated = state.timelineList.filter((t) => t.id !== id);
       if (typeof window !== 'undefined') localStorage.setItem('setara_timeline', JSON.stringify(updated));
       return { timelineList: updated };
     });
   },
 
-  // Videos in Dictionary
+  // ============================================================================
+  // 3. DATA & OPERASI CRUD KOSAKATA ISYARAT KUSTOM (CUSTOM VIDEOS REPOSITORY)
+  // ============================================================================
+  /**
+   * Daftar kata isyarat tambahan kustom buatan administrator.
+   */
   customVideos: typeof window !== 'undefined' && localStorage.getItem('setara_custom_videos')
     ? JSON.parse(localStorage.getItem('setara_custom_videos'))
     : [],
 
+  /**
+   * Menambahkan kosakata isyarat kustom baru ke kamus.
+   * @param {Object} videoItem - Data kata (kata, tipe_bahasa, kategori, gesture_pattern, deskripsi_gerakan)
+   */
   addCustomVideo: (videoItem) => {
     const newItem = {
       ...videoItem,
@@ -94,19 +147,32 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Menghapus kosakata isyarat kustom berdasarkan id.
+   * @param {string} id
+   */
   deleteCustomVideo: (id) => {
     set((state) => {
-      const updated = state.customVideos.filter(v => v.id !== id);
+      const updated = state.customVideos.filter((v) => v.id !== id);
       if (typeof window !== 'undefined') localStorage.setItem('setara_custom_videos', JSON.stringify(updated));
       return { customVideos: updated };
     });
   },
 
-  // ─── Community Directory (SETARA as Bridge) ───
+  // ============================================================================
+  // 4. DIREKTORI JEMBATAN KOMUNITAS (COMMUNITY REPOSITORY)
+  // ============================================================================
+  /**
+   * Daftar seluruh komunitas (status: 'approved' | 'pending' | 'rejected').
+   */
   communityList: typeof window !== 'undefined' && localStorage.getItem('setara_communities')
     ? JSON.parse(localStorage.getItem('setara_communities'))
     : INITIAL_COMMUNITIES,
 
+  /**
+   * Menambahkan komunitas baru langsung oleh administrator (status langsung 'approved').
+   * @param {Object} community
+   */
   addCommunity: (community) => {
     const newItem = {
       ...community,
@@ -120,6 +186,10 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Mengajukan komunitas dari formulir publik luar (status awal 'pending').
+   * @param {Object} community
+   */
   submitCommunity: (community) => {
     const newItem = {
       ...community,
@@ -133,25 +203,38 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Menyetujui pengajuan komunitas pending menjadi approved.
+   * @param {string} id
+   */
   approveCommunity: (id) => {
     set((state) => {
-      const updated = state.communityList.map(c => c.id === id ? { ...c, status: 'approved' } : c);
+      const updated = state.communityList.map((c) => (c.id === id ? { ...c, status: 'approved' } : c));
       if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
       return { communityList: updated };
     });
   },
 
+  /**
+   * Menolak pengajuan komunitas pending.
+   * @param {string} id
+   */
   rejectCommunity: (id) => {
     set((state) => {
-      const updated = state.communityList.map(c => c.id === id ? { ...c, status: 'rejected' } : c);
+      const updated = state.communityList.map((c) => (c.id === id ? { ...c, status: 'rejected' } : c));
       if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
       return { communityList: updated };
     });
   },
 
+  /**
+   * Memperbarui data komunitas terverifikasi (nama, link, platform, logo, PIC, deskripsi).
+   * @param {string} id
+   * @param {Object} updatedData
+   */
   updateCommunity: (id, updatedData) => {
     set((state) => {
-      const updated = state.communityList.map(c => 
+      const updated = state.communityList.map((c) => 
         c.id === id ? { ...c, ...updatedData } : c
       );
       if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
@@ -159,19 +242,32 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Menghapus komunitas dari database berdasarkan id.
+   * @param {string} id
+   */
   deleteCommunity: (id) => {
     set((state) => {
-      const updated = state.communityList.filter(c => c.id !== id);
+      const updated = state.communityList.filter((c) => c.id !== id);
       if (typeof window !== 'undefined') localStorage.setItem('setara_communities', JSON.stringify(updated));
       return { communityList: updated };
     });
   },
 
-  // ─── Testimonials ───
+  // ============================================================================
+  // 5. DATA TESTIMONI PENGGUNA (TESTIMONIALS REPOSITORY)
+  // ============================================================================
+  /**
+   * Daftar testimoni cerita pengalaman pengguna SETARA.
+   */
   testimonialList: typeof window !== 'undefined' && localStorage.getItem('setara_testimonials')
     ? JSON.parse(localStorage.getItem('setara_testimonials'))
     : INITIAL_TESTIMONIALS,
 
+  /**
+   * Menambahkan testimoni baru ke daftar.
+   * @param {Object} testimonial - Data testimoni (nama, peran, avatar, komentar)
+   */
   addTestimonial: (testimonial) => {
     const newItem = {
       ...testimonial,
@@ -185,9 +281,13 @@ export const useContentStore = create((set, get) => ({
     });
   },
 
+  /**
+   * Menghapus testimoni berdasarkan id.
+   * @param {string} id
+   */
   deleteTestimonial: (id) => {
     set((state) => {
-      const updated = state.testimonialList.filter(t => t.id !== id);
+      const updated = state.testimonialList.filter((t) => t.id !== id);
       if (typeof window !== 'undefined') localStorage.setItem('setara_testimonials', JSON.stringify(updated));
       return { testimonialList: updated };
     });

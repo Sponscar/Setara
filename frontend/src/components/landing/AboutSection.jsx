@@ -1,3 +1,16 @@
+/**
+ * ==============================================================================
+ * File: AboutSection.jsx
+ * Direktori: src/components/landing/
+ * Deskripsi: Section Profil, Visi, Misi, Nilai-Nilai Utama, dan Kanal Kontak Platform SETARA.
+ *            Menjelaskan latar belakang inisiatif teknologi sosial inklusif untuk
+ *            menjembatani kesenjangan komunikasi antara teman Tuli dan masyarakat umum.
+ * Pattern:
+ *   - Presentational Component Pattern: Menampilkan data statis nilai-nilai dan informasi kemitraan.
+ *   - Bento Grid & Card System: Menampilkan Visi dan Misi dalam kartu berdampingan bergradasi.
+ * ==============================================================================
+ */
+
 import React from 'react';
 import { 
   Heart, 
@@ -6,12 +19,16 @@ import {
   ShieldCheck, 
   Mail, 
   Globe, 
-  Sparkles,
-  Award,
-  Layers
+  Sparkles, 
+  Award, 
+  Layers 
 } from 'lucide-react';
 
+/**
+ * Komponen Section Profil & Visi-Misi Platform SETARA.
+ */
 export default function AboutSection() {
+  /** Nilai-nilai dasar filosofi pengembangan platform SETARA */
   const values = [
     {
       title: "Inklusivitas Penuh",
@@ -38,7 +55,9 @@ export default function AboutSection() {
   return (
     <section id="tentang" className="py-16 md:py-20 relative scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        {/* Section Header */}
+        {/* ===================================================================
+         * 1. SECTION HEADER — Profil & Komitmen
+         * =================================================================== */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
             <Target className="w-3.5 h-3.5" />
@@ -52,7 +71,9 @@ export default function AboutSection() {
           </p>
         </div>
 
-        {/* Vision & Mission Bento Cards */}
+        {/* ===================================================================
+         * 2. VISION & MISSION CARDS — Dua Pilar Utama Ekosistem SETARA
+         * =================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Vision Card */}
           <div className="p-8 rounded-3xl glass-card border border-brand-500/30 space-y-4 shadow-xl relative overflow-hidden">
@@ -83,7 +104,9 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* Core Values */}
+        {/* ===================================================================
+         * 3. CORE VALUES — 4 Nilai Pokok Platform
+         * =================================================================== */}
         <div className="space-y-6">
           <div className="text-center max-w-xl mx-auto">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -114,7 +137,9 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* Contact Strip */}
+        {/* ===================================================================
+         * 4. CONTACT STRIP — Ajakan Kolaborasi & Kemitraan
+         * =================================================================== */}
         <div className="p-8 rounded-3xl bg-gradient-to-r from-brand-950/80 via-slate-900/80 to-amber-950/80 border border-slate-800 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-1 text-center md:text-left">
             <h4 className="text-xl font-bold">Tertarik Berkolaborasi atau Mengajukan Masukan?</h4>

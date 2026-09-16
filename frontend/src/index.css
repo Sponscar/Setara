@@ -1,4 +1,14 @@
-﻿@tailwind base;
+/**
+ * ==============================================================================
+ * File: index.css
+ * Direktori: src/
+ * Deskripsi: Stylesheet Global Platform SETARA.
+ * Menetapkan CSS custom properties (CSS variables) untuk light/dark mode,
+ * styling scrollbar kustom, efek glassmorphism, dan utility animations.
+ * ==============================================================================
+ */
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 

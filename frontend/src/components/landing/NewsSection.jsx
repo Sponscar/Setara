@@ -1,4 +1,19 @@
-﻿import React, { useState, useEffect } from 'react';
+/**
+ * ==============================================================================
+ * File: NewsSection.jsx
+ * Direktori: src/components/landing/
+ * Deskripsi: Section Wawasan & Berita Terkini pada Landing Page SETARA.
+ *            Menampilkan artikel edukatif seputar bahasa isyarat, disabilitas, teknologi AI,
+ *            dan agenda komunitas dengan filter kategori dinamis serta modal baca artikel lengkap.
+ * Pattern:
+ *   - Repository Pattern Integration: Mengambil `newsList` dari `useContentStore`.
+ *   - Controlled Filter Pattern: Filter kategori lokal ('Semua', 'Edukasi', 'Teknologi', dll).
+ *   - Portal Pattern (React DOM createPortal): Menampilkan modal detail berita langsung
+ *     di root `document.body` dengan scroll lock dan penanganan tombol Escape.
+ * ==============================================================================
+ */
+
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
@@ -7,19 +22,36 @@ import {
   Eye, 
   ArrowRight, 
   Sparkles, 
-  Filter,
-  X,
-  Share2
+  Filter, 
+  X, 
+  Share2 
 } from 'lucide-react';
 
+/**
+ * Komponen Section Berita & Wawasan Terkini.
+ */
 export default function NewsSection() {
+  /* ===================================================================
+   * 1. ZUSTAND STORE SELECTORS & LOCAL STATE
+   * =================================================================== */
+
+  /** Daftar artikel berita dari CMS global store */
   const { newsList } = useContentStore();
+
+  /** Kategori aktif yang dipilih pengguna untuk memfilter berita */
   const [selectedCategory, setSelectedCategory] = useState('Semua');
+
+  /** Objek berita yang sedang dibuka dalam modal pop-up (null jika tertutup) */
   const [activeNewsModal, setActiveNewsModal] = useState(null);
 
+  /** Daftar kategori artikel yang tersedia */
   const categories = ['Semua', 'Edukasi', 'Teknologi', 'Komunitas', 'Event'];
 
-  // Lock body scroll when news modal is open
+  /* ===================================================================
+   * 2. SIDE EFFECTS — Body Scroll Lock & Keyboard Handler (ESC)
+   * =================================================================== */
+
+  /** Mengunci scrollbar halaman ketika modal detail berita terbuka */
   useEffect(() => {
     if (activeNewsModal) {
       document.body.style.overflow = 'hidden';
@@ -31,7 +63,7 @@ export default function NewsSection() {
     };
   }, [activeNewsModal]);
 
-  // Close modal on ESC key
+  /** Menutup modal detail berita saat tombol ESC ditekan */
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && activeNewsModal) {
@@ -42,6 +74,10 @@ export default function NewsSection() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeNewsModal]);
 
+  /* ===================================================================
+   * 3. DATA COMPUTATION — Filter Berita Berdasarkan Kategori
+   * =================================================================== */
+
   const filteredNews = selectedCategory === 'Semua'
     ? newsList
     : newsList.filter(n => n.kategori.toLowerCase() === selectedCategory.toLowerCase());
@@ -49,7 +85,9 @@ export default function NewsSection() {
   return (
     <section id="berita" className="py-16 md:py-20 relative scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {/* ===================================================================
+         * 4. SECTION HEADER & CATEGORY FILTER PILLS
+         * =================================================================== */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
@@ -64,7 +102,7 @@ export default function NewsSection() {
             </p>
           </div>
 
-          {/* Category Filter Pills */}
+          {/* Filter Pills Kategori */}
           <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-slate-200/80 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800">
             {categories.map((cat) => (
               <button
@@ -82,7 +120,9 @@ export default function NewsSection() {
           </div>
         </div>
 
-        {/* News Grid */}
+        {/* ===================================================================
+         * 5. NEWS CARDS GRID — Daftar Artikel Terbit
+         * =================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredNews.map((news) => (
             <div
@@ -130,7 +170,9 @@ export default function NewsSection() {
           ))}
         </div>
 
-        {/* News Detail Modal Portal (Mounted directly to document.body) */}
+        {/* ===================================================================
+         * 6. NEWS DETAIL MODAL (PORTAL TO DOCUMENT.BODY)
+         * =================================================================== */}
         {activeNewsModal && typeof document !== 'undefined' && createPortal(
           <div 
             onClick={(e) => {

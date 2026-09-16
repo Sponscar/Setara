@@ -1,3 +1,16 @@
+/**
+ * ==============================================================================
+ * File: TranslatorHub.jsx
+ * Direktori: src/components/translator/
+ * Deskripsi: Hub Utama Pengendali Modul Penerjemah Bahasa Isyarat SETARA.
+ * Pattern:
+ *   - Strategy Pattern: Pemilihan sistem bahasa isyarat aktif ('SIBI' vs 'BISINDO').
+ *   - Container Component Pattern: Menghubungkan Zustand store useTranslatorStore
+ *     dengan tampilan pemutar TextToSignPlayer, detektor kamera SignToTextCamera,
+ *     dan panel riwayat terjemahan.
+ * ==============================================================================
+ */
+
 import React from 'react';
 import { useTranslatorStore } from '../../stores/useTranslatorStore';
 import TextToSignPlayer from './TextToSignPlayer';
@@ -8,13 +21,17 @@ import {
   History, 
   Check, 
   Sparkles, 
-  Info, 
-  BookOpen,
-  ArrowRightLeft,
-  Trash2
+  Trash2 
 } from 'lucide-react';
 
+/**
+ * Komponen Hub Utama Penerjemah.
+ * 
+ * @param {Object} props
+ * @param {boolean} [props.isStandalone=false] - Penanda apakah dirender di halaman mandiri atau di landing
+ */
 export default function TranslatorHub({ isStandalone = false }) {
+  // State global dari useTranslatorStore
   const {
     languageSystem,
     setLanguageSystem,
@@ -27,7 +44,10 @@ export default function TranslatorHub({ isStandalone = false }) {
   return (
     <section id="translator" className={`${isStandalone ? 'py-4' : 'py-12 md:py-16'} relative scroll-mt-28`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        
+        {/* ===================================================================== */}
+        {/* 1. HEADER UTAMA SECTION PENERJEMAH                                   */}
+        {/* ===================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
             <Sparkles className="w-3.5 h-3.5" />
@@ -41,9 +61,11 @@ export default function TranslatorHub({ isStandalone = false }) {
           </p>
         </div>
 
-        {/* 1. Language System Choice: 2 Big Interactive Cards (PRD FR-TR-01) */}
+        {/* ===================================================================== */}
+        {/* 2. DUAL ENGINE SELECTOR: KARTU SIBI vs BISINDO                        */}
+        {/* ===================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 max-w-4xl mx-auto">
-          {/* SIBI Card */}
+          {/* Kartu Pemilihan SIBI */}
           <div
             onClick={() => setLanguageSystem('SIBI')}
             className={`relative p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 border ${
@@ -51,6 +73,10 @@ export default function TranslatorHub({ isStandalone = false }) {
                 ? 'bg-gradient-to-br from-brand-600/15 via-brand-500/5 to-transparent border-brand-500 shadow-xl shadow-brand-500/15 ring-2 ring-brand-500/30'
                 : 'glass hover:border-slate-300 dark:hover:border-slate-700 opacity-80 hover:opacity-100'
             }`}
+            role="button"
+            tabIndex={0}
+            aria-pressed={languageSystem === 'SIBI'}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLanguageSystem('SIBI'); }}
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
@@ -78,7 +104,7 @@ export default function TranslatorHub({ isStandalone = false }) {
             </p>
           </div>
 
-          {/* BISINDO Card */}
+          {/* Kartu Pemilihan BISINDO */}
           <div
             onClick={() => setLanguageSystem('BISINDO')}
             className={`relative p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 border ${
@@ -86,6 +112,10 @@ export default function TranslatorHub({ isStandalone = false }) {
                 ? 'bg-gradient-to-br from-amber-600/15 via-amber-500/5 to-transparent border-amber-500 shadow-xl shadow-amber-500/15 ring-2 ring-amber-500/30'
                 : 'glass hover:border-slate-300 dark:hover:border-slate-700 opacity-80 hover:opacity-100'
             }`}
+            role="button"
+            tabIndex={0}
+            aria-pressed={languageSystem === 'BISINDO'}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setLanguageSystem('BISINDO'); }}
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
@@ -114,10 +144,14 @@ export default function TranslatorHub({ isStandalone = false }) {
           </div>
         </div>
 
-        {/* 2. Translation Mode Switcher Tabs */}
+        {/* ===================================================================== */}
+        {/* 3. TAB MODE PENERJEMAH (TEXT-TO-SIGN / CAMERA / RIWAYAT)              */}
+        {/* ===================================================================== */}
         <div className="flex items-center justify-center mb-8">
           <div className="p-1.5 rounded-2xl bg-slate-200/80 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 flex items-center gap-1 shadow-inner">
+            {/* Tab Teks ke Isyarat */}
             <button
+              type="button"
               onClick={() => setActiveTab('text-to-sign')}
               className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'text-to-sign'
@@ -129,7 +163,9 @@ export default function TranslatorHub({ isStandalone = false }) {
               <span>Teks ke Isyarat</span>
             </button>
 
+            {/* Tab Kamera ke Teks */}
             <button
+              type="button"
               onClick={() => setActiveTab('sign-to-text')}
               className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'sign-to-text'
@@ -141,7 +177,9 @@ export default function TranslatorHub({ isStandalone = false }) {
               <span>Kamera ke Teks (AI)</span>
             </button>
 
+            {/* Tab Riwayat */}
             <button
+              type="button"
               onClick={() => setActiveTab('history')}
               className={`px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                 activeTab === 'history'
@@ -155,10 +193,17 @@ export default function TranslatorHub({ isStandalone = false }) {
           </div>
         </div>
 
-        {/* 3. Active Mode View */}
+        {/* ===================================================================== */}
+        {/* 4. KONTEN DARI TAB YANG AKTIF                                        */}
+        {/* ===================================================================== */}
         <div>
+          {/* Mode 1: Pemutar Teks ke Animasi Isyarat */}
           {activeTab === 'text-to-sign' && <TextToSignPlayer />}
+
+          {/* Mode 2: Detektor Isyarat ke Teks Kamera YOLO 11 */}
           {activeTab === 'sign-to-text' && <SignToTextCamera />}
+
+          {/* Mode 3: Riwayat Translasi Sesi Pengguna */}
           {activeTab === 'history' && (
             <div className="glass-card rounded-2xl p-6 border border-slate-200 dark:border-dark-border max-w-3xl mx-auto space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -168,8 +213,9 @@ export default function TranslatorHub({ isStandalone = false }) {
                 </h4>
                 {history.length > 0 && (
                   <button
+                    type="button"
                     onClick={clearHistory}
-                    className="text-xs text-rose-500 hover:text-rose-600 flex items-center gap-1 font-semibold cursor-pointer"
+                    className="text-xs text-rose-500 hover:text-rose-600 flex items-center gap-1 font-semibold cursor-pointer transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Hapus Semua</span>
@@ -179,7 +225,7 @@ export default function TranslatorHub({ isStandalone = false }) {
 
               {history.length === 0 ? (
                 <div className="py-12 text-center text-slate-400 text-sm">
-                  Belum ada riwayat terjemahan.
+                  Belum ada riwayat terjemahan pada sesi ini.
                 </div>
               ) : (
                 <div className="space-y-2.5 max-h-[400px] overflow-y-auto pr-1">
@@ -188,16 +234,16 @@ export default function TranslatorHub({ isStandalone = false }) {
                       key={item.id}
                       className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 text-xs"
                     >
-                      <div className="space-y-1">
+                      <div className="space-y-1 min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-500/20 text-brand-400">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-brand-500/20 text-brand-400 shrink-0">
                             {item.languageSystem}
                           </span>
-                          <span className="text-slate-400">
+                          <span className="text-slate-400 text-[11px]">
                             {item.type === 'text_to_sign' ? 'Teks ➔ Isyarat' : 'Kamera ➔ Teks'}
                           </span>
                         </div>
-                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                           "{item.input}" ➔ <span className="text-amber-500 dark:text-amber-400">{item.output}</span>
                         </p>
                       </div>

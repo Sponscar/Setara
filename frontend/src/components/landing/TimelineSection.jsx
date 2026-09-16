@@ -1,3 +1,17 @@
+/**
+ * ==============================================================================
+ * File: TimelineSection.jsx
+ * Direktori: src/components/landing/
+ * Deskripsi: Section Jejak Langkah & Linimasa Sejarah Platform SETARA.
+ *            Menampilkan milestone pencapaian, riset, rilis fitur AI, dan kerja sama
+ *            komunitas dalam format linimasa vertikal alternatif kiri-kanan (zigzag).
+ * Pattern:
+ *   - Repository Integration: Membaca `timelineList` dari `useContentStore`.
+ *   - Alternating Vertical Timeline: Elemen ganjil/genap dibedakan menggunakan `md:flex-row-reverse`.
+ *   - Dynamic Icon Resolver: Fungsi `getIcon` memetakan nama string ikon ke komponen Lucide React.
+ * ==============================================================================
+ */
+
 import React from 'react';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
@@ -7,13 +21,23 @@ import {
   Rocket, 
   BookOpen, 
   Users, 
-  Cpu,
-  CheckCircle2
+  Cpu, 
+  CheckCircle2 
 } from 'lucide-react';
 
+/**
+ * Komponen Section Linimasa Sejarah & Milestone.
+ */
 export default function TimelineSection() {
+  /** Mengambil daftar milestone dari CMS global store */
   const { timelineList } = useContentStore();
 
+  /**
+   * Helper pemetaan nama string ikon ke komponen Lucide icon.
+   * 
+   * @param {string} name - Nama string ikon (Rocket | BookOpen | Users | Cpu)
+   * @returns {React.ComponentType} Komponen ikon Lucide yang cocok
+   */
   const getIcon = (name) => {
     switch (name) {
       case 'Rocket': return Rocket;
@@ -27,7 +51,9 @@ export default function TimelineSection() {
   return (
     <section className="py-16 md:py-20 relative">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {/* ===================================================================
+         * 1. SECTION HEADER — Judul & Deskripsi Milestone
+         * =================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
             <Milestone className="w-3.5 h-3.5" />
@@ -41,7 +67,9 @@ export default function TimelineSection() {
           </p>
         </div>
 
-        {/* Vertical Timeline Track */}
+        {/* ===================================================================
+         * 2. VERTICAL TIMELINE TRACK — Jalur Garis & Kartu Zig-Zag
+         * =================================================================== */}
         <div className="relative">
           {/* Central Line */}
           <div className="absolute left-4 md:left-1/2 top-4 bottom-4 w-0.5 bg-gradient-to-b from-brand-500 via-amber-500 to-brand-500 -translate-x-1/2 opacity-30"></div>

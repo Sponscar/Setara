@@ -1,3 +1,18 @@
+/**
+ * ==============================================================================
+ * File: BentoFeatures.jsx
+ * Direktori: src/components/landing/
+ * Deskripsi: Section Bento Grid Showcase Fitur Unggulan Platform SETARA.
+ *            Menampilkan 4 pilar fungsionalitas utama dalam tata letak kartu bento modern
+ *            dengan efek hover glassmorphism dan ikon representatif.
+ * Pattern:
+ *   - Presentational Component: Menerima callback navigasi `onSelectFeature`
+ *     untuk mengarahkan pengguna ke section atau halaman terkait.
+ *   - Bento Grid Pattern: Tata letak responsif berbasis CSS Grid dengan rasio
+ *     kolom variatif (col-span-2) untuk hierarki visual yang menarik.
+ * ==============================================================================
+ */
+
 import React from 'react';
 import { 
   Type, 
@@ -12,11 +27,19 @@ import {
   Activity
 } from 'lucide-react';
 
+/**
+ * Komponen Bento Grid Fitur Unggulan.
+ * 
+ * @param {Object} props
+ * @param {Function} props.onSelectFeature - Callback navigasi saat kartu fitur diklik ('translator' | 'edukasi' | 'komunitas')
+ */
 export default function BentoFeatures({ onSelectFeature }) {
   return (
     <section className="py-16 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {/* ===================================================================
+         * 1. SECTION HEADER — Judul & Sub-judul Bento Grid
+         * =================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
             <Sparkles className="w-3.5 h-3.5" />
@@ -30,9 +53,11 @@ export default function BentoFeatures({ onSelectFeature }) {
           </p>
         </div>
 
-        {/* Bento Grid Container */}
+        {/* ===================================================================
+         * 2. BENTO GRID CONTAINER — 4 Kartu Fitur Interaktif
+         * =================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {/* Bento Card 1: Text to Sign (Col-Span 2) */}
+          {/* --- KARTU 1: Text to Sign (Col-Span 2) --- */}
           <div 
             onClick={() => onSelectFeature('translator')}
             className="md:col-span-2 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-brand-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
@@ -64,7 +89,7 @@ export default function BentoFeatures({ onSelectFeature }) {
             </div>
           </div>
 
-          {/* Bento Card 2: Sign to Text AI (Col-Span 2) */}
+          {/* --- KARTU 2: Sign to Text AI (Col-Span 2) --- */}
           <div 
             onClick={() => onSelectFeature('translator')}
             className="md:col-span-1 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-amber-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
@@ -96,7 +121,7 @@ export default function BentoFeatures({ onSelectFeature }) {
             </div>
           </div>
 
-          {/* Bento Card 3: Edukasi Komparasi (Col-Span 2) */}
+          {/* --- KARTU 3: Edukasi Komparasi SIBI vs BISINDO --- */}
           <div 
             onClick={() => onSelectFeature('edukasi')}
             className="md:col-span-2 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-purple-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
@@ -124,7 +149,7 @@ export default function BentoFeatures({ onSelectFeature }) {
             </div>
           </div>
 
-          {/* Bento Card 4: Komunitas & Timeline (Col-Span 2) */}
+          {/* --- KARTU 4: Komunitas & Edukasi Inklusif --- */}
           <div 
             onClick={() => onSelectFeature('komunitas')}
             className="md:col-span-1 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-amber-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"

@@ -1,9 +1,32 @@
+/**
+ * ==============================================================================
+ * File: SignCanvasAnimator.jsx
+ * Direktori: src/components/translator/
+ * Deskripsi: Komponen Canvas 2D Procedural Kinematics & Avatar Isyarat Interaktif.
+ *            Merender kerangka anatomis 21-titik keypoint tangan (MediaPipe Hands standard)
+ *            dan animasi gestur tubuh bagian atas sesuai kosakata SIBI & BISINDO.
+ * Pattern:
+ *   - Canvas Game Loop / Animation Loop: Menggunakan `requestAnimationFrame` untuk
+ *     rendering 60 FPS yang halus tanpa overhead DOM React.
+ *   - Procedural Inverse Kinematics Simulation: Perhitungan trigonometri (sinus/kosinus)
+ *     untuk pergerakan sendi bahu, siku, pergelangan, dan buku-buku jari.
+ *   - Pure Presentational Component: Menerima props kata aktif, pola gestur, dan kecepatan
+ *     lalu merender visualisasi visual yang sinkron dengan pemutar isyarat.
+ * ==============================================================================
+ */
+
 import React, { useEffect, useRef } from 'react';
 
 /**
- * Procedural 2D Avatar & Hand Keypoint Canvas Animator.
- * Renders an interactive 21-keypoint anatomical skeleton and animated
- * gesture avatar tailored to Indonesian SIBI & BISINDO words.
+ * Komponen Animator Isyarat Berbasis HTML5 Canvas.
+ *
+ * @param {Object} props
+ * @param {string} [props.currentWord='halo'] - Kata aktif yang sedang diperagakan
+ * @param {string} [props.gesturePattern='hand_wave_forehead'] - Identifier pola gestur kinematika
+ * @param {'SIBI' | 'BISINDO'} [props.languageSystem='BISINDO'] - Sistem bahasa isyarat aktif
+ * @param {boolean} [props.isPlaying=true] - Status pemutaran (true: animasi berjalan, false: jeda)
+ * @param {number} [props.speed=1.0] - Pengali kecepatan animasi (0.5x - 2.0x)
+ * @param {string} [props.description=''] - Penjelasan tekstual arti atau cara peragaan isyarat
  */
 export default function SignCanvasAnimator({
   currentWord = 'halo',
@@ -13,6 +36,7 @@ export default function SignCanvasAnimator({
   speed = 1.0,
   description = ''
 }) {
+  /** Reference ke elemen HTML5 Canvas */
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -94,6 +118,20 @@ export default function SignCanvasAnimator({
   );
 }
 
+/* ==============================================================================
+ * FUNGSI-FUNGSI PENGGAMBARAN PROSEDURAL KINEMATIKA CANVAS
+ * ============================================================================== */
+
+/**
+ * Menggambar seluruh anatomi avatar (kepala, badan, bahu, dan posisi tangan).
+ *
+ * @param {CanvasRenderingContext2D} ctx - Konteks gambar canvas 2D
+ * @param {number} cx - Titik tengah X koordinat canvas
+ * @param {number} cy - Titik tengah Y koordinat canvas
+ * @param {number} t - Parameter waktu animasi berbasis tick
+ * @param {string} pattern - Identifier pola gestur
+ * @param {string} system - Sistem bahasa isyarat ('SIBI' | 'BISINDO')
+ */
 function drawAvatar(ctx, cx, cy, t, pattern, system) {
   // Head Center
   const headY = cy - 70;
@@ -265,6 +303,17 @@ function drawAvatar(ctx, cx, cy, t, pattern, system) {
   drawHandKeypoints(ctx, rightHand.x, rightHand.y, 'right', t);
 }
 
+/**
+ * Menggambar segmen lengan (lengan atas, lengan bawah, dan sendi siku).
+ *
+ * @param {CanvasRenderingContext2D} ctx - Konteks gambar 2D
+ * @param {number} sx - Koordinat X pangkal bahu
+ * @param {number} sy - Koordinat Y pangkal bahu
+ * @param {number} ex - Koordinat X sendi siku
+ * @param {number} ey - Koordinat Y sendi siku
+ * @param {number} hx - Koordinat X pergelangan tangan
+ * @param {number} hy - Koordinat Y pergelangan tangan
+ */
 function drawArm(ctx, sx, sy, ex, ey, hx, hy) {
   ctx.strokeStyle = '#F97316';
   ctx.lineWidth = 4;
@@ -289,6 +338,21 @@ function drawArm(ctx, sx, sy, ex, ey, hx, hy) {
   ctx.fill();
 }
 
+/**
+ * Merender 21 titik keypoint anatomis tangan (MediaPipe Hands Standard):
+ * - Wrist (1 titik pangkal pergelangan)
+ * - Thumb (4 titik: CMC, MCP, IP, TIP)
+ * - Index (4 titik: MCP, PIP, DIP, TIP)
+ * - Middle (4 titik: MCP, PIP, DIP, TIP)
+ * - Ring (4 titik: MCP, PIP, DIP, TIP)
+ * - Pinky (4 titik: MCP, PIP, DIP, TIP)
+ *
+ * @param {CanvasRenderingContext2D} ctx - Konteks gambar 2D
+ * @param {number} hx - Posisi X telapak tangan
+ * @param {number} hy - Posisi Y telapak tangan
+ * @param {'left' | 'right'} side - Sisi tangan
+ * @param {number} t - Parameter waktu animasi
+ */
 function drawHandKeypoints(ctx, hx, hy, side, t) {
   // Hand palm hub
   ctx.fillStyle = '#F97316';

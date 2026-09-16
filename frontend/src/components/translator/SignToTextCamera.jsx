@@ -1,3 +1,27 @@
+/**
+ * @file SignToTextCamera.jsx
+ * @description Komponen deteksi isyarat melalui kamera webcam (Sign-to-Text).
+ *
+ * ## Arsitektur & Pattern
+ * - **WebRTC Camera Integration**: Menggunakan `navigator.mediaDevices.getUserMedia()`
+ *   untuk mengakses webcam browser, dengan graceful fallback jika izin ditolak.
+ * - **Canvas Overlay Rendering**: Canvas transparan di atas video feed untuk
+ *   menggambar bounding box, 21 landmark keypoints, dan animasi visual AI inference.
+ * - **Gesture Simulation Pattern**: Menyediakan tombol simulasi untuk demo deteksi
+ *   gestur tanpa kamera aktif — ideal untuk presentasi dan pengujian.
+ * - **Store-Driven Detection**: Semua hasil deteksi disimpan via useTranslatorStore
+ *   (addDetectedWord, clearDetectedWords) agar terhubung dengan riwayat.
+ *
+ * ## Alur Utama
+ * 1. User mengaktifkan webcam → video stream ditampilkan di viewport.
+ * 2. Canvas overlay menggambar animasi landmark tangan 21 titik (visual AI).
+ * 3. User mengklik tombol simulasi gestur → kata terdeteksi ditambahkan ke buffer.
+ * 4. Buffer kata ditampilkan di panel kanan sebagai kalimat terjemahan.
+ * 5. User dapat menyalin teks ke clipboard atau menyimpan ke riwayat.
+ *
+ * @module SignToTextCamera
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslatorStore } from '../../stores/useTranslatorStore';
 import { 
@@ -15,6 +39,11 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+/**
+ * Data gestur demo untuk simulasi deteksi AI tanpa kamera.
+ * Setiap objek berisi kata, pattern gestur, dan confidence score simulasi.
+ * @constant {Array<{word: string, pattern: string, conf: number}>}
+ */
 const DEMO_GESTURE_TRIGGERS = [
   { word: "halo", pattern: "hand_wave", conf: 0.96 },
   { word: "aku", pattern: "point_chest", conf: 0.94 },
@@ -24,7 +53,18 @@ const DEMO_GESTURE_TRIGGERS = [
   { word: "setara", pattern: "parallel_hands", conf: 0.99 }
 ];
 
+/**
+ * SignToTextCamera — Komponen deteksi isyarat tangan via webcam real-time.
+ *
+ * Menggabungkan video feed, canvas landmark overlay, tombol simulasi gestur,
+ * dan panel hasil terjemahan teks dengan aksi copy/clear.
+ *
+ * @returns {JSX.Element} Komponen Sign-to-Text Camera lengkap.
+ */
 export default function SignToTextCamera() {
+  /* ===================================================================
+   * 1. ZUSTAND STORE SELECTORS — State & action dari translator store
+   * =================================================================== */
   const {
     languageSystem,
     isCameraActive,
@@ -37,17 +77,36 @@ export default function SignToTextCamera() {
     addToHistory
   } = useTranslatorStore();
 
+  /* ===================================================================
+   * 2. STATE LOKAL & REF — Dikelola di level komponen
+   * =================================================================== */
+  /** @state {boolean} hasPermission — Apakah user sudah memberikan izin kamera */
   const [hasPermission, setHasPermission] = useState(false);
+  /** @state {string} errorMsg — Pesan error jika kamera gagal diakses */
   const [errorMsg, setErrorMsg] = useState('');
+  /** @state {boolean} copied — Flag sementara untuk feedback 'tersalin' */
   const [copied, setCopied] = useState(false);
+  /** @state {boolean} isDetecting — Apakah deteksi aktif (overlay animation) */
   const [isDetecting, setIsDetecting] = useState(false);
+  /** @state {string} activeGesture — Label gestur yang sedang terdeteksi */
   const [activeGesture, setActiveGesture] = useState('Standby...');
 
+  /** @ref {HTMLVideoElement} videoRef — Elemen <video> untuk webcam stream */
   const videoRef = useRef(null);
+  /** @ref {MediaStream} streamRef — MediaStream webcam aktif */
   const streamRef = useRef(null);
+  /** @ref {HTMLCanvasElement} overlayCanvasRef — Canvas untuk landmark overlay */
   const overlayCanvasRef = useRef(null);
 
-  // Start Camera
+  /* ===================================================================
+   * 3. CAMERA CONTROL — Fungsi start/stop webcam via WebRTC
+   * =================================================================== */
+
+  /**
+   * Memulai webcam stream dengan getUserMedia.
+   * Jika gagal (izin ditolak), menampilkan pesan error graceful
+   * dan memungkinkan mode simulasi tetap berjalan.
+   */
   const startCamera = async () => {
     try {
       setErrorMsg('');
@@ -69,7 +128,10 @@ export default function SignToTextCamera() {
     }
   };
 
-  // Stop Camera
+  /**
+   * Menghentikan webcam stream.
+   * Melepas semua track dari MediaStream dan reset state terkait.
+   */
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -89,7 +151,16 @@ export default function SignToTextCamera() {
     };
   }, []);
 
-  // Overlay Landmark Animation Loop
+  /* ===================================================================
+   * 4. OVERLAY ANIMATION LOOP — Render 21 keypoint landmark di canvas
+   * =================================================================== */
+
+  /**
+   * Effect: Canvas Animation Loop untuk landmark overlay.
+   * Menggambar bounding box dengan corner targeting, 21 titik keypoint
+   * tangan beranimasi, dan hub center node — semuanya dengan glow effect.
+   * Berjalan ~60fps via requestAnimationFrame selama isDetecting aktif.
+   */
   useEffect(() => {
     const canvas = overlayCanvasRef.current;
     if (!canvas) return;
@@ -191,7 +262,17 @@ export default function SignToTextCamera() {
     };
   }, [isDetecting, hasPermission]);
 
-  // Handle Trigger Gesture Simulation
+  /* ===================================================================
+   * 5. EVENT HANDLERS — Aksi simulasi gestur & clipboard
+   * =================================================================== */
+
+  /**
+   * Mensimulasikan deteksi gestur isyarat (tanpa kamera).
+   * Menambahkan kata terdeteksi ke buffer dan menampilkan confetti.
+   * @param {Object} gesture — Objek gestur dari DEMO_GESTURE_TRIGGERS
+   * @param {string} gesture.word — Kata yang terdeteksi
+   * @param {number} gesture.conf — Confidence score
+   */
   const handleTriggerGesture = (gesture) => {
     setActiveGesture(`Mendeteksi: ${gesture.word.toUpperCase()}`);
     addDetectedWord(gesture.word, gesture.conf);
@@ -210,6 +291,10 @@ export default function SignToTextCamera() {
     }
   };
 
+  /**
+   * Menyalin seluruh kalimat hasil deteksi ke clipboard.
+   * Menampilkan feedback 'Tersalin!' selama 2 detik.
+   */
   const handleCopy = () => {
     const fullSentence = detectedTextList.join(' ');
     if (!fullSentence) return;
@@ -218,6 +303,10 @@ export default function SignToTextCamera() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  /**
+   * Menyimpan kalimat hasil deteksi ke riwayat translasi di store.
+   * Membuat entry riwayat dengan metadata timestamp & tipe 'sign_to_text'.
+   */
   const handleSaveToHistory = () => {
     const fullSentence = detectedTextList.join(' ');
     if (!fullSentence) return;
@@ -232,11 +321,15 @@ export default function SignToTextCamera() {
     });
   };
 
+  /* ===================================================================
+   * 6. DERIVED VALUES & JSX RENDER
+   * =================================================================== */
+  /** @type {string} Kalimat gabungan dari seluruh kata terdeteksi */
   const fullSentence = detectedTextList.join(' ');
 
   return (
     <div className="space-y-6">
-      {/* Top Banner Notice */}
+      {/* --- 6A. TOP BANNER: Info mode deteksi + toggle kamera --- */}
       <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-600/10 via-amber-600/10 to-transparent border border-brand-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-brand-500/20 text-brand-400">

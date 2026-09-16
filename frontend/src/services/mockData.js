@@ -1,6 +1,17 @@
 /**
- * Mock Data Repository for SETARA
- * Provides initial dictionary, news, community, and timeline data.
+ * ==============================================================================
+ * File: mockData.js
+ * Direktori: src/services/
+ * Deskripsi: Pusat Data Mock & Dataset Awal Platform SETARA.
+ * Fungsi:
+ *   - Menyediakan data komparasi edukasi SIBI vs BISINDO (SIBI_VS_BISINDO_DATA).
+ *   - Menyediakan dataset awal artikel berita edukatif (INITIAL_NEWS).
+ *   - Menyediakan dataset milestone linimasa platform (INITIAL_TIMELINE).
+ *   - Menyediakan direktori komunitas terverifikasi awal (INITIAL_COMMUNITIES).
+ *   - Menyediakan testimoni pengguna awal (INITIAL_TESTIMONIALS).
+ *   - Menyediakan kamus kata isyarat 21 titik keypoint (SIGN_DICTIONARY).
+ *   - Menyediakan fitur showcase Bento Grid (BENTO_FEATURES).
+ * ==============================================================================
  */
 
 export const SIBI_VS_BISINDO_DATA = {

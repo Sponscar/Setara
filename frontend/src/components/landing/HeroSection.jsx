@@ -1,3 +1,25 @@
+/**
+ * @file HeroSection.jsx
+ * @description Section hero banner utama landing page SETARA.
+ *
+ * ## Arsitektur & Pattern
+ * - **Presentational Component**: Tidak memiliki state internal sendiri.
+ *   Hanya menerima callback props untuk navigasi (CTA buttons).
+ * - **Visual-First Design**: Menampilkan headline gradient, interactive
+ *   card mockup dengan simulasi token translation, dan floating badges.
+ * - **Ambient Glow Effects**: Background gradient blur orbs untuk kesan
+ *   premium dan dinamis.
+ *
+ * ## Layout
+ * - Grid 2 kolom (lg:7/5): Kiri = headline + CTA, Kanan = visual graphic.
+ * - Responsive: Stack vertikal di mobile, side-by-side di desktop.
+ *
+ * @module HeroSection
+ * @param {Object} props
+ * @param {Function} props.onStartTranslate — Callback navigasi ke halaman penerjemah.
+ * @param {Function} props.onExploreEducation — Callback scroll ke section edukasi SIBI/BISINDO.
+ */
+
 import React from 'react';
 import { 
   Sparkles, 

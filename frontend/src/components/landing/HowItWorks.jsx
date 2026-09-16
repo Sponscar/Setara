@@ -1,3 +1,17 @@
+/**
+ * ==============================================================================
+ * File: HowItWorks.jsx
+ * Direktori: src/components/landing/
+ * Deskripsi: Section Alur Panduan Penggunaan Platform SETARA (Step-by-step Guide).
+ *            Menjelaskan langkah kerja 2 alur utama:
+ *            1. Jalur A (Text to Sign): Teks -> Tokenisasi -> Pemutar Video/Canvas Isyarat.
+ *            2. Jalur B (Sign to Text AI): Webcam -> YOLO 11 Pose Hand Tracking -> Konversi Teks.
+ * Pattern:
+ *   - State Pattern / Workflow Switcher: Pengguna beralih antara 'text-to-sign' dan 'sign-to-text'.
+ *   - Stepper / Process Flow Pattern: Penomoran tahapan terstruktur (01, 02, 03).
+ * ==============================================================================
+ */
+
 import React, { useState } from 'react';
 import { 
   Keyboard, 
@@ -6,13 +20,18 @@ import {
   Camera, 
   Eye, 
   FileText, 
-  ArrowRight,
-  Sparkles
+  ArrowRight, 
+  Sparkles 
 } from 'lucide-react';
 
+/**
+ * Komponen Alur Panduan Penggunaan Platform SETARA.
+ */
 export default function HowItWorks() {
+  /** Alur kerja aktif: 'text-to-sign' | 'sign-to-text' */
   const [activeWorkflow, setActiveWorkflow] = useState('text-to-sign');
 
+  /** Langkah-langkah alur Jalur A: Teks ke Video Isyarat */
   const textToSignSteps = [
     {
       step: "01",
@@ -34,6 +53,7 @@ export default function HowItWorks() {
     }
   ];
 
+  /** Langkah-langkah alur Jalur B: Deteksi Kamera AI ke Teks */
   const signToTextSteps = [
     {
       step: "01",
@@ -55,12 +75,15 @@ export default function HowItWorks() {
     }
   ];
 
+  /** Daftar langkah yang saat ini aktif berdasarkan toggle */
   const currentSteps = activeWorkflow === 'text-to-sign' ? textToSignSteps : signToTextSteps;
 
   return (
     <section className="py-16 md:py-20 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
+        {/* ===================================================================
+         * 1. SECTION HEADER — Judul & Subtitle Alur Kerja
+         * =================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
             <Sparkles className="w-3.5 h-3.5" />
@@ -74,7 +97,9 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        {/* Workflow Switcher Buttons */}
+        {/* ===================================================================
+         * 2. WORKFLOW SWITCHER — Tombol Pemilih Jalur A atau Jalur B
+         * =================================================================== */}
         <div className="flex items-center justify-center mb-12">
           <div className="p-1 rounded-2xl bg-slate-200/80 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 flex items-center gap-1">
             <button
@@ -100,7 +125,9 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Step Cards Grid */}
+        {/* ===================================================================
+         * 3. STEP CARDS GRID — Rangkaian Kartu Tahapan Terstruktur
+         * =================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
           {currentSteps.map((item, idx) => {
             const Icon = item.icon;

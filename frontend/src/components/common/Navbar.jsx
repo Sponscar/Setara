@@ -1,3 +1,20 @@
+/**
+ * ==============================================================================
+ * File: Navbar.jsx
+ * Direktori: src/components/common/
+ * Deskripsi: Dynamic Island Adaptive Navigation Bar untuk Platform SETARA.
+ *            Beradaptasi secara dinamis antara tampilan full-width transparan di posisi puncak
+ *            dan berubah menjadi floating capsule bar dengan indikator progres membaca
+ *            saat pengguna menggulir halaman.
+ * Pattern:
+ *   - Adaptive Floating Capsule / Dynamic Island Pattern: Transisi mulus bentuk navbar
+ *     menggunakan GPU transforms, backdrop-filter blur, dan spring-like cubic bezier.
+ *   - Scroll Spy Pattern: Mendeteksi posisi scroll untuk menyorot section aktif
+ *     ('home', 'edukasi', 'berita', 'komunitas', 'tentang') secara real-time.
+ *   - Responsive Drawer Navigation: Menu drawer mobile dengan penutupan otomatis saat navigasi.
+ * ==============================================================================
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -11,19 +28,42 @@ import {
   Newspaper, 
   Users, 
   Info, 
-  ShieldCheck,
-  ArrowRight,
-  LogOut
+  ShieldCheck, 
+  ArrowRight, 
+  LogOut 
 } from 'lucide-react';
 
+/**
+ * Komponen Navigasi Utama (Navbar).
+ * 
+ * @param {Object} props
+ * @param {Function} props.onNavigate - Callback navigasi ke section atau view ('home' | 'edukasi' | 'berita' | 'komunitas' | 'tentang' | 'translator' | 'admin')
+ * @param {string} props.currentView - View aplikasi saat ini ('home' | 'translator' | 'admin')
+ */
 export default function Navbar({ onNavigate, currentView }) {
+  /* ===================================================================
+   * 1. GLOBAL STORES & LOCAL STATE
+   * =================================================================== */
+
+  /** Store tema global (light/dark) */
   const { theme, toggleTheme } = useThemeStore();
+
+  /** Store autentikasi administrator */
   const { user, isAuthenticated, logout } = useAuthStore();
+
+  /** Status apakah halaman telah digulir lebih dari 25px */
   const [isScrolled, setIsScrolled] = useState(false);
+
+  /** Persentase progres membaca halaman (0 - 100%) */
   const [scrollProgress, setScrollProgress] = useState(0);
+
+  /** Section landing page yang saat ini aktif */
   const [activeSection, setActiveSection] = useState('home');
+
+  /** Status keterbukaan drawer navigasi mobile */
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  /** Daftar tautan menu navigasi utama */
   const navLinks = [
     { name: 'Beranda', id: 'home', icon: Sparkles },
     { name: 'Edukasi SIBI & BISINDO', id: 'edukasi', icon: Info },
@@ -32,6 +72,9 @@ export default function Navbar({ onNavigate, currentView }) {
     { name: 'Tentang Kami', id: 'tentang', icon: Info }
   ];
 
+  /* ===================================================================
+   * 2. SCROLL SPY & READING PROGRESS EFFECT
+   * =================================================================== */
   useEffect(() => {
     let ticking = false;
 
@@ -82,12 +125,28 @@ export default function Navbar({ onNavigate, currentView }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [currentView]);
 
+  /* ===================================================================
+   * 3. NAVIGATION HANDLERS & HELPERS
+   * =================================================================== */
+
+  /**
+   * Menangani klik navigasi pada menu item, menutup drawer mobile,
+   * dan memanggil callback `onNavigate`.
+   * 
+   * @param {string} id - Identifier tujuan navigasi
+   */
   const handleNavClick = (id) => {
     setActiveSection(id);
     onNavigate(id);
     setMobileMenuOpen(false);
   };
 
+  /**
+   * Mengecek apakah tautan navigasi sedang aktif sesuai view atau section saat ini.
+   * 
+   * @param {string} id - Identifier tautan yang dicek
+   * @returns {boolean}
+   */
   const isCurrentActive = (id) => {
     if (currentView === 'admin') return id === 'admin';
     if (currentView === 'translator') return id === 'translator';
@@ -98,11 +157,11 @@ export default function Navbar({ onNavigate, currentView }) {
     <div className={`fixed top-0 inset-x-0 z-50 flex justify-center pointer-events-none transform-gpu transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
       isScrolled ? 'pt-3 sm:pt-4 px-3 sm:px-6' : 'pt-0 px-0'
     }`}>
-      {/* 
-        Dynamic Island Header (Open SaaS Style):
-        - IDLE: Full-width edge-to-edge with glassmorphism
-        - SCROLLED: Smoothly morphs into a floating capsule (max-w-6xl, rounded-full, floating with backdrop-blur-2xl & shadow-2xl)
-      */}
+      {/* ===================================================================
+       * 4. DYNAMIC ISLAND CAPSULE HEADER
+       *    - Posisi Puncak: Full-width edge-to-edge dengan border-b halus
+       *    - Posisi Digulir: Morphing menjadi floating capsule melayang (max-w-6xl)
+       * =================================================================== */}
       <header className={`pointer-events-auto relative overflow-hidden transform-gpu transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         isScrolled
           ? 'w-full max-w-6xl rounded-2xl sm:rounded-full bg-white/85 dark:bg-[#0B0F19]/85 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 shadow-2xl shadow-slate-900/10 dark:shadow-brand-950/30 px-4 sm:px-6 py-2 sm:py-2.5'
@@ -111,7 +170,7 @@ export default function Navbar({ onNavigate, currentView }) {
         <div className={`w-full mx-auto flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isScrolled ? '' : 'max-w-7xl'
         }`}>
-          {/* Brand Logo */}
+          {/* --- BRAND LOGO --- */}
           <div 
             onClick={() => handleNavClick('home')}
             className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
@@ -141,7 +200,9 @@ export default function Navbar({ onNavigate, currentView }) {
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
+          {/* ===================================================================
+           * 5. DESKTOP NAVIGATION LINKS
+           * =================================================================== */}
           <nav className={`hidden lg:flex items-center transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             isScrolled 
               ? 'gap-0.5 px-2 py-1 rounded-full bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/60' 
@@ -167,7 +228,9 @@ export default function Navbar({ onNavigate, currentView }) {
             })}
           </nav>
 
-          {/* Action Buttons & Theme Switcher */}
+          {/* ===================================================================
+           * 6. ACTION BUTTONS & THEME SWITCHER
+           * =================================================================== */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-2.5">
             {/* Theme Toggle Button */}
             <button
@@ -197,7 +260,9 @@ export default function Navbar({ onNavigate, currentView }) {
             </button>
           </div>
 
-          {/* Mobile Menu Trigger */}
+          {/* ===================================================================
+           * 7. MOBILE MENU HAMBURGER TRIGGER
+           * =================================================================== */}
           <div className="flex sm:hidden items-center gap-1.5">
             <button
               onClick={toggleTheme}
@@ -215,7 +280,9 @@ export default function Navbar({ onNavigate, currentView }) {
           </div>
         </div>
 
-        {/* Smooth Scroll Reading Progress Indicator */}
+        {/* ===================================================================
+         * 8. READING SCROLL PROGRESS BAR (CAPSULE BOTTOM LINE)
+         * =================================================================== */}
         <div className={`absolute bottom-0 left-0 right-0 h-[2px] bg-slate-200/30 dark:bg-slate-800/40 transition-opacity duration-500 ${
           isScrolled ? 'opacity-100' : 'opacity-0'
         }`}>
@@ -226,7 +293,9 @@ export default function Navbar({ onNavigate, currentView }) {
         </div>
       </header>
 
-      {/* Mobile Drawer Navigation */}
+      {/* ===================================================================
+       * 9. MOBILE DRAWER NAVIGATION MENU
+       * =================================================================== */}
       {mobileMenuOpen && (
         <div className="fixed inset-x-4 top-20 z-50 pointer-events-auto p-4 rounded-3xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 space-y-2 shadow-2xl animate-float">
           {navLinks.map((link) => {
