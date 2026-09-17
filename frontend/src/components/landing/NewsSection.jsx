@@ -16,6 +16,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useContentStore } from '../../stores/useContentStore';
+import { api } from '../../services/api';
 import { 
   Newspaper, 
   Clock, 
@@ -26,6 +27,14 @@ import {
   X, 
   Share2 
 } from 'lucide-react';
+
+/**
+ * Helper untuk membersihkan tag HTML agar teks tampil bersih
+ */
+const stripHtml = (html) => {
+  if (!html) return '';
+  return html.replace(/<[^>]*>?/gm, '').trim();
+};
 
 /**
  * Komponen Section Berita & Wawasan Terkini.
@@ -52,7 +61,7 @@ export default function NewsSection() {
   const categories = ['Semua', 'Edukasi', 'Teknologi', 'Komunitas', 'Event'];
 
   /* ===================================================================
-   * 2. SIDE EFFECTS — Body Scroll Lock & Keyboard Handler (ESC)
+   * 2. SIDE EFFECTS - Body Scroll Lock & Keyboard Handler (ESC)
    * =================================================================== */
 
   /** Mengunci scrollbar halaman ketika modal detail berita terbuka */
@@ -78,13 +87,34 @@ export default function NewsSection() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeNewsModal]);
 
+  /**
+   * Membuka modal detail berita dan memastikan konten lengkap tersedia
+   */
+  const handleOpenNewsModal = async (news) => {
+    setActiveNewsModal(news);
+
+    // Jika konten lengkap belum dimuat di store, fetch detailnya langsung dari REST API
+    if (!news.konten) {
+      try {
+        const detail = await api.get(`/berita/${news.id}`);
+        if (detail && (detail.konten || detail.ringkasan)) {
+          setActiveNewsModal((prev) => 
+            prev && prev.id === news.id ? { ...prev, ...detail } : prev
+          );
+        }
+      } catch (err) {
+        // Gunakan ringkasan yang ada sebagai fallback
+      }
+    }
+  };
+
   /* ===================================================================
-   * 3. DATA COMPUTATION — Filter Berita Berdasarkan Kategori
+   * 3. DATA COMPUTATION - Filter Berita Berdasarkan Kategori
    * =================================================================== */
 
   const filteredNews = selectedCategory === 'Semua'
     ? newsList
-    : newsList.filter(n => n.kategori.toLowerCase() === selectedCategory.toLowerCase());
+    : newsList.filter(n => n.kategori && n.kategori.toLowerCase() === selectedCategory.toLowerCase());
 
   return (
     <section id="berita" className="py-16 md:py-20 relative scroll-mt-28">
@@ -125,9 +155,9 @@ export default function NewsSection() {
         </div>
 
         {/* ===================================================================
-         * 5. NEWS CARDS GRID — Daftar Artikel Terbit
+         * 5. NEWS CARDS GRID - Daftar Artikel Terbit
          * =================================================================== */}
-                {isLoading && newsList.length === 0 ? (
+        {isLoading && newsList.length === 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="rounded-3xl glass-card border border-slate-200 dark:border-dark-border overflow-hidden animate-pulse">
@@ -141,52 +171,52 @@ export default function NewsSection() {
             ))}
           </div>
         ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredNews.map((news) => (
-            <div
-              key={news.id}
-              onClick={() => setActiveNewsModal(news)}
-              className="rounded-3xl glass-card border border-slate-200 dark:border-dark-border overflow-hidden hover:border-brand-500/60 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer group"
-            >
-              {/* Thumbnail */}
-              <div className="aspect-[16/10] w-full overflow-hidden relative">
-                <img
-                  src={news.thumbnail}
-                  alt={news.judul}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[11px] font-bold backdrop-blur-md border ${news.kategoriBadge || 'bg-brand-500/20 text-brand-400 border-brand-500/30'}`}>
-                  {news.kategori}
-                </span>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {filteredNews.map((news) => (
+              <div
+                key={news.id}
+                onClick={() => handleOpenNewsModal(news)}
+                className="rounded-3xl glass-card border border-slate-200 dark:border-dark-border overflow-hidden hover:border-brand-500/60 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer group"
+              >
+                {/* Thumbnail */}
+                <div className="aspect-[16/10] w-full overflow-hidden relative">
+                  <img
+                    src={news.thumbnail}
+                    alt={news.judul}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <span className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[11px] font-bold backdrop-blur-md border ${news.kategoriBadge || 'bg-brand-500/20 text-brand-400 border-brand-500/30'}`}>
+                    {news.kategori}
+                  </span>
+                </div>
 
-              {/* Content Box */}
-              <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 text-[11px] text-slate-400">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {news.waktuBaca || '4 menit'}
-                    </span>
-                    <span>•</span>
-                    <span>{news.tanggal}</span>
+                {/* Content Box */}
+                <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {news.waktuBaca || '4 menit'}
+                      </span>
+                      <span>&bull;</span>
+                      <span>{news.tanggal}</span>
+                    </div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-500 transition-colors">
+                      {news.judul}
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                      {stripHtml(news.ringkasan) || stripHtml(news.konten) || 'Tidak ada ringkasan.'}
+                    </p>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-500 transition-colors">
-                    {news.judul}
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                    {news.ringkasan}
-                  </p>
-                </div>
 
-                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-semibold text-brand-600 dark:text-brand-400">
-                  <span>Baca Selengkapnya</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-semibold text-brand-600 dark:text-brand-400">
+                    <span>Baca Selengkapnya</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         )}
 
         {/* ===================================================================
@@ -214,20 +244,24 @@ export default function NewsSection() {
                 <span className="px-3 py-1 rounded-full text-xs font-bold bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
                   {activeNewsModal.kategori}
                 </span>
-                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
                   {activeNewsModal.judul}
                 </h3>
                 <div className="flex items-center gap-4 text-xs text-slate-400">
-                  <span>Penulis: {activeNewsModal.author}</span>
-                  <span>•</span>
+                  <span>Penulis: {activeNewsModal.author || activeNewsModal.author_name}</span>
+                  <span>&bull;</span>
                   <span>{activeNewsModal.tanggal}</span>
-                  <span>•</span>
-                  <span>{activeNewsModal.views} Pembaca</span>
+                  {activeNewsModal.views !== undefined && (
+                    <>
+                      <span>&bull;</span>
+                      <span>{activeNewsModal.views} Pembaca</span>
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Image */}
-              <div className="aspect-[16/9] w-full rounded-2xl overflow-hidden">
+              <div className="aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800">
                 <img
                   src={activeNewsModal.thumbnail}
                   alt={activeNewsModal.judul}
@@ -235,9 +269,16 @@ export default function NewsSection() {
                 />
               </div>
 
-              {/* Content */}
-              <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 whitespace-pre-line max-h-[250px] overflow-y-auto pr-2">
-                {activeNewsModal.konten}
+              {/* Ringkasan Singkat (Lead Highlight Box) */}
+              {activeNewsModal.ringkasan && (
+                <div className="p-4 rounded-2xl bg-brand-500/10 border border-brand-500/20 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                  "{stripHtml(activeNewsModal.ringkasan)}"
+                </div>
+              )}
+
+              {/* Konten Lengkap */}
+              <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed space-y-4 whitespace-pre-line max-h-[260px] overflow-y-auto pr-2">
+                {stripHtml(activeNewsModal.konten) || stripHtml(activeNewsModal.ringkasan) || 'Belum ada konten lengkap untuk artikel ini.'}
               </div>
 
               <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">

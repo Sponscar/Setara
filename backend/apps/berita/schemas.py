@@ -51,6 +51,7 @@ class BeritaListOut(Schema):
     judul: str
     slug: str
     ringkasan: str
+    konten: Optional[str] = ''
     kategori: str
     thumbnail: Optional[str] = None
     thumbnail_url: Optional[str] = None

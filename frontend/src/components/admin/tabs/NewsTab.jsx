@@ -2,39 +2,74 @@
  * ==============================================================================
  * File: NewsTab.jsx
  * Direktori: src/components/admin/tabs/
- * Deskripsi: Tab Manajemen Berita & Artikel Edukasi pada Dashboard Admin.
- * Integrasi:
- *   - Terhubung langsung ke API backend Django Ninja (/api/berita/*).
- *   - Operasi CRUD asynchronous dengan feedback loading & toast notification.
+ * Deskripsi: Tab Manajemen Wawasan & Berita pada Dashboard Administrator.
+ * Fitur:
+ *   - Form publikasi berita baru langsung ke PostgreSQL via Django Ninja REST API.
+ *   - Input thumbnail URL, kategori lengkap, judul, ringkasan, dan konten lengkap.
+ *   - Sub-panel daftar berita aktif dengan tombol Edit dan tombol Hapus.
+ *   - Integrasi asynchronous ke state store global (useContentStore).
+ * Pattern: Controlled Component, Form Validation, Repository Integration.
  * ==============================================================================
  */
 
 import React, { useState } from 'react';
-import { Plus, Upload, Trash2 } from 'lucide-react';
+import { 
+  Plus, 
+  Upload, 
+  Trash2, 
+  Edit3, 
+  Loader2, 
+  Image as ImageIcon 
+} from 'lucide-react';
 
+/**
+ * Komponen Tab Kelola Berita untuk Administrator.
+ * 
+ * @param {Object} props
+ * @param {Array} props.newsList - Daftar artikel berita
+ * @param {Function} props.addNews - Aksi store menambahkan berita baru
+ * @param {Function} props.deleteNews - Aksi store menghapus berita
+ * @param {Function} props.onOpenEditModal - Callback untuk membuka modal edit berita
+ * @param {Function} props.showToast - Fungsi menampilkan notifikasi toast interaktif
+ */
 export default function NewsTab({
   newsList = [],
   addNews,
   deleteNews,
+  onOpenEditModal,
   showToast
 }) {
+  // State formulir berita baru
   const [newsForm, setNewsForm] = useState({
     judul: '',
     kategori: 'Edukasi',
     ringkasan: '',
     author: 'Tim Redaksi SETARA',
+    waktuBaca: '4 menit',
+    thumbnail: '',
     konten: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
+  /**
+   * Handler untuk submit publikasi berita baru
+   */
   const handleCreateNews = async (e) => {
     e.preventDefault();
     if (!newsForm.judul.trim() || !newsForm.ringkasan.trim()) return;
 
     setIsSubmitting(true);
     try {
-      const res = await addNews(newsForm);
+      const res = await addNews({
+        ...newsForm,
+        author_name: newsForm.author,
+        waktu_baca: newsForm.waktuBaca,
+        thumbnail_url: newsForm.thumbnail,
+        // Pastikan konten terisi, jika kosong gunakan ringkasan
+        konten: newsForm.konten.trim() || newsForm.ringkasan.trim()
+      });
       setIsSubmitting(false);
 
       if (res && res.success !== false) {
@@ -43,6 +78,8 @@ export default function NewsTab({
           kategori: 'Edukasi',
           ringkasan: '',
           author: 'Tim Redaksi SETARA',
+          waktuBaca: '4 menit',
+          thumbnail: '',
           konten: ''
         });
         if (showToast) showToast('Berita baru berhasil diterbitkan ke database.');
@@ -93,6 +130,7 @@ export default function NewsTab({
                 <option value="Teknologi">Teknologi</option>
                 <option value="Event">Event</option>
                 <option value="Budaya Tuli">Budaya Tuli</option>
+                <option value="Komunitas">Komunitas</option>
               </select>
             </div>
 
@@ -102,6 +140,32 @@ export default function NewsTab({
                 type="text"
                 value={newsForm.author}
                 onChange={(e) => setNewsForm({ ...newsForm, author: e.target.value })}
+                placeholder="Tim Redaksi SETARA"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+              />
+            </div>
+          </div>
+
+          {/* Estimasi Waktu Baca & Thumbnail URL */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="font-semibold block mb-1">Waktu Baca</label>
+              <input
+                type="text"
+                value={newsForm.waktuBaca}
+                onChange={(e) => setNewsForm({ ...newsForm, waktuBaca: e.target.value })}
+                placeholder="4 menit"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+              />
+            </div>
+
+            <div>
+              <label className="font-semibold block mb-1">URL Gambar (Opsional)</label>
+              <input
+                type="url"
+                value={newsForm.thumbnail}
+                onChange={(e) => setNewsForm({ ...newsForm, thumbnail: e.target.value })}
+                placeholder="https://..."
                 className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
               />
             </div>
@@ -115,20 +179,20 @@ export default function NewsTab({
               required
               value={newsForm.ringkasan}
               onChange={(e) => setNewsForm({ ...newsForm, ringkasan: e.target.value })}
-              placeholder="Ringkasan 1-2 kalimat..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+              placeholder="Ringkasan 1-2 kalimat yang tampil di kartu artikel..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 leading-relaxed"
             />
           </div>
 
           {/* Konten Lengkap */}
           <div>
-            <label className="font-semibold block mb-1">Konten Lengkap</label>
+            <label className="font-semibold block mb-1">Konten Lengkap Berita</label>
             <textarea
               rows="5"
               value={newsForm.konten}
               onChange={(e) => setNewsForm({ ...newsForm, konten: e.target.value })}
-              placeholder="Isi berita lengkap..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-[11px] focus:outline-none focus:border-brand-500"
+              placeholder="Isi berita lengkap. Jika dikosongkan, ringkasan singkat di atas akan otomatis digunakan."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono text-[11px] focus:outline-none focus:border-brand-500 leading-relaxed"
             />
           </div>
 
@@ -139,7 +203,7 @@ export default function NewsTab({
             className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-brand-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Upload className="w-4 h-4" />
             )}
@@ -159,7 +223,7 @@ export default function NewsTab({
           </span>
         </h3>
 
-        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
           {newsList.length === 0 ? (
             <div className="text-center py-12 text-xs text-slate-400">
               Belum ada berita yang diterbitkan.
@@ -176,23 +240,48 @@ export default function NewsTab({
                     <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-500 shrink-0">
                       {n.kategori}
                     </span>
+                    {n.status === 'draft' && (
+                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-500/10 text-slate-400 shrink-0">
+                        Draft
+                      </span>
+                    )}
                   </div>
-                  <p className="text-slate-400 line-clamp-2">{n.ringkasan}</p>
-                  <div className="text-[10px] text-slate-400">Oleh {n.author} &bull; {n.tanggal}</div>
+                  <p className="text-slate-400 line-clamp-2 leading-relaxed">{n.ringkasan}</p>
+                  <div className="text-[10px] text-slate-400">
+                    Oleh {n.author || n.author_name} &bull; {n.tanggal}
+                  </div>
                 </div>
 
-                {/* Tombol Hapus Berita */}
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await deleteNews(n.id);
-                    if (showToast) showToast('Berita berhasil dihapus dari database.');
-                  }}
-                  className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors"
-                  title="Hapus berita"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {/* Tombol Aksi: Edit & Hapus Berita */}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onOpenEditModal && onOpenEditModal(n)}
+                    className="p-2 rounded-xl bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 cursor-pointer transition-colors"
+                    title="Edit berita"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+
+                  <button
+                    type="button"
+                    disabled={deletingId === n.id}
+                    onClick={async () => {
+                      setDeletingId(n.id);
+                      await deleteNews(n.id);
+                      setDeletingId(null);
+                      if (showToast) showToast('Berita berhasil dihapus dari database.');
+                    }}
+                    className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer transition-colors disabled:opacity-50"
+                    title="Hapus berita"
+                  >
+                    {deletingId === n.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
               </div>
             ))
           )}

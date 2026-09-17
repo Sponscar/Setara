@@ -35,6 +35,7 @@ function normalizeNews(b) {
     thumbnail_url: thumb,
     tanggal,
     ringkasan: b.ringkasan || (b.konten ? b.konten.slice(0, 140) + '...' : ''),
+    konten: b.konten || b.ringkasan || '',
     kategoriBadge: b.kategori === 'Edukasi'
       ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
       : b.kategori === 'Teknologi'

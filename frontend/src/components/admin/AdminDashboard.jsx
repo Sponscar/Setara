@@ -40,6 +40,7 @@ import CommunityTab from './tabs/CommunityTab';
 // Sub-komponen Modals
 import LogoutConfirmModal from './modals/LogoutConfirmModal';
 import EditCommunityModal from './modals/EditCommunityModal';
+import EditNewsModal from './modals/EditNewsModal';
 
 /**
  * Komponen Utama AdminDashboard.
@@ -93,6 +94,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
 
   // State objek komunitas yang sedang diedit (null jika modal edit tertutup)
   const [editingCommunity, setEditingCommunity] = useState(null);
+  const [editingNews, setEditingNews] = useState(null);
 
   // State notifikasi toast
   const [toastMessage, setToastMessage] = useState('');
@@ -139,6 +141,32 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
   /**
    * Menangani pembukaan modal edit komunitas terverifikasi
    */
+
+  /**
+   * Menangani pembukaan modal edit berita
+   */
+  const handleOpenEditNewsModal = (news) => {
+    setEditingNews(news);
+  };
+
+  /**
+   * Menangani penyimpanan perubahan data edit berita
+   */
+  const handleSaveEditNews = async (id, updatedData) => {
+    try {
+      const res = await updateNews(id, updatedData);
+      setEditingNews(null);
+      if (res && res.success !== false) {
+        showToast(`Berita "${updatedData.judul}" berhasil diperbarui.`);
+      } else {
+        showToast(res?.error || 'Gagal memperbarui berita.');
+      }
+    } catch (err) {
+      setEditingNews(null);
+      showToast('Terjadi kesalahan saat memperbarui berita.');
+    }
+  };
+
   const handleOpenEditModal = (community) => {
     setEditingCommunity(community);
   };
@@ -313,6 +341,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
               newsList={newsList}
               addNews={addNews}
               deleteNews={deleteNews}
+              onOpenEditModal={handleOpenEditNewsModal}
               showToast={showToast}
             />
           )}
@@ -358,6 +387,13 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={handleConfirmLogout}
         userEmail={user?.email}
+      />
+
+      {/* Modal Dialog Edit Berita */}
+      <EditNewsModal
+        news={editingNews}
+        onClose={() => setEditingNews(null)}
+        onSave={handleSaveEditNews}
       />
 
       {/* Modal Dialog Edit Komunitas Terverifikasi */}
