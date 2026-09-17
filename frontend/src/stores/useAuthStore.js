@@ -1,85 +1,111 @@
-/**
+﻿/**
  * ==============================================================================
  * File: useAuthStore.js
  * Direktori: src/stores/
- * Deskripsi: Global Authentication State Management untuk sesi Administrator SETARA.
- * Pattern:
- *   - Flux / Store Pattern (via Zustand): Mengelola status autentikasi global.
- *   - Protected Route Guard Data: Menyediakan state `isAuthenticated` untuk gating rute /admin di App.jsx.
- *   - Local Storage Session Persistence: Menyimpan token JWT mock dan data user.
+ * Deskripsi: Global Authentication State Management platform SETARA.
+ * Integrasi:
+ *   - Terhubung langsung ke Django Ninja API (/api/auth/*)
+ *   - Mengelola JWT Access Token & Refresh Token
+ *   - Auto-restore sesi user saat browser dimuat ulang
  * ==============================================================================
  */
 
 import { create } from 'zustand';
+import { api, tokenStorage } from '../services/api';
 
-export const useAuthStore = create((set) => ({
-  // ============================================================================
-  // 1. STATE AUTENTIKASI
-  // ============================================================================
-  /** Data profil user yang sedang login (null jika belum login) */
-  user: typeof window !== 'undefined' && localStorage.getItem('setara_user')
-    ? JSON.parse(localStorage.getItem('setara_user'))
-    : null,
-
-  /** Token sesi autentikasi mock (JWT) */
-  token: typeof window !== 'undefined' ? localStorage.getItem('setara_token') : null,
-
-  /** Flag boolean penanda apakah sesi login aktif dan terverifikasi */
-  isAuthenticated: typeof window !== 'undefined' && !!localStorage.getItem('setara_token'),
-
-  // ============================================================================
-  // 2. AKSI AUTENTIKASI (LOGIN & LOGOUT)
-  // ============================================================================
-  /**
-   * Memproses login administrator demo.
-   * Aturan verifikasi demo:
-   *   - Password harus 'setara2026'
-   *   - Email harus mengandung kata 'admin' (contoh: admin@setara.id)
-   * 
-   * @param {string} email
-   * @param {string} password
-   * @returns {{ success: boolean, error?: string, user?: Object }}
-   */
-  login: (email, password) => {
-    // Validasi kata sandi demo
-    if (password !== 'setara2026') {
-      return { success: false, error: 'Email atau kata sandi salah.' };
-    }
-
-    // Validasi role admin berdasarkan format email
-    const isAdmin = email.toLowerCase().includes('admin');
-    if (!isAdmin) {
-      return { success: false, error: 'Akun ini tidak memiliki akses administrator.' };
-    }
-
-    // Buat objek profil pengguna dan mock token
-    const userData = {
-      id: `usr-${Date.now()}`,
-      nama: 'Administrator SETARA',
-      email: email,
-      role: 'admin',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-    };
-    const mockToken = `jwt-token-${Date.now()}`;
-
-    // Simpan ke localStorage untuk persistensi sesi
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('setara_user', JSON.stringify(userData));
-      localStorage.setItem('setara_token', mockToken);
-    }
-
-    set({ user: userData, token: mockToken, isAuthenticated: true });
-    return { success: true, user: userData };
-  },
-
-  /**
-   * Mengakhiri sesi login pengguna dan menghapus data sesi dari localStorage.
-   */
-  logout: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('setara_user');
-      localStorage.removeItem('setara_token');
-    }
-    set({ user: null, token: null, isAuthenticated: false });
+export const useAuthStore = create((set, get) => {
+  // Setup listener for unauthorized events (session expiry)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('auth:unauthorized', () => {
+      get().logout();
+    });
   }
-}));
+
+  return {
+    // ============================================================================
+    // 1. STATE AUTENTIKASI
+    // ============================================================================
+    user: tokenStorage.getUser(),
+    token: tokenStorage.getAccessToken(),
+    isAuthenticated: !!tokenStorage.getAccessToken(),
+    isLoading: false,
+    error: null,
+
+    // ============================================================================
+    // 2. AKSI AUTENTIKASI
+    // ============================================================================
+
+    /**
+     * Memproses login menggunakan endpoint Django Ninja /api/auth/login.
+     * @param {string} email
+     * @param {string} password
+     * @returns {Promise<{ success: boolean, error?: string, user?: Object }>}
+     */
+    login: async (email, password) => {
+      set({ isLoading: true, error: null });
+      try {
+        const data = await api.post('/auth/login', { email, password });
+        const user = data.user || {
+          email,
+          role: 'admin',
+          full_name: 'Administrator SETARA'
+        };
+
+        tokenStorage.setSession(data.access_token, data.refresh_token, user);
+        set({
+          user,
+          token: data.access_token,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null
+        });
+        return { success: true, user };
+      } catch (err) {
+        const errorMsg = err.message || 'Email atau kata sandi tidak valid.';
+        set({ isLoading: false, error: errorMsg });
+        return { success: false, error: errorMsg };
+      }
+    },
+
+    /**
+     * Mengakhiri sesi login pengguna dan menghapus data sesi.
+     */
+    logout: () => {
+      tokenStorage.clearSession();
+      set({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null
+      });
+    },
+
+    /**
+     * Memvalidasi token aktif dan memperbarui profil pengguna dari backend /api/auth/me.
+     */
+    checkAuth: async () => {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        set({ user: null, isAuthenticated: false });
+        return null;
+      }
+
+      try {
+        const userProfile = await api.get('/auth/me');
+        tokenStorage.setSession(token, tokenStorage.getRefreshToken(), userProfile);
+        set({ user: userProfile, isAuthenticated: true });
+        return userProfile;
+      } catch (err) {
+        // Jika token tidak valid / kedaluwarsa
+        get().logout();
+        return null;
+      }
+    },
+
+    /**
+     * Membersihkan pesan error
+     */
+    clearError: () => set({ error: null })
+  };
+});

@@ -3,12 +3,14 @@
  * File: TimelineTab.jsx
  * Direktori: src/components/admin/tabs/
  * Deskripsi: Tab Manajemen Milestone Linimasa Sejarah & Pencapaian Platform.
- * Pattern: Controlled Component Pattern untuk penambahan milestone baru.
+ * Integrasi:
+ *   - Terhubung langsung ke API backend Django Ninja (/api/timeline/*).
+ *   - Operasi CRUD asynchronous dengan feedback loading & toast notification.
  * ==============================================================================
  */
 
 import React, { useState } from 'react';
-import { Plus, Upload, Trash2 } from 'lucide-react';
+import { Plus, Upload, Trash2, Loader2 } from 'lucide-react';
 
 /**
  * Komponen Tab Manajemen Milestone Timeline.
@@ -33,26 +35,54 @@ export default function TimelineTab({
     deskripsi: ''
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
   /**
    * Handler submit formulir penambahan milestone baru
    */
-  const handleCreateTimeline = (e) => {
+  const handleCreateTimeline = async (e) => {
     e.preventDefault();
     if (!timelineForm.judul.trim()) return;
 
-    // Simpan ke store
-    addTimelineMilestone(timelineForm);
+    setIsSubmitting(true);
+    try {
+      const res = await addTimelineMilestone(timelineForm);
+      setIsSubmitting(false);
 
-    // Reset formulir
-    setTimelineForm({
-      judul: '',
-      tanggal: '',
-      kategori: 'Pencapaian',
-      deskripsi: ''
-    });
+      if (res && res.success !== false) {
+        setTimelineForm({
+          judul: '',
+          tanggal: '',
+          kategori: 'Pencapaian',
+          deskripsi: ''
+        });
+        if (showToast) showToast('Milestone baru berhasil ditambahkan ke linimasa.');
+      } else if (showToast) {
+        showToast(res?.error || 'Gagal menambahkan milestone.');
+      }
+    } catch (err) {
+      setIsSubmitting(false);
+      if (showToast) showToast('Terjadi kesalahan saat menyimpan milestone.');
+    }
+  };
 
-    if (showToast) {
-      showToast('Milestone baru berhasil ditambahkan ke linimasa.');
+  /**
+   * Handler hapus milestone
+   */
+  const handleDeleteTimeline = async (id, judul) => {
+    setDeletingId(id);
+    try {
+      const res = await deleteTimelineMilestone(id);
+      setDeletingId(null);
+      if (res && res.success !== false) {
+        if (showToast) showToast(`Milestone "${judul || 'terpilih'}" berhasil dihapus.`);
+      } else if (showToast) {
+        showToast(res?.error || 'Gagal menghapus milestone.');
+      }
+    } catch (err) {
+      setDeletingId(null);
+      if (showToast) showToast('Terjadi kesalahan saat menghapus milestone.');
     }
   };
 
@@ -74,10 +104,11 @@ export default function TimelineTab({
             <input
               type="text"
               required
+              disabled={isSubmitting}
               value={timelineForm.judul}
               onChange={(e) => setTimelineForm({ ...timelineForm, judul: e.target.value })}
               placeholder="Contoh: Rilis Model YOLO 11 v2"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
             />
           </div>
 
@@ -87,10 +118,11 @@ export default function TimelineTab({
               <label className="font-semibold block mb-1">Waktu / Bulan</label>
               <input
                 type="text"
+                disabled={isSubmitting}
                 value={timelineForm.tanggal}
                 onChange={(e) => setTimelineForm({ ...timelineForm, tanggal: e.target.value })}
                 placeholder="Contoh: Oktober 2026"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
               />
             </div>
 
@@ -98,10 +130,11 @@ export default function TimelineTab({
               <label className="font-semibold block mb-1">Kategori</label>
               <input
                 type="text"
+                disabled={isSubmitting}
                 value={timelineForm.kategori}
                 onChange={(e) => setTimelineForm({ ...timelineForm, kategori: e.target.value })}
                 placeholder="Contoh: Inovasi AI"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
               />
             </div>
           </div>
@@ -111,20 +144,31 @@ export default function TimelineTab({
             <label className="font-semibold block mb-1">Deskripsi Milestone</label>
             <textarea
               rows="3"
+              disabled={isSubmitting}
               value={timelineForm.deskripsi}
               onChange={(e) => setTimelineForm({ ...timelineForm, deskripsi: e.target.value })}
               placeholder="Penjelasan pencapaian penting..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
             />
           </div>
 
           {/* Tombol Submit */}
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-purple-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            disabled={isSubmitting}
+            className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-purple-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Upload className="w-4 h-4" />
-            <span>Tambahkan Milestone</span>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Menyimpan ke Database...</span>
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4" />
+                <span>Tambahkan Milestone</span>
+              </>
+            )}
           </button>
         </form>
       </div>
@@ -152,6 +196,11 @@ export default function TimelineTab({
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-slate-900 dark:text-white">{t.judul}</span>
                     <span className="text-[10px] text-slate-400 font-mono">({t.tanggal})</span>
+                    {t.kategori && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/20 font-medium">
+                        {t.kategori}
+                      </span>
+                    )}
                   </div>
                   <p className="text-slate-400">{t.deskripsi}</p>
                 </div>
@@ -159,14 +208,16 @@ export default function TimelineTab({
                 {/* Tombol Hapus Milestone */}
                 <button
                   type="button"
-                  onClick={() => {
-                    deleteTimelineMilestone(t.id);
-                    if (showToast) showToast('Milestone berhasil dihapus.');
-                  }}
-                  className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors"
+                  disabled={deletingId === t.id}
+                  onClick={() => handleDeleteTimeline(t.id, t.judul)}
+                  className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors disabled:opacity-50"
                   title="Hapus milestone"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  {deletingId === t.id ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             ))

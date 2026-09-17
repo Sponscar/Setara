@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==============================================================================
  * File: tokenizer.js
  * Direktori: src/utils/
@@ -8,6 +8,7 @@
  *     dan evaluasi struktur kalimat.
  *   - N-Gram Compound Phrase Matching: Mendeteksi idiom / frasa majemuk 2 kata (seperti 'terima kasih',
  *     'selamat pagi') sebelum memecah menjadi kata tunggal.
+ *   - Dynamic Database Dictionary Support: Mendukung injeksi kamus kosakata langsung dari backend PostgreSQL.
  *   - Fallback Spelling Pattern: Kata yang belum terdaftar di kamus diarahkan ke peragaan
  *     ejaan huruf per huruf (fingerspelling).
  * ==============================================================================
@@ -19,19 +20,19 @@ import { SIGN_DICTIONARY } from '../services/mockData';
  * Melakukan tokenisasi kalimat bahasa Indonesia menjadi rangkaian token isyarat
  * yang dapat divisualisasikan oleh animator canvas atau video player.
  * 
- * Tahapan Algoritma:
- * 1. Normalisasi: Ubah ke huruf kecil dan bersihkan tanda baca umum.
- * 2. N-Gram Matching: Cek apakah 2 kata berurutan membentuk frasa majemuk yang ada di kamus.
- * 3. Single Word Lookup: Jika bukan frasa, cocokkan kata tunggal dengan kamus (sesuai sistem bahasa aktif).
- * 4. Fallback Handling: Jika kata tidak ditemukan di kamus, buat token 'unknown' dengan mode fingerspelling.
- * 
  * @param {string} text - Teks kalimat yang akan diterjemahkan
  * @param {'SIBI' | 'BISINDO'} [languageSystem='SIBI'] - Sistem bahasa isyarat yang dipilih
+ * @param {Array<Object>} [customDictionary=null] - Daftar kamus aktif dari PostgreSQL backend
  * @returns {Array<Object>} Daftar token kata/frasa lengkap dengan metadata gestur
  */
-export function tokenizeIndonesianText(text, languageSystem = 'SIBI') {
+export function tokenizeIndonesianText(text, languageSystem = 'SIBI', customDictionary = null) {
   // Validasi tipe data input
   if (!text || typeof text !== 'string') return [];
+
+  // Gunakan kamus dari database backend jika tersedia, fallback ke kamus dasar jika kosong
+  const dict = (Array.isArray(customDictionary) && customDictionary.length > 0)
+    ? customDictionary
+    : SIGN_DICTIONARY;
 
   // 1. Normalisasi teks: lower-case & eliminasi tanda baca
   const clean = text
@@ -51,10 +52,10 @@ export function tokenizeIndonesianText(text, languageSystem = 'SIBI') {
     // A. Evaluasi N-Gram 2 kata (Frasa Majemuk)
     if (i < rawWords.length - 1) {
       const twoWordPhrase = `${rawWords[i]} ${rawWords[i + 1]}`;
-      const foundPhrase = SIGN_DICTIONARY.find(
+      const foundPhrase = dict.find(
         (item) =>
           item.kata.toLowerCase() === twoWordPhrase &&
-          (item.tipe_bahasa === 'BOTH' || item.tipe_bahasa === languageSystem)
+          (item.tipe_bahasa === 'BOTH' || item.tipe_bahasa === languageSystem || !item.tipe_bahasa)
       );
 
       if (foundPhrase) {
@@ -71,10 +72,10 @@ export function tokenizeIndonesianText(text, languageSystem = 'SIBI') {
 
     // B. Evaluasi Kata Tunggal (Single Word Lookup)
     const singleWord = rawWords[i];
-    const foundWord = SIGN_DICTIONARY.find(
+    const foundWord = dict.find(
       (item) =>
         item.kata.toLowerCase() === singleWord &&
-        (item.tipe_bahasa === 'BOTH' || item.tipe_bahasa === languageSystem)
+        (item.tipe_bahasa === 'BOTH' || item.tipe_bahasa === languageSystem || !item.tipe_bahasa)
     );
 
     if (foundWord) {

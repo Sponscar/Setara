@@ -7,6 +7,7 @@
  *   - Form penambahan komunitas baru oleh admin (dengan upload logo & validasi foto maks 2MB).
  *   - Sub-panel moderasi persetujuan & penolakan pengajuan komunitas dari publik.
  *   - Sub-panel daftar komunitas terverifikasi aktif dengan filter pencarian, tombol Edit, dan tombol Hapus.
+ *   - Operasi asynchronous terhubung langsung ke REST API Django Ninja (/api/komunitas/*).
  * Pattern: Controlled Component, Form Validation, Repository Integration.
  * ==============================================================================
  */
@@ -22,7 +23,8 @@ import {
   CheckCircle2, 
   AlertCircle, 
   Search, 
-  ExternalLink 
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { getPlatformBadge } from '../../helpers/adminHelpers';
 
@@ -70,6 +72,11 @@ export default function CommunityTab({
   // State pesan error validasi upload logo foto
   const [logoError, setLogoError] = useState('');
 
+  // State loading asynchronous
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [processingId, setProcessingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
   /**
    * Handler untuk memproses upload foto/logo dengan validasi ukuran 2 MB.
    */
@@ -114,36 +121,103 @@ export default function CommunityTab({
   /**
    * Handler submit form pembuatan komunitas baru oleh admin
    */
-  const handleCreateCommunity = (e) => {
+  const handleCreateCommunity = async (e) => {
     e.preventDefault();
     if (!communityForm.nama.trim() || !communityForm.link.trim()) return;
 
-    // Tambahkan langsung ke store komunitas dengan status approved
-    addCommunity({
-      ...communityForm,
-      logo: communityForm.logo || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80'
-    });
+    setIsSubmitting(true);
+    try {
+      const res = await addCommunity({
+        ...communityForm,
+        logo: communityForm.logo || 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?auto=format&fit=crop&w=200&q=80'
+      });
+      setIsSubmitting(false);
 
-    // Reset formulir
-    setCommunityForm({
-      nama: '',
-      platform: 'WhatsApp',
-      kategori: '',
-      link: '',
-      anggota: '',
-      logo: '',
-      deskripsi: '',
-      deskripsiLengkap: '',
-      kontak: '',
-      emailKontak: ''
-    });
-    setLogoError('');
-    if (logoInputRef.current) {
-      logoInputRef.current.value = '';
+      if (res && res.success !== false) {
+        setCommunityForm({
+          nama: '',
+          platform: 'WhatsApp',
+          kategori: '',
+          link: '',
+          anggota: '',
+          logo: '',
+          deskripsi: '',
+          deskripsiLengkap: '',
+          kontak: '',
+          emailKontak: ''
+        });
+        setLogoError('');
+        if (logoInputRef.current) {
+          logoInputRef.current.value = '';
+        }
+        if (showToast) {
+          showToast(`Komunitas "${communityForm.nama}" berhasil diterbitkan ke database.`);
+        }
+      } else if (showToast) {
+        showToast(res?.error || 'Gagal menambahkan komunitas.');
+      }
+    } catch (err) {
+      setIsSubmitting(false);
+      if (showToast) {
+        showToast('Terjadi kesalahan saat menyimpan komunitas.');
+      }
     }
+  };
 
-    if (showToast) {
-      showToast(`Komunitas "${communityForm.nama}" berhasil diterbitkan.`);
+  /**
+   * Handler persetujuan pengajuan komunitas
+   */
+  const handleApprove = async (id, nama) => {
+    setProcessingId(id);
+    try {
+      const res = await approveCommunity(id);
+      setProcessingId(null);
+      if (res && res.success !== false) {
+        if (showToast) showToast(`Komunitas "${nama}" telah disetujui dan aktif.`);
+      } else if (showToast) {
+        showToast(res?.error || 'Gagal menyetujui komunitas.');
+      }
+    } catch (err) {
+      setProcessingId(null);
+      if (showToast) showToast('Terjadi kesalahan saat memproses persetujuan.');
+    }
+  };
+
+  /**
+   * Handler penolakan pengajuan komunitas
+   */
+  const handleReject = async (id, nama) => {
+    setProcessingId(id);
+    try {
+      const res = await rejectCommunity(id);
+      setProcessingId(null);
+      if (res && res.success !== false) {
+        if (showToast) showToast(`Pengajuan "${nama}" ditolak.`);
+      } else if (showToast) {
+        showToast(res?.error || 'Gagal menolak pengajuan.');
+      }
+    } catch (err) {
+      setProcessingId(null);
+      if (showToast) showToast('Terjadi kesalahan saat menolak pengajuan.');
+    }
+  };
+
+  /**
+   * Handler hapus komunitas terverifikasi
+   */
+  const handleDelete = async (id, nama) => {
+    setDeletingId(id);
+    try {
+      const res = await deleteCommunity(id);
+      setDeletingId(null);
+      if (res && res.success !== false) {
+        if (showToast) showToast(`Komunitas "${nama}" berhasil dihapus.`);
+      } else if (showToast) {
+        showToast(res?.error || 'Gagal menghapus komunitas.');
+      }
+    } catch (err) {
+      setDeletingId(null);
+      if (showToast) showToast('Terjadi kesalahan saat menghapus komunitas.');
     }
   };
 
@@ -152,8 +226,9 @@ export default function CommunityTab({
   const approvedList = communityList
     .filter((c) => c.status === 'approved')
     .filter((c) => 
-      c.nama.toLowerCase().includes(communitySearch.toLowerCase()) || 
-      c.platform.toLowerCase().includes(communitySearch.toLowerCase())
+      (c.nama || '').toLowerCase().includes(communitySearch.toLowerCase()) || 
+      (c.platform || '').toLowerCase().includes(communitySearch.toLowerCase()) ||
+      (c.kategori || '').toLowerCase().includes(communitySearch.toLowerCase())
     );
 
   return (
@@ -206,10 +281,11 @@ export default function CommunityTab({
               <input
                 type="text"
                 required
+                disabled={isSubmitting}
                 value={communityForm.nama}
                 onChange={(e) => setCommunityForm({ ...communityForm, nama: e.target.value })}
                 placeholder="Contoh: Deaf Club Indonesia"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
               />
             </div>
 
@@ -218,9 +294,10 @@ export default function CommunityTab({
               <div>
                 <label className="font-semibold block mb-1">Platform *</label>
                 <select
+                  disabled={isSubmitting}
                   value={communityForm.platform}
                   onChange={(e) => setCommunityForm({ ...communityForm, platform: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 cursor-pointer"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 cursor-pointer disabled:opacity-50"
                 >
                   <option value="WhatsApp">WhatsApp</option>
                   <option value="Telegram">Telegram</option>
@@ -235,10 +312,11 @@ export default function CommunityTab({
                 <input
                   type="text"
                   required
+                  disabled={isSubmitting}
                   value={communityForm.kategori}
                   onChange={(e) => setCommunityForm({ ...communityForm, kategori: e.target.value })}
                   placeholder="Contoh: Belajar Isyarat"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -249,10 +327,11 @@ export default function CommunityTab({
               <input
                 type="url"
                 required
+                disabled={isSubmitting}
                 value={communityForm.link}
                 onChange={(e) => setCommunityForm({ ...communityForm, link: e.target.value })}
                 placeholder="https://chat.whatsapp.com/... atau https://..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px] disabled:opacity-50"
               />
             </div>
 
@@ -261,10 +340,11 @@ export default function CommunityTab({
               <label className="font-semibold block mb-1">Estimasi Anggota</label>
               <input
                 type="text"
+                disabled={isSubmitting}
                 value={communityForm.anggota}
                 onChange={(e) => setCommunityForm({ ...communityForm, anggota: e.target.value })}
                 placeholder="Contoh: 1.000+ Anggota"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
               />
             </div>
 
@@ -334,10 +414,11 @@ export default function CommunityTab({
                 <input
                   type="text"
                   required
+                  disabled={isSubmitting}
                   value={communityForm.kontak}
                   onChange={(e) => setCommunityForm({ ...communityForm, kontak: e.target.value })}
                   placeholder="Nama koordinator"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
                 />
               </div>
 
@@ -345,10 +426,11 @@ export default function CommunityTab({
                 <label className="font-semibold block mb-1">Email PIC</label>
                 <input
                   type="email"
+                  disabled={isSubmitting}
                   value={communityForm.emailKontak}
                   onChange={(e) => setCommunityForm({ ...communityForm, emailKontak: e.target.value })}
                   placeholder="email@komunitas.id"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -359,10 +441,11 @@ export default function CommunityTab({
               <textarea
                 rows="2"
                 required
+                disabled={isSubmitting}
                 value={communityForm.deskripsi}
                 onChange={(e) => setCommunityForm({ ...communityForm, deskripsi: e.target.value })}
                 placeholder="Penjelasan ringkas komunitas..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
               />
             </div>
 
@@ -371,20 +454,31 @@ export default function CommunityTab({
               <label className="font-semibold block mb-1">Deskripsi Lengkap (Opsional)</label>
               <textarea
                 rows="2"
+                disabled={isSubmitting}
                 value={communityForm.deskripsiLengkap}
                 onChange={(e) => setCommunityForm({ ...communityForm, deskripsiLengkap: e.target.value })}
                 placeholder="Detail profil, visi, dan kegiatan..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
               />
             </div>
 
             {/* Tombol Publikasi */}
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-brand-600/20 hover:scale-[1.02] active:scale-98 transition-all"
+              disabled={isSubmitting}
+              className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-brand-600/20 hover:scale-[1.02] active:scale-98 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Upload className="w-4 h-4" />
-              <span>Publikasikan Komunitas</span>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Menyimpan ke Database...</span>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  <span>Publikasikan Komunitas</span>
+                </>
+              )}
             </button>
           </form>
         </div>
@@ -421,16 +515,18 @@ export default function CommunityTab({
                       <p className="text-slate-600 dark:text-slate-300 line-clamp-2">{c.deskripsi}</p>
                       <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-400">
                         <span>PIC: <strong className="text-slate-700 dark:text-slate-200">{c.kontak}</strong></span>
-                        {c.emailKontak && <span>Email: {c.emailKontak}</span>}
-                        <a
-                          href={c.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-brand-500 hover:underline inline-flex items-center gap-0.5"
-                        >
-                          <span>Link Tautan</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                        {(c.emailKontak || c.email_kontak) && <span>Email: {c.emailKontak || c.email_kontak}</span>}
+                        {c.link && (
+                          <a
+                            href={c.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand-500 hover:underline inline-flex items-center gap-0.5"
+                          >
+                            <span>Link Tautan</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
                       </div>
                     </div>
 
@@ -438,22 +534,24 @@ export default function CommunityTab({
                     <div className="flex sm:flex-col items-center gap-1.5 shrink-0">
                       <button
                         type="button"
-                        onClick={() => {
-                          approveCommunity(c.id);
-                          if (showToast) showToast(`Komunitas "${c.nama}" telah disetujui dan aktif.`);
-                        }}
-                        className="w-full px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-1 cursor-pointer text-xs transition-colors"
+                        disabled={processingId === c.id}
+                        onClick={() => handleApprove(c.id, c.nama)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold flex items-center justify-center gap-1 cursor-pointer text-xs transition-colors disabled:opacity-50"
                       >
-                        <Check className="w-3.5 h-3.5" />
-                        <span>Setujui</span>
+                        {processingId === c.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Setujui</span>
+                          </>
+                        )}
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
-                          rejectCommunity(c.id);
-                          if (showToast) showToast(`Pengajuan "${c.nama}" ditolak.`);
-                        }}
-                        className="w-full px-3 py-1.5 rounded-xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-500 font-bold flex items-center justify-center gap-1 cursor-pointer text-xs transition-colors"
+                        disabled={processingId === c.id}
+                        onClick={() => handleReject(c.id, c.nama)}
+                        className="w-full px-3 py-1.5 rounded-xl bg-rose-600/10 hover:bg-rose-600/20 text-rose-500 font-bold flex items-center justify-center gap-1 cursor-pointer text-xs transition-colors disabled:opacity-50"
                       >
                         <X className="w-3.5 h-3.5" />
                         <span>Tolak</span>
@@ -515,16 +613,20 @@ export default function CommunityTab({
                           <span>{c.kategori}</span>
                           <span>•</span>
                           <span>{c.anggota}</span>
-                          <span>•</span>
-                          <a
-                            href={c.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-brand-500 hover:underline inline-flex items-center gap-0.5"
-                          >
-                            <span>Buka Link</span>
-                            <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
+                          {c.link && (
+                            <>
+                              <span>•</span>
+                              <a
+                                href={c.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-brand-500 hover:underline inline-flex items-center gap-0.5"
+                              >
+                                <span>Buka Link</span>
+                                <ExternalLink className="w-2.5 h-2.5" />
+                              </a>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -541,14 +643,16 @@ export default function CommunityTab({
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
-                          deleteCommunity(c.id);
-                          if (showToast) showToast(`Komunitas "${c.nama}" berhasil dihapus.`);
-                        }}
-                        className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors"
+                        disabled={deletingId === c.id}
+                        onClick={() => handleDelete(c.id, c.nama)}
+                        className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 cursor-pointer shrink-0 transition-colors disabled:opacity-50"
                         title="Hapus Komunitas"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {deletingId === c.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
                       </button>
                     </div>
                   </div>

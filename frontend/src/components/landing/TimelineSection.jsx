@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==============================================================================
  * File: TimelineSection.jsx
  * Direktori: src/components/landing/
@@ -12,7 +12,7 @@
  * ==============================================================================
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
   Milestone, 
@@ -30,7 +30,11 @@ import {
  */
 export default function TimelineSection() {
   /** Mengambil daftar milestone dari CMS global store */
-  const { timelineList } = useContentStore();
+  const { timelineList, fetchTimeline } = useContentStore();
+
+  useEffect(() => {
+    fetchTimeline();
+  }, []);
 
   /**
    * Helper pemetaan nama string ikon ke komponen Lucide icon.

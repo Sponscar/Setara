@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ==============================================================================
  * File: NewsSection.jsx
  * Direktori: src/components/landing/
@@ -36,7 +36,11 @@ export default function NewsSection() {
    * =================================================================== */
 
   /** Daftar artikel berita dari CMS global store */
-  const { newsList } = useContentStore();
+  const { newsList, fetchNews, isLoading } = useContentStore();
+
+  useEffect(() => {
+    fetchNews(false);
+  }, []);
 
   /** Kategori aktif yang dipilih pengguna untuk memfilter berita */
   const [selectedCategory, setSelectedCategory] = useState('Semua');
@@ -123,6 +127,20 @@ export default function NewsSection() {
         {/* ===================================================================
          * 5. NEWS CARDS GRID — Daftar Artikel Terbit
          * =================================================================== */}
+                {isLoading && newsList.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-3xl glass-card border border-slate-200 dark:border-dark-border overflow-hidden animate-pulse">
+                <div className="aspect-[16/10] w-full bg-slate-200 dark:bg-slate-800"></div>
+                <div className="p-5 space-y-3">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3"></div>
+                  <div className="h-5 bg-slate-200 dark:bg-slate-800 rounded w-4/5"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredNews.map((news) => (
             <div
@@ -169,6 +187,7 @@ export default function NewsSection() {
             </div>
           ))}
         </div>
+        )}
 
         {/* ===================================================================
          * 6. NEWS DETAIL MODAL (PORTAL TO DOCUMENT.BODY)

@@ -1,13 +1,11 @@
-/**
+﻿/**
  * ==============================================================================
  * File: AdminLoginPage.jsx
  * Direktori: src/components/admin/
- * Deskripsi: Halaman autentikasi login khusus Administrator SETARA.
- * Pattern: Controlled Component Pattern & Authentication Guard Flow.
- * Fitur:
- *   - Form login dengan input email dan password (toggle lihat/sembunyikan password).
- *   - Simulasi verifikasi delay jaringan dan validasi kredensial via useAuthStore.
- *   - Tampilan glassmorphism modern dengan tombol kembali ke beranda dan toggle tema.
+ * Deskripsi: Halaman Login Administrator Platform SETARA.
+ * Integrasi:
+ *   - Autentikasi riil menggunakan JWT Django Ninja API via useAuthStore.
+ *   - Error feedback langsung dari API backend.
  * ==============================================================================
  */
 
@@ -16,23 +14,23 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { useThemeStore } from '../../stores/useThemeStore';
 import {
   ShieldCheck,
+  Mail,
+  Lock,
   Eye,
   EyeOff,
-  ArrowLeft,
   LogIn,
   AlertCircle,
   Sparkles,
-  Lock,
-  Mail,
+  ArrowLeft,
   Sun,
   Moon
 } from 'lucide-react';
 
 /**
- * Komponen Halaman Login Administrator.
- * 
+ * Komponen Halaman Login Administrator SETARA
+ *
  * @param {Object} props
- * @param {Function} props.onBackToHome - Callback navigasi kembali ke halaman utama / landing page
+ * @param {Function} props.onBackToHome - Callback navigasi kembali ke beranda utama
  * @param {Function} props.onLoginSuccess - Callback setelah login berhasil divalidasi
  */
 export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
@@ -50,7 +48,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
   /**
    * Handler submit autentikasi login
    */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -62,21 +60,25 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
 
     setLoading(true);
 
-    // Simulasi delay verifikasi jaringan (800ms)
-    setTimeout(() => {
-      const result = login(email, password);
+    try {
+      const result = await login(email.trim(), password);
       setLoading(false);
 
       if (result.success) {
-        onLoginSuccess();
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
       } else {
-        setError(result.error);
+        setError(result.error || 'Email atau kata sandi salah.');
       }
-    }, 800);
+    } catch (err) {
+      setLoading(false);
+      setError('Gagal terhubung ke server backend. Pastikan server aktif.');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg flex flex-col items-center justify-center px-4 relative overflow-hidden bg-grid-pattern transition-colors duration-300">
+    <div className="min-h-screen relative flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 via-white to-amber-50/20 dark:from-dark-bg dark:via-slate-900 dark:to-dark-bg transition-colors duration-500 overflow-hidden font-sans">
       {/* Elemen Dekoratif Efek Blur Latar Belakang */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -209,7 +211,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
             <div className="flex items-start gap-2 text-xs text-slate-400 dark:text-slate-500">
               <Sparkles className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500/60" />
               <p>
-                <strong className="text-slate-500 dark:text-slate-400">Demo:</strong> Gunakan email yang mengandung kata "admin" (contoh: <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-[11px]">admin@setara.id</code>) dan kata sandi <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-[11px]">setara2026</code>
+                <strong className="text-slate-500 dark:text-slate-400">Akun Admin:</strong> <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-[11px]">admin@setara.id</code> / <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-[11px]">setara2026</code>
               </p>
             </div>
           </div>
@@ -217,7 +219,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
 
         {/* Footer Hak Cipta */}
         <p className="text-center text-xs text-slate-400 dark:text-slate-500 mt-6">
-          © 2026 SETARA · Hanya administrator yang memiliki akses ke halaman ini
+          &copy; 2026 SETARA &bull; Hanya administrator yang memiliki akses ke halaman ini
         </p>
       </div>
     </div>

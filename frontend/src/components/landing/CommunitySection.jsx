@@ -11,7 +11,7 @@
  * ==============================================================================
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
   Users, 
@@ -48,8 +48,15 @@ export default function CommunitySection() {
     communityList, 
     submitCommunity, 
     testimonialList, 
-    addTestimonial 
+    addTestimonial,
+    fetchCommunities,
+    fetchTestimonials
   } = useContentStore();
+
+  useEffect(() => {
+    fetchCommunities(false);
+    fetchTestimonials();
+  }, []);
 
   // --- 2. LOCAL STATE FILTER & SEARCH ---
   const [selectedCategory, setSelectedCategory] = useState('Semua');

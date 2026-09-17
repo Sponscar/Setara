@@ -54,21 +54,35 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
   const { theme, toggleTheme } = useThemeStore();
   const {
     newsList,
+    fetchNews,
     addNews,
+    updateNews,
     deleteNews,
     timelineList,
+    fetchTimeline,
     addTimelineMilestone,
     deleteTimelineMilestone,
     customVideos,
+    fetchVideos,
     addCustomVideo,
     deleteCustomVideo,
     communityList,
+    fetchCommunities,
     addCommunity,
     approveCommunity,
     rejectCommunity,
     updateCommunity,
-    deleteCommunity
+    deleteCommunity,
+    fetchTestimonials
   } = useContentStore();
+
+  useEffect(() => {
+    fetchNews(true);
+    fetchTimeline();
+    fetchCommunities(true);
+    fetchVideos(true);
+    fetchTestimonials();
+  }, []);
 
   // --- 2. LOCAL STATE ---
   // Tab aktif saat ini ('overview' | 'berita' | 'video' | 'timeline' | 'komunitas')
@@ -132,10 +146,19 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
   /**
    * Menangani penyimpanan perubahan data edit komunitas
    */
-  const handleSaveEditCommunity = (id, updatedData) => {
-    updateCommunity(id, updatedData);
-    setEditingCommunity(null);
-    showToast(`Komunitas "${updatedData.nama}" berhasil diperbarui.`);
+  const handleSaveEditCommunity = async (id, updatedData) => {
+    try {
+      const res = await updateCommunity(id, updatedData);
+      setEditingCommunity(null);
+      if (res && res.success !== false) {
+        showToast(`Komunitas "${updatedData.nama}" berhasil diperbarui.`);
+      } else {
+        showToast(res?.error || 'Gagal memperbarui komunitas.');
+      }
+    } catch (err) {
+      setEditingCommunity(null);
+      showToast('Terjadi kesalahan saat memperbarui komunitas.');
+    }
   };
 
   // Definisi daftar tab navigasi dashboard
