@@ -38,6 +38,7 @@ import {
   Hand
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { api } from '../../services/api';
 
 /**
  * Data gestur demo untuk simulasi deteksi AI tanpa kamera.
@@ -273,7 +274,7 @@ export default function SignToTextCamera() {
    * @param {string} gesture.word — Kata yang terdeteksi
    * @param {number} gesture.conf — Confidence score
    */
-  const handleTriggerGesture = (gesture) => {
+  const handleTriggerGesture = async (gesture) => {
     setActiveGesture(`Mendeteksi: ${gesture.word.toUpperCase()}`);
     addDetectedWord(gesture.word, gesture.conf);
 
@@ -289,6 +290,14 @@ export default function SignToTextCamera() {
     } catch (e) {
       // ignore
     }
+
+    // Kirim data deteksi ke backend API (async, non-blocking)
+    api.post('/translator/sign-to-text', {
+      frame_data: gesture.pattern || 'simulated_gesture',
+      tipe_bahasa: languageSystem || 'BISINDO'
+    }).catch(() => {
+      // Non-blocking: jika backend offline, tidak menghambat UI
+    });
   };
 
   /**

@@ -1,4 +1,4 @@
-﻿"""
+"""
 API endpoints for Translator app.
 Core translation endpoints - PRD Section 9.4
 """
@@ -7,7 +7,7 @@ from ninja import Router
 from django.http import HttpRequest
 from typing import List
 
-from shared.utils.permissions import AuthBearer, OptionalAuthBearer
+from shared.utils.permissions import OptionalAuthBearer
 from apps.translator.models import TranslationHistory
 from apps.translator.services import TranslatorService
 from apps.translator.schemas import (
@@ -15,10 +15,23 @@ from apps.translator.schemas import (
     SignToTextIn, SignToTextOut,
     TranslationHistoryOut,
 )
-from apps.accounts.schemas import ErrorOut
 
 router = Router()
-auth = AuthBearer()
+_bearer_helper = OptionalAuthBearer()
+
+
+def _get_request_user(request: HttpRequest):
+    """Extract authenticated user from Bearer header if present, else None."""
+    auth_header = request.headers.get('Authorization', '') or request.META.get('HTTP_AUTHORIZATION', '')
+    if auth_header and auth_header.startswith('Bearer '):
+        token = auth_header[7:].strip()
+        user = _bearer_helper.authenticate(request, token)
+        if user and getattr(user, 'is_authenticated', False):
+            return user
+    user = getattr(request, 'user', None)
+    if user and getattr(user, 'is_authenticated', False):
+        return user
+    return None
 
 
 @router.post('/text-to-sign', response=TextToSignOut)
@@ -30,7 +43,7 @@ def text_to_sign(request: HttpRequest, data: TextToSignIn):
     result = TranslatorService.text_to_sign(data.teks, data.tipe_bahasa)
 
     # Save history if user is authenticated
-    user = getattr(request, 'user', None)
+    user = _get_request_user(request)
     if user and hasattr(user, 'id'):
         try:
             video_ids = [
@@ -62,10 +75,13 @@ def sign_to_text(request: HttpRequest, data: SignToTextIn):
     return result
 
 
-@router.get('/history', response=List[TranslationHistoryOut], auth=auth)
+@router.get('/history', response=List[TranslationHistoryOut])
 def translation_history(request: HttpRequest):
-    """Get translation history for authenticated user."""
-    user = request.auth
+    """Get translation history for user if authenticated, else return empty list."""
+    user = _get_request_user(request)
+    if not user or not hasattr(user, 'id'):
+        return []
+
     qs = TranslationHistory.objects.filter(user=user)[:50]
     return [
         {

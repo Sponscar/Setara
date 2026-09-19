@@ -87,7 +87,11 @@ export default function TextToSignPlayer() {
     jumpToWord,
     replay,
     setPlaybackSpeed,
-    toggleLooping
+    toggleLooping,
+    visualMode,
+    dictionary,
+    fetchDictionary,
+    dbStatus
   } = useTranslatorStore();
 
   /* ===================================================================
@@ -97,6 +101,8 @@ export default function TextToSignPlayer() {
   const [inputVal, setInputVal] = useState(textInput || 'aku sayang ibu');
   /** @ref {number|null} timerRef — ID timeout untuk FSM sequential timer */
   const timerRef = useRef(null);
+  /** @ref {HTMLVideoElement} videoPlayerRef — Elemen <video> untuk pemutar MP4 */
+  const videoPlayerRef = useRef(null);
 
   /* ===================================================================
    * 3. SIDE EFFECTS — Lifecycle hooks komponen
@@ -107,6 +113,7 @@ export default function TextToSignPlayer() {
    * Memastikan user langsung melihat hasil terjemahan contoh kalimat default.
    */
   useEffect(() => {
+    fetchDictionary();
     if (tokens.length === 0 && inputVal) {
       translateText(inputVal);
     }
@@ -201,6 +208,10 @@ export default function TextToSignPlayer() {
   const currentPattern = currentToken?.matchedData?.gesture_pattern || 'hand_wave_forehead';
   /** @type {string} Deskripsi gerakan isyarat untuk info panel */
   const currentDescription = currentToken?.matchedData?.deskripsi_gerakan || '';
+  /** @type {string|null} URL video MP4 dari database PostgreSQL jika tersedia */
+  const currentVideoUrl = currentToken?.video_url || currentToken?.matchedData?.video_url || null;
+  /** @type {boolean} Apakah pemutar video MP4 aktif dan memiliki berkas video */
+  const showVideoPlayer = visualMode === 'video' && Boolean(currentVideoUrl);
 
   /* ===================================================================
    * 6. JSX RENDER — Tampilan utama komponen
@@ -231,7 +242,12 @@ export default function TextToSignPlayer() {
 
           {/* Sample quick chips */}
           <div className="flex items-center gap-2 flex-wrap pt-1">
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Contoh Kalimat:</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center gap-1">
+              Contoh Kalimat
+              {dbStatus === 'connected' && (
+                <span className="text-[10px] text-emerald-500">({dictionary.length}+ kata di DB)</span>
+              )}:
+            </span>
             {SAMPLE_SENTENCES.map((s, idx) => (
               <button
                 key={idx}
@@ -250,15 +266,59 @@ export default function TextToSignPlayer() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Visual Sign Canvas Animator */}
         <div className="lg:col-span-7 flex flex-col">
-          <div className="aspect-[4/3] w-full min-h-[340px] max-h-[420px]">
-            <SignCanvasAnimator
-              currentWord={currentWord}
-              gesturePattern={currentPattern}
-              languageSystem={languageSystem}
-              isPlaying={playbackState === 'PLAYING'}
-              speed={playbackSpeed}
-              description={currentDescription}
-            />
+          <div className="aspect-[4/3] w-full min-h-[340px] max-h-[420px] relative">
+            {/* Mode 1: Canvas 2D Kinematics Animation (Default) */}
+            {!showVideoPlayer && (
+              <SignCanvasAnimator
+                currentWord={currentWord}
+                gesturePattern={currentPattern}
+                languageSystem={languageSystem}
+                isPlaying={playbackState === 'PLAYING'}
+                speed={playbackSpeed}
+                description={currentDescription}
+              />
+            )}
+
+            {/* Mode 2: Video MP4 Player dari Database */}
+            {showVideoPlayer && (
+              <div className="w-full h-full rounded-2xl overflow-hidden bg-black border border-purple-500/30 shadow-lg shadow-purple-500/10 relative">
+                <video
+                  ref={videoPlayerRef}
+                  key={currentVideoUrl}
+                  src={currentVideoUrl}
+                  autoPlay={playbackState === 'PLAYING'}
+                  loop={false}
+                  muted={false}
+                  playsInline
+                  className="w-full h-full object-contain"
+                  onEnded={() => {
+                    if (currentWordIndex < tokens.length - 1) {
+                      nextWord();
+                    } else if (isLooping) {
+                      replay();
+                    } else {
+                      pause();
+                    }
+                  }}
+                />
+                {/* Badge Video Mode */}
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-600/90 backdrop-blur-md text-white border border-purple-400/30 flex items-center gap-1.5">
+                    🎬 Video MP4 Asli
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-600/80 backdrop-blur-md text-white border border-emerald-400/30">
+                    PostgreSQL
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Fallback notice if video mode but no video available */}
+            {visualMode === 'video' && !currentVideoUrl && currentToken && (
+              <div className="absolute bottom-2 left-2 right-2 p-2 rounded-xl bg-amber-500/10 backdrop-blur-md border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] font-medium text-center">
+                ⓘ Video MP4 belum tersedia untuk kata "{currentWord}". Menampilkan animasi Canvas 2D sebagai fallback.
+              </div>
+            )}
           </div>
 
           {/* Playback Controls Bar */}
@@ -399,8 +459,13 @@ export default function TextToSignPlayer() {
             {currentToken && (
               <div className="mt-auto p-4 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700/60 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase">
+                  <span className="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase flex items-center gap-1.5">
                     Kamus {languageSystem}
+                    {currentToken?.fromPostgres && (
+                      <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-500 font-bold normal-case">
+                        PostgreSQL
+                      </span>
+                    )}
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
                     Durasi: ~{currentToken.matchedData?.durasi || 2}s

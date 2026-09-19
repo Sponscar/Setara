@@ -3,6 +3,7 @@ API endpoints for Video app.
 Manajemen video & kamus isyarat - PRD Section 9.3 & Video CMS
 """
 
+import os
 from ninja import Router, File
 from ninja.files import UploadedFile
 from django.http import HttpRequest
@@ -157,9 +158,9 @@ def delete_video(request: HttpRequest, id: UUID):
     return 200, {'message': f'Video "{video.kata}" berhasil dihapus'}
 
 
-@router.post('/{id}/upload', response={200: VideoOut, 403: ErrorOut, 404: ErrorOut}, auth=auth)
+@router.post('/{id}/upload', response={200: VideoOut, 400: ErrorOut, 403: ErrorOut, 404: ErrorOut}, auth=auth)
 def upload_video_file(request: HttpRequest, id: UUID, file: UploadedFile = File(...)):
-    """Upload video file (Admin only)."""
+    """Upload video file (Admin only, Max 5MB, format mp4/webm/mov)."""
     if not is_admin(request):
         return 403, {'detail': 'Hanya admin yang dapat upload video'}
 
@@ -167,7 +168,20 @@ def upload_video_file(request: HttpRequest, id: UUID, file: UploadedFile = File(
     if not video:
         return 404, {'detail': 'Video tidak ditemukan'}
 
-    video.video_file.save(file.name, file)
+    # Validasi ekstensi
+    allowed_exts = ('.mp4', '.webm', '.mov')
+    file_ext = os.path.splitext(file.name.lower())[1]
+    if file_ext not in allowed_exts:
+        return 400, {'detail': f'Format file {file_ext} tidak didukung. Harap unggah video MP4 atau WebM.'}
+
+    # Validasi ukuran berkas maksimal 5 MB
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
+    if file.size > MAX_FILE_SIZE:
+        size_mb = round(file.size / (1024 * 1024), 2)
+        return 400, {'detail': f'Ukuran berkas video ({size_mb} MB) melebihi batas maksimal 5 MB.'}
+
+    clean_filename = f"{video.kata}_{video.id.hex[:8]}{file_ext}"
+    video.video_file.save(clean_filename, file, save=False)
     video.video_url = video.video_file.url
     video.save()
     return 200, _video_to_out(video)

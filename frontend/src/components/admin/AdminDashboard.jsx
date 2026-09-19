@@ -41,6 +41,7 @@ import CommunityTab from './tabs/CommunityTab';
 import LogoutConfirmModal from './modals/LogoutConfirmModal';
 import EditCommunityModal from './modals/EditCommunityModal';
 import EditNewsModal from './modals/EditNewsModal';
+import EditVideoModal from './modals/EditVideoModal';
 
 /**
  * Komponen Utama AdminDashboard.
@@ -66,6 +67,8 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
     customVideos,
     fetchVideos,
     addCustomVideo,
+    updateCustomVideo,
+    uploadVideoFile,
     deleteCustomVideo,
     communityList,
     fetchCommunities,
@@ -95,6 +98,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
   // State objek komunitas yang sedang diedit (null jika modal edit tertutup)
   const [editingCommunity, setEditingCommunity] = useState(null);
   const [editingNews, setEditingNews] = useState(null);
+  const [editingVideo, setEditingVideo] = useState(null);
 
   // State notifikasi toast
   const [toastMessage, setToastMessage] = useState('');
@@ -350,7 +354,9 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
             <VideoTab
               customVideos={customVideos}
               addCustomVideo={addCustomVideo}
+              uploadVideoFile={uploadVideoFile}
               deleteCustomVideo={deleteCustomVideo}
+              onEditVideo={(v) => setEditingVideo(v)}
               showToast={showToast}
             />
           )}
@@ -401,6 +407,16 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
         community={editingCommunity}
         onClose={() => setEditingCommunity(null)}
         onSave={handleSaveEditCommunity}
+      />
+
+      {/* Modal Dialog Edit Kosakata Isyarat */}
+      <EditVideoModal
+        isOpen={!!editingVideo}
+        video={editingVideo}
+        onClose={() => setEditingVideo(null)}
+        onSave={async (id, data) => updateCustomVideo(id, data)}
+        onUploadFile={uploadVideoFile}
+        showToast={showToast}
       />
     </div>
   );

@@ -490,6 +490,53 @@ export const useContentStore = create((set, get) => ({
     }
   },
 
+  updateCustomVideo: async (id, videoItem) => {
+    set({ isLoading: true, error: null });
+    try {
+      const payload = {
+        kata: videoItem.kata ? videoItem.kata.toLowerCase().trim() : undefined,
+        tipe_bahasa: videoItem.tipe_bahasa,
+        kategori: videoItem.kategori,
+        tag: videoItem.tag,
+        durasi: videoItem.durasi ? Number(videoItem.durasi) : undefined,
+        gesture_pattern: videoItem.gesture_pattern,
+        deskripsi_gerakan: videoItem.deskripsi_gerakan,
+        video_url: videoItem.video_url,
+        thumbnail_url: videoItem.thumbnail_url,
+        status: videoItem.status
+      };
+
+      const updated = await api.put(`/video/${id}`, payload);
+      const normalized = normalizeVideo(updated);
+      set((state) => ({
+        customVideos: state.customVideos.map((v) => (v.id === String(id) ? normalized : v)),
+        isLoading: false
+      }));
+      return { success: true, item: normalized };
+    } catch (err) {
+      set({ isLoading: false, error: err.message });
+      return { success: false, error: err.message };
+    }
+  },
+
+  uploadVideoFile: async (id, file) => {
+    set({ isLoading: true, error: null });
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const updated = await api.upload(`/video/${id}/upload`, formData);
+      const normalized = normalizeVideo(updated);
+      set((state) => ({
+        customVideos: state.customVideos.map((v) => (v.id === String(id) ? normalized : v)),
+        isLoading: false
+      }));
+      return { success: true, item: normalized };
+    } catch (err) {
+      set({ isLoading: false, error: err.message });
+      return { success: false, error: err.message };
+    }
+  },
+
   deleteCustomVideo: async (id) => {
     set({ isLoading: true, error: null });
     try {

@@ -11,7 +11,7 @@
  * ==============================================================================
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslatorStore } from '../../stores/useTranslatorStore';
 import TextToSignPlayer from './TextToSignPlayer';
 import SignToTextCamera from './SignToTextCamera';
@@ -21,7 +21,10 @@ import {
   History, 
   Check, 
   Sparkles, 
-  Trash2 
+  Trash2,
+  Database,
+  Film,
+  Tv
 } from 'lucide-react';
 
 /**
@@ -38,8 +41,20 @@ export default function TranslatorHub({ isStandalone = false }) {
     activeTab,
     setActiveTab,
     history,
-    clearHistory
+    clearHistory,
+    fetchDictionary,
+    dbStatus,
+    dictionary,
+    visualMode,
+    setVisualMode,
+    fetchHistory
   } = useTranslatorStore();
+  // Fetch dictionary dan riwayat saat halaman dimuat
+  useEffect(() => {
+    fetchDictionary();
+    fetchHistory();
+  }, []);
+
 
   return (
     <section id="translator" className={`${isStandalone ? 'py-4' : 'py-12 md:py-16'} relative scroll-mt-28`}>
@@ -49,9 +64,20 @@ export default function TranslatorHub({ isStandalone = false }) {
         {/* 1. HEADER UTAMA SECTION PENERJEMAH                                   */}
         {/* ===================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Penerjemah Dua Arah Cerdas</span>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Penerjemah Dua Arah Cerdas</span>
+            </div>
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+              dbStatus === 'connected'
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+            }`}>
+              <Database className="w-3.5 h-3.5" />
+              <span className="w-2 h-2 rounded-full animate-pulse" style={{background: dbStatus === 'connected' ? '#10b981' : '#ef4444'}}></span>
+              <span>{dbStatus === 'connected' ? `PostgreSQL (${dictionary.length}+ Kata)` : 'Offline'}</span>
+            </div>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
             Penerjemah Isyarat <span className="gradient-text-primary">SETARA</span>
@@ -192,6 +218,40 @@ export default function TranslatorHub({ isStandalone = false }) {
             </button>
           </div>
         </div>
+
+        {/* ===================================================================== */}
+        {/* 3B. SWITCH MODE VISUAL: ANIMASI CANVAS 2D vs VIDEO MP4 ASLI          */}
+        {/* ===================================================================== */}
+        {activeTab === 'text-to-sign' && (
+          <div className="flex items-center justify-center mb-6">
+            <div className="p-1 rounded-2xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setVisualMode('animation')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                  visualMode === 'animation'
+                    ? 'bg-emerald-600 text-white shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Tv className="w-3.5 h-3.5" />
+                <span>🎭 Animasi Canvas 2D</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setVisualMode('video')}
+                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                  visualMode === 'video'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Film className="w-3.5 h-3.5" />
+                <span>🎬 Video MP4 Asli</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ===================================================================== */}
         {/* 4. KONTEN DARI TAB YANG AKTIF                                        */}
