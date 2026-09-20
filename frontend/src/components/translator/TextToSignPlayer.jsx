@@ -105,7 +105,23 @@ export default function TextToSignPlayer() {
   const videoPlayerRef = useRef(null);
 
   /* ===================================================================
-   * 3. SIDE EFFECTS — Lifecycle hooks komponen
+   * 3. DERIVED VALUES — Nilai turunan dari state untuk render & effects
+   * =================================================================== */
+  /** @type {Object|null} Token kata yang sedang aktif diputar */
+  const currentToken = tokens[currentWordIndex] || null;
+  /** @type {string} Kata aktif untuk dikirim ke canvas animator */
+  const currentWord = currentToken?.word || 'siap';
+  /** @type {string} Pattern gestur isyarat untuk animasi canvas */
+  const currentPattern = currentToken?.matchedData?.gesture_pattern || 'hand_wave_forehead';
+  /** @type {string} Deskripsi gerakan isyarat untuk info panel */
+  const currentDescription = currentToken?.matchedData?.deskripsi_gerakan || '';
+  /** @type {string|null} URL video MP4 dari database PostgreSQL jika tersedia */
+  const currentVideoUrl = currentToken?.video_url || currentToken?.matchedData?.video_url || null;
+  /** @type {boolean} Apakah pemutar video MP4 aktif dan memiliki berkas video */
+  const showVideoPlayer = visualMode === 'video' && Boolean(currentVideoUrl);
+
+  /* ===================================================================
+   * 4. SIDE EFFECTS — Lifecycle hooks komponen
    * =================================================================== */
 
   /**
@@ -133,6 +149,13 @@ export default function TextToSignPlayer() {
    * 5. Cleanup: clearTimeout saat unmount atau dependency berubah.
    */
   useEffect(() => {
+    // Jika sedang dalam mode pemutar video MP4 dan video tersedia, 
+    // durasi playback dikontrol penuh oleh durasi riil berkas video dan event onEnded.
+    if (showVideoPlayer) {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      return;
+    }
+
     if (playbackState !== 'PLAYING' || tokens.length === 0) {
       if (timerRef.current) clearTimeout(timerRef.current);
       return;
@@ -170,8 +193,35 @@ export default function TextToSignPlayer() {
     };
   }, [playbackState, currentWordIndex, tokens, playbackSpeed, isLooping]);
 
+  /**
+   * Effect: Sinkronisasi pemutar video MP4 dengan status playback dan kecepatan.
+   * Mengontrol play/pause secara imperatif dan menangani autoplay browser restriction.
+   */
+  useEffect(() => {
+    const video = videoPlayerRef.current;
+    if (!video || !showVideoPlayer) return;
+
+    video.playbackRate = playbackSpeed;
+
+    if (playbackState === 'PLAYING') {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Playback error (retrying with muted):', err);
+          video.muted = true;
+          video.play().catch(() => {});
+        });
+      }
+    } else if (playbackState === 'PAUSED' || playbackState === 'IDLE') {
+      video.pause();
+    } else if (playbackState === 'COMPLETED') {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [playbackState, playbackSpeed, currentVideoUrl, showVideoPlayer, currentWordIndex]);
+
   /* ===================================================================
-   * 4. EVENT HANDLERS — Aksi user pada form & chip
+   * 5. EVENT HANDLERS — Aksi user pada form & chip
    * =================================================================== */
 
   /**
@@ -196,22 +246,6 @@ export default function TextToSignPlayer() {
     setTextInput(sentence);
     translateText(sentence);
   };
-
-  /* ===================================================================
-   * 5. DERIVED VALUES — Nilai turunan dari state untuk render
-   * =================================================================== */
-  /** @type {Object|null} Token kata yang sedang aktif diputar */
-  const currentToken = tokens[currentWordIndex] || null;
-  /** @type {string} Kata aktif untuk dikirim ke canvas animator */
-  const currentWord = currentToken?.word || 'siap';
-  /** @type {string} Pattern gestur isyarat untuk animasi canvas */
-  const currentPattern = currentToken?.matchedData?.gesture_pattern || 'hand_wave_forehead';
-  /** @type {string} Deskripsi gerakan isyarat untuk info panel */
-  const currentDescription = currentToken?.matchedData?.deskripsi_gerakan || '';
-  /** @type {string|null} URL video MP4 dari database PostgreSQL jika tersedia */
-  const currentVideoUrl = currentToken?.video_url || currentToken?.matchedData?.video_url || null;
-  /** @type {boolean} Apakah pemutar video MP4 aktif dan memiliki berkas video */
-  const showVideoPlayer = visualMode === 'video' && Boolean(currentVideoUrl);
 
   /* ===================================================================
    * 6. JSX RENDER — Tampilan utama komponen
@@ -286,11 +320,17 @@ export default function TextToSignPlayer() {
                   ref={videoPlayerRef}
                   key={currentVideoUrl}
                   src={currentVideoUrl}
-                  autoPlay={playbackState === 'PLAYING'}
-                  loop={false}
-                  muted={false}
+                  muted
                   playsInline
-                  className="w-full h-full object-contain"
+                  preload="auto"
+                  className="w-full h-full object-contain cursor-pointer"
+                  onClick={togglePlayPause}
+                  onPlay={() => {
+                    if (playbackState !== 'PLAYING') play();
+                  }}
+                  onPause={() => {
+                    if (playbackState === 'PLAYING') pause();
+                  }}
                   onEnded={() => {
                     if (currentWordIndex < tokens.length - 1) {
                       nextWord();
@@ -298,6 +338,13 @@ export default function TextToSignPlayer() {
                       replay();
                     } else {
                       pause();
+                      try {
+                        confetti({
+                          particleCount: 35,
+                          spread: 60,
+                          origin: { y: 0.7 }
+                        });
+                      } catch (e) {}
                     }
                   }}
                 />

@@ -79,8 +79,13 @@ export default function TranslatorHub({ isStandalone = false }) {
               <span>{dbStatus === 'connected' ? `PostgreSQL (${dictionary.length}+ Kata)` : 'Offline'}</span>
             </div>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Penerjemah Isyarat <span className="gradient-text-primary">SETARA</span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
+            <img
+              src="/Setara Logo.jpg"
+              alt="SETARA Logo"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl object-cover shadow-lg shadow-brand-500/20 border border-slate-200/80 dark:border-white/10"
+            />
+            <span>Penerjemah Isyarat <span className="gradient-text-primary">SETARA</span></span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
             Pilih sistem bahasa isyarat dan mode terjemahan yang Anda butuhkan secara instan.

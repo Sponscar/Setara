@@ -22,10 +22,34 @@ class TranslatorService:
         kata_tidak_tersedia = []
 
         for kata in kata_list:
+            # 1. Cari video sesuai kata & tipe_bahasa yang dipilih, prioritaskan yang memiliki berkas/URL video aktif
             video = Video.objects.filter(
                 kata__iexact=kata,
+                tipe_bahasa=tipe_bahasa,
                 status='active',
-            ).first()
+            ).exclude(video_url='', video_file='').first()
+
+            if not video:
+                # Cari sesuai tipe_bahasa aktif
+                video = Video.objects.filter(
+                    kata__iexact=kata,
+                    tipe_bahasa=tipe_bahasa,
+                    status='active',
+                ).first()
+
+            # 2. Jika tidak ada file video di tipe_bahasa aktif, lakukan fallback cerdas ke video bahasa isyarat mitra
+            if not video or (not video.video_url and not video.video_file):
+                other_video = Video.objects.filter(
+                    kata__iexact=kata,
+                    status='active',
+                ).exclude(video_url='', video_file='').first()
+                if other_video:
+                    video = other_video
+                elif not video:
+                    video = Video.objects.filter(
+                        kata__iexact=kata,
+                        status='active',
+                    ).first()
 
             if video:
                 v_url = video.video_url or (video.video_file.url if video.video_file else None)

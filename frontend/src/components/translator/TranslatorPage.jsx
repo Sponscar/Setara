@@ -48,17 +48,17 @@ export default function TranslatorPage({ onBackToHome, onNavigate }) {
 
   return (
     <div className="pt-3 sm:pt-4 pb-16 sm:pb-20">
-      {/* ======================================================================= */}
+            {/* ======================================================================= */}
       {/* 1. STICKY FLOATING HEADER & BREADCRUMB BAR                              */}
       {/* ======================================================================= */}
       <div className="sticky top-3 sm:top-4 z-40 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 transition-all duration-300">
-        <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 rounded-3xl backdrop-blur-2xl transition-all duration-300 ${
+        <div className={`flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 p-3 sm:p-4 rounded-3xl backdrop-blur-2xl transition-all duration-300 ${
           isScrolled
             ? 'bg-white/90 dark:bg-dark-card/90 shadow-2xl border border-brand-500/30 shadow-brand-500/10 scale-[0.99] sm:scale-100'
             : 'glass-card border border-slate-200/80 dark:border-dark-border shadow-lg'
         }`}>
-          {/* Tombol Kembali & Breadcrumb Navigasi */}
-          <div className="flex items-center gap-3">
+          {/* SISI KIRI: Tombol Kembali, Logo SETARA, Divider, Logo TCC & TRIPLE-C, Breadcrumb */}
+          <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
             <button
               type="button"
               onClick={onBackToHome}
@@ -66,26 +66,103 @@ export default function TranslatorPage({ onBackToHome, onNavigate }) {
               title="Kembali ke Beranda"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Kembali ke Beranda</span>
+              <span className="hidden sm:inline">Kembali</span>
             </button>
-            <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span 
-                className="cursor-pointer hover:underline hover:text-brand-500 transition-colors" 
-                onClick={onBackToHome}
-              >
-                Beranda
+
+            {/* Logo SETARA */}
+            <div
+              onClick={onBackToHome}
+              className="flex items-center gap-2 cursor-pointer group"
+              title="Ke Beranda SETARA"
+            >
+              <div className="w-8 h-8 rounded-xl overflow-hidden shadow-md shadow-brand-500/15 group-hover:scale-105 transition-transform bg-white border border-slate-200/80 dark:border-white/10">
+                <img
+                  src="/Setara Logo.jpg"
+                  alt="SETARA Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <span className="font-black tracking-tight text-slate-900 dark:text-white text-base">
+                SETARA
               </span>
+            </div>
+
+            {/* Subtle Divider */}
+            <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
+            {/* Logo Penyelenggara: JACK, TCC & TRIPLE-C */}
+            <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
+              <div
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                title="JACK"
+              >
+                <img
+                  src="/JACK 2.png"
+                  alt="Logo JACK"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                title="TCC"
+              >
+                <img
+                  src="/Salinan LOGO TCC.png"
+                  alt="Logo TCC"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                title="TRIPLE-C"
+              >
+                <img
+                  src="/Salinan LOGO TRIPLE-C.png"
+                  alt="Logo TRIPLE-C"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+
+            {/* Breadcrumb Path */}
+            <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 pl-1">
               <span>/</span>
-              <span className="font-bold text-slate-900 dark:text-white">Penerjemah Isyarat AI</span>
+              <span className="font-medium text-slate-600 dark:text-slate-300">Penerjemah Isyarat AI</span>
             </div>
           </div>
 
-          {/* Badge Fitur & Toggle Tema */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap">
+          {/* SISI KANAN: Logo UINSA & UISI, Divider, Badges, Toggle Tema */}
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-between sm:justify-end">
+            {/* Logo Institusi Kampus: UINSA & UISI (Ukuran Sama) */}
+            <div className="flex items-center gap-2 pr-1">
+              <div
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                title="UIN Sunan Ampel Surabaya"
+              >
+                <img
+                  src="/Logo UINSA.png"
+                  alt="Logo UINSA"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                title="Universitas Internasional Semen Indonesia (UISI)"
+              >
+                <img
+                  src="/uisi.jpg"
+                  alt="Logo UISI"
+                  className="w-full h-full object-contain rounded-xs"
+                />
+              </div>
+            </div>
+
+            {/* Subtle Divider */}
+            <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Dual Engine: SIBI & BISINDO</span>
+              <span className="hidden sm:inline">Dual Engine:</span> SIBI & BISINDO
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               <Zap className="w-3.5 h-3.5" />

@@ -69,7 +69,13 @@ export const useTranslatorStore = create((set, get) => ({
 
   /** Mode visual player: 'animation' (Canvas 2D) | 'video' (MP4 Asli) */
   visualMode: 'animation',
-  setVisualMode: (mode) => set({ visualMode: mode }),
+  setVisualMode: (mode) => {
+    set({ visualMode: mode });
+    const { tokens, textInput } = get();
+    if (mode === 'video' && textInput && tokens.some((t) => !t.video_url)) {
+      get().translateText(textInput);
+    }
+  },
 
   // ============================================================================
   // 3. STATE & FSM PEMUTAR TEKS KE ISYARAT (TEXT-TO-SIGN - 100% REAL BACKEND)
@@ -187,8 +193,15 @@ export const useTranslatorStore = create((set, get) => ({
   pause: () => set({ playbackState: 'PAUSED' }),
 
   togglePlayPause: () => {
-    const { playbackState, tokens } = get();
+    const { playbackState, tokens, visualMode, textInput } = get();
     if (tokens.length === 0) return;
+
+    // Jika di mode video tetapi token belum memiliki video_url, otomatis refresh translasi dari backend
+    if (visualMode === 'video' && textInput && tokens.some((t) => !t.video_url)) {
+      get().translateText(textInput);
+      return;
+    }
+
     if (playbackState === 'PLAYING') {
       set({ playbackState: 'PAUSED' });
     } else if (playbackState === 'COMPLETED') {

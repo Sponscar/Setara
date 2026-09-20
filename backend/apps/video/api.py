@@ -109,17 +109,34 @@ def create_video(request: HttpRequest, data: VideoCreateIn):
     if not is_admin(request):
         return 403, {'detail': 'Hanya admin yang dapat menambah video'}
 
-    video = Video.objects.create(
-        kata=data.kata.lower().strip(),
-        tipe_bahasa=data.tipe_bahasa,
-        kategori=data.kategori or 'Umum',
-        tag=data.tag or '',
-        durasi=data.durasi or 2,
-        gesture_pattern=data.gesture_pattern or 'hand_wave_forehead',
-        deskripsi_gerakan=data.deskripsi_gerakan or '',
-        video_url=data.video_url or '',
-        thumbnail_url=data.thumbnail_url or '',
-    )
+    # get_or_create to prevent duplicate entries for the same word and language
+    clean_kata = data.kata.lower().strip()
+    video = Video.objects.filter(kata=clean_kata, tipe_bahasa=data.tipe_bahasa).first()
+    if video:
+        # Update existing
+        video.kategori = data.kategori or video.kategori or 'Umum'
+        video.tag = data.tag or video.tag or ''
+        video.durasi = data.durasi or video.durasi or 2
+        video.gesture_pattern = data.gesture_pattern or video.gesture_pattern or 'hand_wave_forehead'
+        video.deskripsi_gerakan = data.deskripsi_gerakan or video.deskripsi_gerakan or ''
+        if data.video_url:
+            video.video_url = data.video_url
+        if data.thumbnail_url:
+            video.thumbnail_url = data.thumbnail_url
+        video.status = 'active'
+        video.save()
+    else:
+        video = Video.objects.create(
+            kata=clean_kata,
+            tipe_bahasa=data.tipe_bahasa,
+            kategori=data.kategori or 'Umum',
+            tag=data.tag or '',
+            durasi=data.durasi or 2,
+            gesture_pattern=data.gesture_pattern or 'hand_wave_forehead',
+            deskripsi_gerakan=data.deskripsi_gerakan or '',
+            video_url=data.video_url or '',
+            thumbnail_url=data.thumbnail_url or '',
+        )
     return 201, _video_to_out(video)
 
 
