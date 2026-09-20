@@ -122,6 +122,9 @@ setara/
 │   ├── requirements.txt               # Dependensi Python
 │   └── manage.py                      # Django CLI utility
 │
+├── database/                          # Skema & Berkas Dump Database
+│   └── setara_db.sql                  # PostgreSQL database dump (tabel & kamus isyarat)
+│
 ├── frontend/                          # Aplikasi Frontend React (Vite)
 │   ├── public/
 │   │   ├── setara-logo.png            # Logo resmi SETARA baru
@@ -195,6 +198,22 @@ cd frontend
 npm install
 npm run dev
 ```
+
+---
+
+### 3. Setup & Restore Database (PostgreSQL)
+
+Untuk memuat skema tabel dan kamus kosakata isyarat awal ke PostgreSQL lokal:
+
+```bash
+# 1. Buat database baru di PostgreSQL (jika belum ada)
+psql -U postgres -c "CREATE DATABASE setara_db;"
+
+# 2. Restore seluruh skema dan data dari berkas dump SQL
+psql -U postgres -d setara_db -f database/setara_db.sql
+```
+
+> **Catatan**: Pastikan konfigurasi pada berkas `backend/.env` sesuai dengan kredensial PostgreSQL Anda (`DB_NAME=setara_db`, `DB_USER=postgres`, `DB_PASSWORD=...`, `DB_PORT=5432`). Jika menggunakan SQLite untuk *quick testing*, Django akan otomatis menginisialisasi database saat menjalankan `python manage.py migrate`.
 
 ---
 
