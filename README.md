@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/logo-setara.svg" alt="SETARA Logo" width="80" />
+  <img src="frontend/public/setara-logo.png" alt="SETARA Logo" width="120" style="border-radius: 24px; box-shadow: 0 8px 30px rgba(234, 88, 12, 0.25);" />
 </p>
 
 <h1 align="center">SETARA</h1>
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  Platform Penerjemah Bahasa Isyarat Indonesia berbasis AI yang mendukung <strong>SIBI</strong> (Sistem Isyarat Bahasa Indonesia) dan <strong>BISINDO</strong> (Bahasa Isyarat Indonesia) secara real-time.
+  Platform Penerjemah Bahasa Isyarat Indonesia berbasis AI yang mendukung <strong>SIBI</strong> (Sistem Isyarat Bahasa Indonesia) dan <strong>BISINDO</strong> (Bahasa Isyarat Indonesia) secara real-time dengan pemutar animasi 21 keypoints dan video peraga asli PostgreSQL.
 </p>
 
 <p align="center">
@@ -17,6 +17,9 @@
   <img src="https://img.shields.io/badge/Vite-6.1-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind" />
   <img src="https://img.shields.io/badge/Zustand-5.0-orange?style=for-the-badge" alt="Zustand" />
+  <img src="https://img.shields.io/badge/Django-5.1-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django" />
+  <img src="https://img.shields.io/badge/Django_Ninja-REST_API-009688?style=for-the-badge" alt="Django Ninja" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License" />
 </p>
 
@@ -30,7 +33,8 @@
 - [Struktur Proyek](#-struktur-proyek)
 - [Instalasi & Menjalankan](#-instalasi--menjalankan)
 - [Halaman & Routing](#-halaman--routing)
-- [Roadmap](#-roadmap)
+- [Roadmap & Progres](#-roadmap--progres)
+- [Afiliasi & Institusi](#-afiliasi--institusi)
 - [Tim Pengembang](#-tim-pengembang)
 - [Lisensi](#-lisensi)
 
@@ -38,78 +42,68 @@
 
 ## 🌟 Tentang Proyek
 
-**SETARA** adalah platform web penerjemah bahasa isyarat Indonesia yang dirancang untuk menjembatani komunikasi antara komunitas Tuli dan masyarakat umum. Platform ini memanfaatkan teknologi **Computer Vision** dan **AI** untuk menerjemahkan teks menjadi peragaan isyarat (Text-to-Sign) serta mendeteksi gestur isyarat dari kamera menjadi teks (Sign-to-Text) secara real-time.
+**SETARA** adalah solusi teknologi inklusif yang dirancang untuk menjembatani kesenjangan komunikasi antara teman Tuli dan masyarakat umum di Indonesia. Mengintegrasikan kemudahan akses web modern dengan kecerdasan buatan, SETARA menghadirkan penerjemah bahasa isyarat dua arah (*Text-to-Sign* dan *Sign-to-Text*) yang presisi dan mudah dipelajari.
 
-### Mengapa SETARA?
-
-Indonesia memiliki **2,5 juta** penyandang tuna rungu, namun aksesibilitas komunikasi digital masih sangat terbatas. SETARA hadir untuk:
-
-- 🤟 **Menerjemahkan teks ke bahasa isyarat** dengan animasi 21 titik sendi tangan
-- 📸 **Mendeteksi gestur isyarat dari kamera** menggunakan model YOLO 11 Pose
-- 📚 **Mengedukasi masyarakat** tentang perbedaan SIBI dan BISINDO
-- 🌍 **Membangun komunitas inklusif** yang setara untuk semua
+### Nilai Utama:
+- 🤝 **Aksesibilitas Tanpa Batas**: Antarmuka responsif dan ramah pembaca layar (WCAG 2.1 AA compliant)
+- 📚 **Edukasi Komprehensif**: Mendukung dua dialek isyarat utama nasional (SIBI dan BISINDO)
+- ⚡ **Dual-Mode Visualizer**: Pilihan visualisasi antara animasi rangka gestur 21 keypoints dan video peraga manusia asli MP4
+- 🌍 **Inklusivitas Komunitas**: Mendorong integrasi sosial, pendidikan, dan profesionalitas disabilitas sensorik rungu
 
 ---
 
 ## ✨ Fitur Utama
 
-### 🔄 Penerjemah Dua Arah (Dual Engine)
+### 🔄 Penerjemah Dua Arah (Dual Engine & Dual Mode)
 
-| Fitur | Deskripsi |
-|-------|-----------|
-| **Text to Sign** | Ketik kalimat → sistem memecah menjadi token kata → memutar animasi isyarat 21 keypoints secara berurutan |
-| **Sign to Text** | Aktifkan webcam → model AI mendeteksi gestur tangan → menerjemahkan menjadi teks secara real-time |
-| **SIBI Engine** | Mendukung Sistem Isyarat Bahasa Indonesia (konteks formal/pendidikan) |
-| **BISINDO Engine** | Mendukung Bahasa Isyarat Indonesia (percakapan alami komunitas Tuli) |
+| Fitur | Deskripsi | Status |
+|---|---|---|
+| **Dual Engine (SIBI & BISINDO)** | Pilihan penerjemahan antara konteks formal edukasi (SIBI) dan percakapan harian komunitas Tuli (BISINDO) | ✅ Aktif |
+| **Text to Sign (FSM Sequential)** | Tokenisasi kalimat otomatis dengan pemutaran sekuensial, pengaturan kecepatan playback (0.5x - 2.0x), dan loop | ✅ Aktif |
+| **Dual-Mode Visualizer** | Toggle instan antara pemutar **Animasi Canvas 2D (21 keypoints)** dan **Video MP4 Asli** dari basis data PostgreSQL | ✅ Aktif |
+| **Sign to Text (Kamera AI)** | Deteksi gestur tangan langsung melalui kamera webcam pengguna secara real-time | ✅ Aktif (Backend MVP) |
+| **Dynamic Dictionary** | Kamus kosakata terhubung ke database Django Ninja & PostgreSQL dengan fallback offline adaptif | ✅ Aktif |
 
-### 🎨 Desain & UI/UX
+### 🎨 Desain & UI/UX Premium
 
-- **Dynamic Island Navbar** — Navbar full-width saat idle, mengecil menjadi floating capsule saat scroll
-- **Glassmorphism Design System** — Desain modern dengan backdrop blur, gradient, dan micro-animations
-- **Dark Mode** — Dukungan tema gelap yang responsif
-- **Orange & Amber Palette** — Identitas visual hangat dan inklusif
-- **Smooth Page Transitions** — Animasi perpindahan halaman yang mulus
+- **Dynamic Island Navbar** — Floating capsule navbar adaptif saat scroll dengan navigasi presisi
+- **Grid Background Pattern** — Aksen visual geometris modern pada halaman Admin Dashboard dan landing page
+- **Glassmorphism Design System** — Backdrop blur, gradien halus HSL, dan mikro-animasi interaktif
+- **Dark Mode Responsive** — Dukungan tema gelap (*Dark Mode*) dan terang (*Light Mode*) dengan persistensi lokal
+- **Identitas Visual Resmi** — Logo emblem SETARA baru, favicon rounded responsif, serta identitas perguruan tinggi (UINSA & UISI)
 
-### 📄 Halaman Landing
+### 🔐 Admin CMS Dashboard
 
-- **Hero Section** — CTA utama dengan animasi pulse glow
-- **Bento Grid Fitur** — Showcase fitur unggulan dalam layout grid modern
-- **Edukasi SIBI vs BISINDO** — Perbandingan mendalam dua sistem isyarat
-- **How It Works** — Panduan langkah demi langkah
-- **Berita & Artikel** — Konten edukasi terkini
-- **Timeline Milestone** — Perjalanan dan pencapaian komunitas
-- **Komunitas** — Aktivitas dan testimoni pengguna
-- **Tentang Kami** — Visi, misi, dan tim pengembang
-
-### 🔐 Admin Dashboard
-
-- **Login Page** — Autentikasi dengan halaman login premium
-- **Manajemen Konten** — CRUD berita, kosakata isyarat, timeline, dan komunitas
-- **Akses via URL** — Hanya dapat diakses melalui `/admin`
+- **Autentikasi Terproteksi** — Login administrator berbasis JSON Web Token (JWT)
+- **Kamus Kosakata Isyarat** — Manajemen kosakata (kata, jenis isyarat SIBI/BISINDO, durasi gerakan, deskripsi gerakan)
+- **Upload Video Peraga** — Pengunggahan berkas video MP4 langsung ke penyimpanan media backend (batas berkas maks 5MB)
+- **Live Video Preview** — Pratinjau video isyarat langsung pada tabel manajemen kosakata
+- **CMS Konten** — Manajemen artikel berita, linimasa milestone komunitas, dan dokumentasi aktivitas
 
 ---
 
 ## 🛠 Tech Stack
 
-### Frontend (Fase 1 — ✅ Selesai)
+### Frontend
 
 | Teknologi | Versi | Kegunaan |
-|-----------|-------|----------|
-| **React** | 18.3 | Library UI komponen |
-| **Vite** | 6.1 | Build tool & dev server |
-| **Tailwind CSS** | 3.4 | Utility-first CSS framework |
-| **Zustand** | 5.0 | State management ringan |
-| **Lucide React** | 0.475 | Icon library |
-| **Canvas Confetti** | 1.9 | Efek celebrasi |
+|---|---|---|
+| **React** | 18.3 | Library komponen UI modern |
+| **Vite** | 6.1+ | Build tool & high-speed development server |
+| **Tailwind CSS** | 3.4 | Utility-first styling dengan sistem tema custom |
+| **Zustand** | 5.0 | Global state management untuk penerjemah, tema, konten, dan autentikasi |
+| **Lucide React** | 0.475 | Ikon antarmuka pengguna yang konsisten |
+| **Canvas Confetti** | 1.9 | Efek mikro-interaksi selebrasi |
 
-### Backend (Fase 2 — 🔜 Segera)
+### Backend
 
-| Teknologi | Kegunaan |
-|-----------|----------|
-| **Django 5** | Web framework Python |
-| **Django Ninja** | REST API framework |
-| **SQLite / PostgreSQL** | Database |
-| **YOLO 11 Pose** | Model deteksi gestur tangan |
+| Teknologi | Versi | Kegunaan |
+|---|---|---|
+| **Django** | 5.1 | Web application framework Python yang kokoh & aman |
+| **Django Ninja** | 1.3+ | REST API framework berkecepatan tinggi berbasis Pydantic |
+| **PostgreSQL** | 16+ | Database relasional utama untuk kamus isyarat dan media video |
+| **PyJWT** | 2.10+ | Otentikasi dan autorisasi token JWT sesi administrator |
+| **Concurrently** | 9.1 | Eksekutor proses paralel frontend dan backend dalam satu perintah |
 
 ---
 
@@ -117,52 +111,42 @@ Indonesia memiliki **2,5 juta** penyandang tuna rungu, namun aksesibilitas komun
 
 ```
 setara/
-├── frontend/                          # Aplikasi React (Vite)
+├── backend/                           # Backend Django Ninja REST API
+│   ├── apps/
+│   │   ├── authentication/            # Modul otentikasi JWT & profil admin
+│   │   ├── content/                   # CMS Berita, linimasa, komunitas
+│   │   ├── translator/                # Engine translasi SIBI & BISINDO
+│   │   └── video/                     # API kamus kosakata, streaming, & upload video MP4
+│   ├── config/                        # Django project configuration & router
+│   ├── media/                         # Direktori berkas video isyarat terunggah
+│   ├── requirements.txt               # Dependensi Python
+│   └── manage.py                      # Django CLI utility
+│
+├── frontend/                          # Aplikasi Frontend React (Vite)
 │   ├── public/
-│   │   ├── favicon.svg
-│   │   ├── icons.svg
-│   │   └── logo-setara.svg
+│   │   ├── setara-logo.png            # Logo resmi SETARA baru
+│   │   ├── Setara Logo.jpg            # Berkas master logo SETARA
+│   │   ├── Logo UINSA.png             # Logo resmi UIN Sunan Ampel Surabaya
+│   │   ├── uisi.jpg                   # Logo resmi Universitas Internasional Semen Indonesia
+│   │   ├── Salinan LOGO TCC.png       # Logo kompetisi TCC
+│   │   ├── Salinan LOGO TRIPLE-C.png  # Logo kompetisi TRIPLE-C
+│   │   ├── favicon.ico                # Favicon rounded
+│   │   └── apple-touch-icon.png       # Web app icon rounded
 │   ├── src/
-│   │   ├── assets/                    # Aset statis
 │   │   ├── components/
-│   │   │   ├── admin/
-│   │   │   │   ├── AdminDashboard.jsx # Dashboard CMS administrator
-│   │   │   │   └── AdminLoginPage.jsx # Halaman login admin
-│   │   │   ├── common/
-│   │   │   │   ├── Navbar.jsx         # Dynamic island navbar
-│   │   │   │   └── Footer.jsx         # Footer global
-│   │   │   ├── landing/
-│   │   │   │   ├── HeroSection.jsx    # Hero banner & CTA
-│   │   │   │   ├── BentoFeatures.jsx  # Grid showcase fitur
-│   │   │   │   ├── SibiBisindoSection.jsx # Edukasi SIBI vs BISINDO
-│   │   │   │   ├── HowItWorks.jsx     # Cara kerja platform
-│   │   │   │   ├── NewsSection.jsx    # Berita & artikel
-│   │   │   │   ├── TimelineSection.jsx# Timeline milestone
-│   │   │   │   ├── CommunitySection.jsx # Komunitas
-│   │   │   │   └── AboutSection.jsx   # Tentang kami
-│   │   │   └── translator/
-│   │   │       ├── TranslatorPage.jsx # Halaman penerjemah mandiri
-│   │   │       ├── TranslatorHub.jsx  # Hub utama penerjemah
-│   │   │       ├── TextToSignPlayer.jsx # Pemutar teks ke isyarat
-│   │   │       ├── SignToTextCamera.jsx # Kamera ke teks (AI)
-│   │   │       └── SignCanvasAnimator.jsx # Animator canvas 21 keypoints
-│   │   ├── services/                  # API service layer
-│   │   ├── stores/
-│   │   │   ├── useAuthStore.js        # State autentikasi
-│   │   │   ├── useThemeStore.js       # State tema (light/dark)
-│   │   │   ├── useTranslatorStore.js  # State penerjemah
-│   │   │   └── useContentStore.js     # State konten CMS
-│   │   ├── utils/                     # Utility functions
-│   │   ├── App.jsx                    # Root app & client-side routing
-│   │   ├── index.css                  # Global styles & animations
-│   │   └── main.jsx                   # Entry point React
-│   ├── index.html
+│   │   │   ├── admin/                 # Admin Dashboard, Login, & Video Editor Modal
+│   │   │   ├── common/                # Dynamic Navbar, Footer, & Shared UI
+│   │   │   ├── landing/               # Hero, Bento Grid, SIBI vs BISINDO, dsb.
+│   │   │   └── translator/            # TranslatorHub, TextToSignPlayer, SignCanvasAnimator
+│   │   ├── stores/                    # Zustand stores (useTranslatorStore, useContentStore, dll.)
+│   │   ├── App.jsx                    # Root routing
+│   │   └── main.jsx                   # React DOM Entry
 │   ├── package.json
 │   ├── tailwind.config.js
-│   ├── postcss.config.js
-│   └── vite.config.js
-├── PRD_SIBI_BISINDO_Translator_v2.0.md # Product Requirements Document
-└── README.md
+│   └── vite.config.js                 # Konfigurasi proxy API & Media
+│
+├── package.json                       # Root script (concurrently runner)
+└── README.md                          # Dokumentasi platform
 ```
 
 ---
@@ -171,33 +155,45 @@ setara/
 
 ### Prasyarat
 
-- **Node.js** ≥ 18.x
-- **npm** ≥ 9.x
+- **Node.js** ≥ 18.x & **npm** ≥ 9.x
+- **Python** ≥ 3.10
+- **PostgreSQL** (opsional pada mode development lokal; dapat menggunakan SQLite otomatis)
 
-### Langkah Instalasi
+### 1. Menjalankan Sekaligus (Rekomendasi)
+
+Dari direktori *root* proyek `setara/`, Anda dapat menjalankan backend dan frontend secara bersamaan menggunakan satu perintah:
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/username/setara.git
-cd setara
-
-# 2. Masuk ke direktori frontend
-cd frontend
-
-# 3. Install dependencies
+# Install dependensi root
 npm install
 
-# 4. Jalankan development server
+# Jalankan Frontend & Backend secara bersamaan
 npm run dev
 ```
 
-Aplikasi akan berjalan di **[http://localhost:5173](http://localhost:5173)**
+* **Frontend**: berjalan di [http://localhost:5173](http://localhost:5173)
+* **Backend API**: berjalan di [http://localhost:8000/api](http://localhost:8000/api)
+* **API Documentation (OpenAPI)**: dapat diakses di [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
 
-### Build Produksi
+---
 
+### 2. Menjalankan Secara Terpisah
+
+#### A. Menyiapkan Backend
 ```bash
-npm run build
-npm run preview
+cd backend
+python -m venv venv
+venv\Scripts\activate  # Linux/macOS: source venv/bin/activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver 8000
+```
+
+#### B. Menyiapkan Frontend
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
@@ -205,74 +201,78 @@ npm run preview
 ## 🗺 Halaman & Routing
 
 | Route | Halaman | Deskripsi |
-|-------|---------|-----------|
-| `/` | Homepage | Landing page lengkap dengan semua section |
-| `/penerjemah` | Penerjemah | Halaman penerjemah isyarat AI mandiri |
-| `/admin` | Admin Login | Halaman login administrator (memerlukan autentikasi) |
+|---|---|---|
+| `/` | Homepage | Landing page komprehensif (Hero, Bento, Edukasi, Berita, Milestone, Tim) |
+| `/penerjemah` | Penerjemah Isyarat AI | Hub penerjemah teks ke isyarat (Dual Mode Canvas & MP4) serta kamera ke teks |
+| `/admin` | Admin Dashboard | Panel administrasi konten, kamus kosakata isyarat, dan unggah video peraga |
 
 ### Kredensial Demo Admin
 
-| Field | Nilai |
-|-------|-------|
-| Email | `admin@setara.id` |
-| Password | `setara2026` |
+| Parameter | Nilai Demo |
+|---|---|
+| **Email** | `admin@setara.id` |
+| **Password** | `setara2026` |
 
 ---
 
-## 🗓 Roadmap
+## 🗓 Roadmap & Progres
 
-### Fase 1: Frontend Development ✅
+### Fase 1: Frontend Architecture ✅
+- [x] Implementasi landing page responsif (Hero, Bento Features, SIBI vs BISINDO, News, Timeline, Community)
+- [x] Sistem tokenisasi kalimat dan pemutar gestur berbasis Finite State Machine (FSM)
+- [x] Animator Canvas 2D peraga skeleton tangan 21 keypoints
+- [x] Dynamic Island navbar dengan transisi ukuran otomatis saat scroll
+- [x] Sistem tema ganda (*Dark/Light mode*) dan micro-animations
 
-- [x] Landing page (Hero, Bento, Edukasi, Berita, Timeline, Komunitas, Tentang)
-- [x] Penerjemah dua arah (Text-to-Sign & Sign-to-Text UI)
-- [x] Animator canvas 21 keypoints skeleton tangan
-- [x] Dynamic island navbar dengan scroll animation
-- [x] Client-side routing (`/`, `/penerjemah`, `/admin`)
-- [x] Admin dashboard dengan login authentication gate
-- [x] Dark mode & responsive design
-- [x] Orange & amber design system
+### Fase 2: Backend Architecture & API Engine ✅
+- [x] Setup Django 5 & Django Ninja REST API berkecepatan tinggi
+- [x] Pemodelan database kamus kosakata isyarat (SIBI & BISINDO)
+- [x] Sistem autentikasi admin terproteksi berbasis JSON Web Token (JWT)
+- [x] Konfigurasi endpoint streaming media dan validasi berkas upload maksimal 5MB
+- [x] Runner konkurensi paralel (`npm run dev`) untuk frontend dan backend
 
-### Fase 2: Backend Development 🔜
+### Fase 3: Full-Stack Integration & Dynamic Dictionary ✅
+- [x] Integrasi komunikasi dua arah Frontend (Zustand) ↔ Backend (Django Ninja)
+- [x] Sinkronisasi kamus isyarat dinamis dari basis data PostgreSQL dengan fallback offline
+- [x] Panel manajemen kosakata di Admin Dashboard dengan modal pengeditan data isyarat
+- [x] Integrasi proxy Vite `/api` dan `/media` menuju server backend Django
 
-- [ ] Django 5 + Django Ninja REST API
-- [ ] Database schema (SQLite → PostgreSQL)
-- [ ] Strategy Pattern untuk SIBI/BISINDO engine
-- [ ] Adapter Pattern untuk YOLO 11 detector
-- [ ] JWT authentication & authorization
+### Fase 4: Dual-Mode Sign Player & Autoplay Compliance ✅
+- [x] Mode pemutar ganda: Animasi Skeleton Canvas 2D + Video Peraga MP4 Asli dari basis data
+- [x] Kepatuhan kebijakan keamanan pemutaran media browser modern (`muted`, `playsInline`, retry handler)
+- [x] Penyelarasan antarmuka Admin Dashboard (Background grid pattern & keselarasan navbar)
+- [x] Integrasi aset branding resmi: Logo SETARA baru, favicon rounded, dan identitas kampus
 
-### Fase 3: Full-Stack Integration 📋
+### Fase 5: Machine Learning & YOLO 11 Integration 🔜
+- [ ] Integrasi model deteksi gestur tangan berbasis YOLO 11 Pose
+- [ ] Pipeline inferensi kamera webcam real-time (target 30+ FPS)
+- [ ] Fine-tuning dataset gestur alfabet dan kata dasar SIBI / BISINDO
 
-- [ ] Koneksi frontend ↔ backend API
-- [ ] Real-time WebSocket untuk deteksi kamera
-- [ ] Upload & manajemen dataset video isyarat
-- [ ] CMS admin dengan data persisten
+### Fase 6: Competition Readiness & Accessibility Audit 📋
+- [ ] Audit aksesibilitas komprehensif (WCAG 2.1 AA)
+- [ ] Optimasi performa aset dan pengujian lintas perangkat
+- [ ] Penyusunan laporan teknis dan video presentasi demonstrasi platform
 
-### Fase 4: AI & YOLO 11 Integration 📋
+---
 
-- [ ] Integrasi model YOLO 11 Pose
-- [ ] Training dataset SIBI & BISINDO
-- [ ] Real-time 21 keypoint hand detection
-- [ ] Optimasi inference (30+ FPS target)
+## 🏛️ Afiliasi & Institusi
 
-### Fase 5: Polish & Competition Ready 📋
+Platform ini dikembangkan dengan bangga sebagai representasi kolaborasi institusi pendidikan:
 
-- [ ] Performance optimization & Lighthouse audit
-- [ ] Accessibility (WCAG 2.1 AA compliance)
-- [ ] SEO optimization
-- [ ] Documentation & deployment guide
-- [ ] Demo video & presentation deck
+* **UIN Sunan Ampel Surabaya (UINSA)**
+* **Universitas Internasional Semen Indonesia (UISI)**
 
 ---
 
 ## 👥 Tim Pengembang
 
-**SETARA** dikembangkan dengan dedikasi untuk menciptakan komunikasi yang inklusif dan setara bagi seluruh masyarakat Indonesia.
+Platform **SETARA** dibangun dengan dedikasi penuh untuk memajukan kesetaraan komunikasi dan keterbukaan akses teknologi bagi komunitas Tuli di seluruh pelosok Indonesia.
 
 ---
 
 ## 📄 Lisensi
 
-Proyek ini dilisensikan di bawah **MIT License** — lihat file [LICENSE](LICENSE) untuk detail.
+Proyek ini dilisensikan di bawah **MIT License** — lihat berkas [LICENSE](LICENSE) untuk detail.
 
 ---
 
