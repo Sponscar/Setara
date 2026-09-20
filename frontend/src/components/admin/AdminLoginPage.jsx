@@ -78,7 +78,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 bg-gradient-to-br from-slate-50 via-white to-amber-50/20 dark:from-dark-bg dark:via-slate-900 dark:to-dark-bg transition-colors duration-500 overflow-hidden font-sans">
+    <div className="min-h-screen relative flex items-center justify-center p-4 bg-slate-50 dark:bg-dark-bg transition-colors duration-500 overflow-hidden font-sans bg-grid-pattern selection:bg-brand-600 selection:text-white">
       {/* Elemen Dekoratif Efek Blur Latar Belakang */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>

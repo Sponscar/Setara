@@ -43,14 +43,16 @@ export default function Footer({ onNavigate }) {
            * 1. BRAND COLUMN — Logo, Tagline, & Kepatuhan Aksesibilitas
            * =================================================================== */}
           <div className="md:col-span-2 space-y-4">
-            <div 
+            <div
               onClick={() => onNavigate('home')}
-              className="flex items-center gap-2.5 cursor-pointer"
+              className="flex items-center gap-2.5 cursor-pointer group"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 p-0.5">
-                <div className="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-amber-400 text-base">
-                  S
-                </div>
+              <div className="w-9 h-9 rounded-xl overflow-hidden shadow-md shadow-brand-500/15 group-hover:scale-105 transition-transform bg-white border border-slate-200/80 dark:border-white/10">
+                <img
+                  src="/Setara Logo.jpg"
+                  alt="SETARA Logo"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                 SETARA
@@ -62,6 +64,66 @@ export default function Footer({ onNavigate }) {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>WCAG 2.1 AA Accessibility Compliant</span>
+            </div>
+
+            {/* Partner & Institution Logos - Sama dengan Navbar */}
+            <div className="pt-4 mt-1">
+              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2.5">
+                Penyelenggara & Kolaborasi
+              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                  title="JACK"
+                >
+                  <img
+                    src="/JACK 2.png"
+                    alt="Logo JACK"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                  title="TCC"
+                >
+                  <img
+                    src="/Salinan LOGO TCC.png"
+                    alt="Logo TCC"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                  title="TRIPLE-C"
+                >
+                  <img
+                    src="/Salinan LOGO TRIPLE-C.png"
+                    alt="Logo TRIPLE-C"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="h-6 w-px bg-slate-200/80 dark:bg-slate-700/80" />
+                <div
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                  title="UIN Sunan Ampel Surabaya"
+                >
+                  <img
+                    src="/Logo UINSA.png"
+                    alt="Logo UINSA"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div
+                  className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                  title="Universitas Internasional Semen Indonesia (UISI)"
+                >
+                  <img
+                    src="/uisi.jpg"
+                    alt="Logo UISI"
+                    className="w-full h-full object-contain rounded-xs"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

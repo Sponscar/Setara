@@ -208,33 +208,87 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-dark-bg text-slate-900 dark:text-slate-100 pb-20 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-dark-bg text-slate-900 dark:text-slate-100 pb-20 transition-colors duration-300 bg-grid-pattern relative selection:bg-brand-600 selection:text-white">
       {/* ======================================================================= */}
       {/* HEADER / TOP NAVBAR ADMINISTRATOR                                       */}
       {/* ======================================================================= */}
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-dark-card/80 border-b border-slate-200 dark:border-dark-border px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-sm">
-        {/* Identitas Logo & Akses Cepat Beranda */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-amber-500 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-black text-lg">
-            S
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white">
-                SETARA Admin CMS
-              </h1>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-                v2.0
-              </span>
+        {/* Identitas Logo & Partner — Sama persis dengan susunan Navbar Landing Page */}
+        <div className="flex items-center gap-2.5 sm:gap-3.5">
+          {/* SETARA Brand Logo */}
+          <div
+            onClick={onBackToHome}
+            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group"
+            title="Kembali ke Beranda"
+          >
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-md shadow-brand-500/15 group-hover:scale-105 transition-all duration-500 bg-white border border-slate-200/80 dark:border-white/10">
+              <img
+                src="/Setara Logo.jpg"
+                alt="SETARA Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
-              Pusat Kendali Konten & Komunitas Bahasa Isyarat
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black tracking-tight text-slate-900 dark:text-white text-base sm:text-lg">
+                  SETARA
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+                  Admin
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
+                Pusat Kendali Konten & Komunitas
+              </p>
+            </div>
+          </div>
+
+          {/* Subtle Vertical Divider */}
+          <div className="h-6 w-px bg-slate-200/80 dark:bg-slate-700/80 hidden sm:block" />
+
+          {/* Partner / Event Logos (JACK, TCC & TRIPLE-C) */}
+          <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
+            <div
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+              title="JACK"
+            >
+              <img src="/JACK 2.png" alt="Logo JACK" className="w-full h-full object-contain" />
+            </div>
+            <div
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+              title="TCC"
+            >
+              <img src="/Salinan LOGO TCC.png" alt="Logo TCC" className="w-full h-full object-contain" />
+            </div>
+            <div
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+              title="TRIPLE-C"
+            >
+              <img src="/Salinan LOGO TRIPLE-C.png" alt="Logo TRIPLE-C" className="w-full h-full object-contain" />
+            </div>
           </div>
         </div>
 
-        {/* Action Controls: Kembali ke Web, Toggle Tema, Info Akun, & Logout */}
+        {/* Action Controls & University Logos (Sama persis dengan bagian kanan Navbar Landing) */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Institutional / University Logos (UINSA & UISI) */}
+          <div className="hidden md:flex items-center gap-1.5 sm:gap-2 pr-1">
+            <div
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+              title="UIN Sunan Ampel Surabaya"
+            >
+              <img src="/Logo UINSA.png" alt="Logo UINSA" className="w-full h-full object-contain" />
+            </div>
+            <div
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+              title="Universitas Internasional Semen Indonesia (UISI)"
+            >
+              <img src="/uisi.jpg" alt="Logo UISI" className="w-full h-full object-contain rounded-xs" />
+            </div>
+          </div>
+
+          {/* Subtle Vertical Divider */}
+          <div className="h-6 w-px bg-slate-200/80 dark:bg-slate-700/80 hidden md:block" />
           {/* Tombol Lihat Website */}
           <button
             type="button"

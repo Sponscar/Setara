@@ -170,32 +170,78 @@ export default function Navbar({ onNavigate, currentView }) {
         <div className={`w-full mx-auto flex items-center justify-between transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           isScrolled ? '' : 'max-w-7xl'
         }`}>
-          {/* --- BRAND LOGO --- */}
-          <div 
-            onClick={() => handleNavClick('home')}
-            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
-          >
-            <div className={`rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 p-0.5 shadow-lg shadow-brand-500/20 group-hover:scale-105 group-hover:rotate-1 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              isScrolled ? 'w-8 h-8 sm:w-9 sm:h-9' : 'w-9 h-9 sm:w-10 sm:h-10'
-            }`}>
-              <div className="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center">
-                <span className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-amber-400 text-sm sm:text-base">
-                  S
+          {/* --- BRAND & EVENT LOGOS (LEFT) --- */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5">
+            {/* SETARA Brand Logo */}
+            <div
+              onClick={() => handleNavClick('home')}
+              className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group"
+            >
+              <div className={`rounded-xl overflow-hidden shadow-md shadow-brand-500/15 group-hover:scale-105 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] bg-white border border-slate-200/80 dark:border-white/10 ${
+                isScrolled ? 'w-8 h-8 sm:w-9 sm:h-9' : 'w-9 h-9 sm:w-10 sm:h-10'
+              }`}>
+                <img
+                  src="/Setara Logo.jpg"
+                  alt="SETARA Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <span className={`font-black tracking-tight text-slate-900 dark:text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
+                }`}>
+                  SETARA
                 </span>
+                <div className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  isScrolled ? 'max-h-0 opacity-0' : 'max-h-6 opacity-100'
+                }`}>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
+                    Penerjemah SIBI & BISINDO
+                  </p>
+                </div>
               </div>
             </div>
-            <div>
-              <span className={`font-black tracking-tight text-slate-900 dark:text-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                isScrolled ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'
-              }`}>
-                SETARA
-              </span>
-              <div className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                isScrolled ? 'max-h-0 opacity-0' : 'max-h-6 opacity-100'
-              }`}>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden sm:block">
-                  Penerjemah SIBI & BISINDO
-                </p>
+
+            {/* Subtle Vertical Divider */}
+            <div className="h-6 w-px bg-slate-200/80 dark:bg-slate-700/80 hidden sm:block" />
+
+            {/* Partner / Event Logos (JACK, TCC & TRIPLE-C) */}
+            <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
+              <div
+                className={`flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden ${
+                  isScrolled ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-9 sm:h-9'
+                }`}
+                title="JACK"
+              >
+                <img
+                  src="/JACK 2.png"
+                  alt="Logo JACK"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                className={`flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden ${
+                  isScrolled ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-9 sm:h-9'
+                }`}
+                title="TCC"
+              >
+                <img
+                  src="/Salinan LOGO TCC.png"
+                  alt="Logo TCC"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                className={`flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden ${
+                  isScrolled ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-9 sm:h-9'
+                }`}
+                title="TRIPLE-C"
+              >
+                <img
+                  src="/Salinan LOGO TRIPLE-C.png"
+                  alt="Logo TRIPLE-C"
+                  className="w-full h-full object-contain"
+                />
               </div>
             </div>
           </div>
@@ -229,9 +275,40 @@ export default function Navbar({ onNavigate, currentView }) {
           </nav>
 
           {/* ===================================================================
-           * 6. ACTION BUTTONS & THEME SWITCHER
+           * 6. ACTION BUTTONS & THEME SWITCHER (WITH UNIVERSITY LOGOS)
            * =================================================================== */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-2.5">
+            {/* Institutional / University Logos (UINSA & UISI - Ukuran Sama) */}
+            <div className="flex items-center gap-2 pr-0.5 sm:pr-1">
+              <div
+                className={`flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden ${
+                  isScrolled ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-9 sm:h-9'
+                }`}
+                title="UIN Sunan Ampel Surabaya"
+              >
+                <img
+                  src="/Logo UINSA.png"
+                  alt="Logo UINSA"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div
+                className={`flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden ${
+                  isScrolled ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-8 h-8 sm:w-9 sm:h-9'
+                }`}
+                title="Universitas Internasional Semen Indonesia (UISI)"
+              >
+                <img
+                  src="/uisi.jpg"
+                  alt="Logo UISI"
+                  className="w-full h-full object-contain rounded-xs"
+                />
+              </div>
+            </div>
+
+            {/* Subtle Divider */}
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700/80 hidden md:block" />
+
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -246,7 +323,6 @@ export default function Navbar({ onNavigate, currentView }) {
                 <Moon className="w-4 h-4 text-slate-700" />
               )}
             </button>
-
 
             {/* CTA Try Translator Button */}
             <button
@@ -315,6 +391,31 @@ export default function Navbar({ onNavigate, currentView }) {
               </button>
             );
           })}
+
+          {/* Mobile Partner & Institution Logos */}
+          <div className="pt-3 pb-1 border-t border-slate-200/80 dark:border-slate-800">
+            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2 px-1 text-center">
+              Penyelenggara & Kolaborasi
+            </p>
+            <div className="flex items-center justify-center gap-2 py-1 flex-wrap">
+              <div className="p-1 rounded-lg bg-white border border-slate-200 dark:border-slate-700 shadow-xs">
+                <img src="/JACK 2.png" alt="JACK" className="h-5 sm:h-6 w-auto object-contain" />
+              </div>
+              <div className="p-1 rounded-lg bg-white border border-slate-200 dark:border-slate-700 shadow-xs">
+                <img src="/Salinan LOGO TCC.png" alt="TCC" className="h-5 sm:h-6 w-auto object-contain" />
+              </div>
+              <div className="p-1 rounded-lg bg-white border border-slate-200 dark:border-slate-700 shadow-xs">
+                <img src="/Salinan LOGO TRIPLE-C.png" alt="Triple-C" className="h-5 sm:h-6 w-auto object-contain" />
+              </div>
+              <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-0.5" />
+              <div className="p-1 rounded-lg bg-white border border-slate-200 dark:border-slate-700 shadow-xs">
+                <img src="/Logo UINSA.png" alt="UINSA" className="h-5 sm:h-6 w-auto object-contain" />
+              </div>
+              <div className="p-0.5 rounded-lg bg-white border border-slate-200 dark:border-slate-700 shadow-xs">
+                <img src="/uisi.jpg" alt="UISI" className="h-5 w-5 sm:h-6 sm:w-6 object-cover rounded-md" />
+              </div>
+            </div>
+          </div>
 
           <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
             <button
