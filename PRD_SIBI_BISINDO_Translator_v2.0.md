@@ -1,5 +1,5 @@
-# Product Requirements Document (PRD)
-## Website Penerjemah Bahasa Isyarat SIBI & BISINDO
+# ***Product Requirements Document (PRD)***
+## ***Website Penerjemah Bahasa Isyarat SIBI & BISINDO***
 
 ---
 
@@ -12,7 +12,7 @@
 
 ---
 
-## Daftar Isi
+## ***Daftar Isi***
 
 1. [Executive Summary](#1-executive-summary)
 2. [Fitur & Functional Requirements](#2-fitur--functional-requirements)
@@ -23,7 +23,7 @@
 7. [Tech Stack & Arsitektur](#7-tech-stack--arsitektur)
 8. [Struktur Project](#8-struktur-project)
 9. [API Specification](#9-api-specification)
-10. [Machine Learning (YOLO 11)](#10-machine-learning-yolo-11)
+10. [Model Deep Learning (YOLOv11) (SOON)](#10-machine-learning-yolo-11)
 11. [Acceptance Criteria](#11-acceptance-criteria)
 12. [Roadmap](#12-roadmap)
 13. [Risiko & Mitigasi](#13-risiko--mitigasi)
@@ -31,7 +31,7 @@
 
 ---
 
-## 1. Executive Summary
+## 1. ***Executive Summary***
 
 ### 1.1 Latar Belakang
 Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi antara penyandang tunarungu/tunawicara dengan masyarakat umum di Indonesia. Platform ini mendukung dua sistem bahasa isyarat utama: **SIBI (Sistem Isyarat Bahasa Indonesia)** dan **BISINDO (Bahasa Isyarat Indonesia)**.
@@ -53,7 +53,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 2. Fitur & Functional Requirements
+## 2. ***Fitur & Functional Requirements***
 
 ### 2.1 Homepage / Landing Page
 
@@ -214,7 +214,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 3. Non-Functional Requirements
+## 3. ***Non-Functional Requirements***
 
 ### 3.1 Performa
 | ID | Requirement |
@@ -255,7 +255,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 4. User Flow
+## 4. ***User Flow***
 
 ### 4.1 Alur User - Text to Sign
 ```
@@ -287,7 +287,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 5. Data Requirements
+## 5. ***Data Requirements***
 
 ### 5.1 Entitas Utama
 
@@ -385,7 +385,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 6. UI/UX Requirements
+## 6. ***UI/UX Requirements***
 
 ### 6.1 Design System
 | Komponen | Spesifikasi |
@@ -415,7 +415,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 7. Tech Stack & Arsitektur
+## 7. ***Tech Stack & Arsitektur***
 
 ### 7.1 Tech Stack Final
 
@@ -484,7 +484,7 @@ Website penerjemah bahasa isyarat ini dikembangkan untuk menjembatani komunikasi
 
 ---
 
-## 8. Struktur Project
+## 8. ***Struktur Project***
 
 ```
 sibi_bisindo_project/
@@ -565,7 +565,7 @@ sibi_bisindo_project/
 
 ---
 
-## 9. API Specification
+## 9. ***API Specification***
 
 ### 9.1 Authentication
 
@@ -662,7 +662,7 @@ sibi_bisindo_project/
 
 ---
 
-## 10. Machine Learning (YOLO 11)
+## 10. ***Model Deep Learning (YOLO 11) (SOON)***
 
 ### 10.1 Arsitektur ML Pipeline
 
@@ -706,7 +706,7 @@ ml_service/
 
 ---
 
-## 11. Acceptance Criteria
+## 11. ***Acceptance Criteria***
 
 ### 11.1 Translator Text to Sign
 - [ ] User dapat mengetik kalimat dan melihat video per kata dengan benar
@@ -740,7 +740,7 @@ ml_service/
 
 ---
 
-## 12. Roadmap
+## 12. ***Roadmap***
 
 | Fase | Timeline | Deliverables |
 |------|----------|--------------|
@@ -751,7 +751,7 @@ ml_service/
 
 ---
 
-## 13. Risiko & Mitigasi
+## 13. ***Risiko & Mitigasi***
 
 | Risiko | Dampak | Mitigasi |
 |--------|--------|----------|
@@ -764,7 +764,7 @@ ml_service/
 
 ---
 
-## 14. Glossary
+## 14. ***Glossary***
 
 | Istilah | Definisi |
 |---------|----------|
