@@ -15,14 +15,13 @@
  * 2. Tokens di-render sebagai chip navigasi di sidebar kanan.
  * 3. Timer FSM memutar kata satu per satu, memanggil nextWord() per interval.
  * 4. SignCanvasAnimator menerima currentWord & gesturePattern untuk render animasi canvas.
- * 5. Saat kata terakhir selesai: loop (replay) atau selesai (confetti celebration).
+ * 5. Saat kata terakhir selesai: loop (replay) atau selesai (pause idle).
  *
  * @module TextToSignPlayer
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslatorStore } from '../../stores/useTranslatorStore';
-import SignCanvasAnimator from './SignCanvasAnimator';
 import { 
   Play, 
   Pause, 
@@ -33,11 +32,9 @@ import {
   ArrowRight, 
   Film,
   AlertCircle,
-  Volume2,
   CheckCircle2,
   Sliders
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 /**
  * Daftar kalimat contoh yang ditampilkan sebagai quick-chip
@@ -104,6 +101,8 @@ export default function TextToSignPlayer() {
   const timerRef = useRef(null);
   /** @ref {HTMLVideoElement} videoPlayerRef — Elemen <video> untuk pemutar MP4 */
   const videoPlayerRef = useRef(null);
+  /** @ref {boolean} isTransitioningRef — Flag transisi antar kata, mencegah onPause spurious */
+  const isTransitioningRef = useRef(false);
 
   /* ===================================================================
    * 3. DERIVED VALUES — Nilai turunan dari state untuk render & effects
@@ -119,7 +118,7 @@ export default function TextToSignPlayer() {
   /** @type {string|null} URL video MP4 dari database PostgreSQL jika tersedia */
   const currentVideoUrl = currentToken?.video_url || currentToken?.matchedData?.video_url || null;
   /** @type {boolean} Apakah pemutar video MP4 aktif dan memiliki berkas video */
-  const showVideoPlayer = visualMode === 'video' && Boolean(currentVideoUrl);
+  const showVideoPlayer = Boolean(currentVideoUrl);
 
   /* ===================================================================
    * 4. SIDE EFFECTS — Lifecycle hooks komponen
@@ -132,6 +131,7 @@ export default function TextToSignPlayer() {
   useEffect(() => {
     fetchDictionary();
     if (tokens.length === 0 && inputVal) {
+      setTextInput(inputVal);
       translateText(inputVal);
     }
   }, []);
@@ -146,7 +146,7 @@ export default function TextToSignPlayer() {
    * 3. Setelah durasi habis: panggil nextWord() untuk maju ke kata berikutnya.
    * 4. Jika sudah di kata terakhir:
    *    - isLooping=true → replay() dari awal.
-   *    - isLooping=false → pause() + trigger confetti celebration.
+   *    - isLooping=false → pause().
    * 5. Cleanup: clearTimeout saat unmount atau dependency berubah.
    */
   useEffect(() => {
@@ -175,16 +175,7 @@ export default function TextToSignPlayer() {
           replay();
         } else {
           pause();
-          // Trigger subtle celebration confetti
-          try {
-            confetti({
-              particleCount: 35,
-              spread: 60,
-              origin: { y: 0.7 }
-            });
-          } catch (e) {
-            // ignore
-          }
+
         }
       }
     }, durationMs);
@@ -192,7 +183,7 @@ export default function TextToSignPlayer() {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [playbackState, currentWordIndex, tokens, playbackSpeed, isLooping]);
+  }, [playbackState, currentWordIndex, tokens, playbackSpeed, isLooping, showVideoPlayer]);
 
   /**
    * Effect: Sinkronisasi pemutar video MP4 dengan status playback dan kecepatan.
@@ -302,16 +293,26 @@ export default function TextToSignPlayer() {
         {/* Left Column: Visual Sign Canvas Animator */}
         <div className="lg:col-span-7 flex flex-col">
           <div className="aspect-[4/3] w-full min-h-[340px] max-h-[420px] relative">
-            {/* Mode 1: Canvas 2D Kinematics Animation (Default) */}
-            {!showVideoPlayer && (
-              <SignCanvasAnimator
-                currentWord={currentWord}
-                gesturePattern={currentPattern}
-                languageSystem={languageSystem}
-                isPlaying={playbackState === 'PLAYING'}
-                speed={playbackSpeed}
-                description={currentDescription}
-              />
+            {/* Placeholder: kata tidak memiliki video MP4 di database */}
+            {!showVideoPlayer && currentToken && (
+              <div className="w-full h-full rounded-2xl bg-slate-900/90 border border-slate-800 flex flex-col items-center justify-center gap-4 text-center p-6">
+                <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
+                  <Film className="w-8 h-8 text-slate-500" />
+                </div>
+                <div className="space-y-1.5">
+                  <p className="text-white font-bold text-lg capitalize">"{currentWord}"</p>
+                  <p className="text-slate-400 text-xs leading-relaxed max-w-[220px]">
+                    Video isyarat untuk kata ini belum tersedia di database.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Empty state saat belum ada token */}
+            {!showVideoPlayer && !currentToken && (
+              <div className="w-full h-full rounded-2xl bg-slate-900/90 border border-slate-800 flex items-center justify-center">
+                <p className="text-slate-500 text-sm">Ketik kalimat dan klik Terjemahkan</p>
+              </div>
             )}
 
             {/* Mode 2: Video MP4 Player dari Database */}
@@ -330,22 +331,22 @@ export default function TextToSignPlayer() {
                     if (playbackState !== 'PLAYING') play();
                   }}
                   onPause={() => {
-                    if (playbackState === 'PLAYING') pause();
+                    // Abaikan onPause saat sedang transisi otomatis antar kata
+                    if (!isTransitioningRef.current && playbackState === 'PLAYING') pause();
                   }}
                   onEnded={() => {
                     if (currentWordIndex < tokens.length - 1) {
+                      // Set flag transisi agar onPause tidak menginterupsi
+                      isTransitioningRef.current = true;
                       nextWord();
+                      // Reset flag setelah video baru siap diputar
+                      setTimeout(() => { isTransitioningRef.current = false; }, 300);
                     } else if (isLooping) {
+                      isTransitioningRef.current = true;
                       replay();
+                      setTimeout(() => { isTransitioningRef.current = false; }, 300);
                     } else {
                       pause();
-                      try {
-                        confetti({
-                          particleCount: 35,
-                          spread: 60,
-                          origin: { y: 0.7 }
-                        });
-                      } catch (e) {}
                     }
                   }}
                 />
@@ -362,12 +363,6 @@ export default function TextToSignPlayer() {
               </div>
             )}
 
-            {/* Fallback notice if video mode but no video available */}
-            {visualMode === 'video' && !currentVideoUrl && currentToken && (
-              <div className="absolute bottom-2 left-2 right-2 p-2 rounded-xl bg-amber-500/10 backdrop-blur-md border border-amber-500/30 text-amber-600 dark:text-amber-400 text-[11px] font-medium text-center">
-                ⓘ Video MP4 belum tersedia untuk kata "{currentWord}". Menampilkan animasi Canvas 2D sebagai fallback.
-              </div>
-            )}
           </div>
 
           {/* Playback Controls Bar */}

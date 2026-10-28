@@ -55,10 +55,12 @@ class BeritaStatus:
 class TipeBahasa:
     SIBI = 'SIBI'
     BISINDO = 'BISINDO'
+    BOTH = 'BOTH'
 
     CHOICES = [
         (SIBI, 'SIBI'),
         (BISINDO, 'BISINDO'),
+        (BOTH, 'Keduanya (BOTH)'),
     ]
 
 

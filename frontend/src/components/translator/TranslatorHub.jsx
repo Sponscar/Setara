@@ -22,9 +22,7 @@ import {
   Check, 
   Languages, 
   Trash2,
-  Database,
-  Film,
-  Tv
+  Database
 } from 'lucide-react';
 
 /**
@@ -44,9 +42,7 @@ export default function TranslatorHub({ isStandalone = false }) {
     clearHistory,
     fetchDictionary,
     dbStatus,
-    dictionary,
-    visualMode,
-    setVisualMode,
+    dictionary,
     fetchHistory
   } = useTranslatorStore();
   // Fetch dictionary dan riwayat saat halaman dimuat
@@ -224,41 +220,7 @@ export default function TranslatorHub({ isStandalone = false }) {
           </div>
         </div>
 
-        {/* ===================================================================== */}
-        {/* 3B. SWITCH MODE VISUAL: ANIMASI CANVAS 2D vs VIDEO MP4 ASLI          */}
-        {/* ===================================================================== */}
-        {activeTab === 'text-to-sign' && (
-          <div className="flex items-center justify-center mb-6">
-            <div className="p-1 rounded-2xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setVisualMode('animation')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                  visualMode === 'animation'
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Tv className="w-3.5 h-3.5" />
-                <span>Animasi Canvas 2D</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setVisualMode('video')}
-                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                  visualMode === 'video'
-                    ? 'bg-slate-700 text-white shadow-md'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Film className="w-3.5 h-3.5" />
-                <span>Video MP4 Asli</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ===================================================================== */}
+{/* ===================================================================== */}
         {/* 4. KONTEN DARI TAB YANG AKTIF                                        */}
         {/* ===================================================================== */}
         <div>

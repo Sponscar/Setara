@@ -13,7 +13,8 @@ class TranslatorService:
     def text_to_sign(teks: str, tipe_bahasa: str = 'BISINDO'):
         """
         Convert text string to sequence of sign videos / animations.
-        Splits into words, searches dictionary by kata & tipe_bahasa.
+        Splits into words, searches dictionary strictly by kata & tipe_bahasa (or BOTH).
+        Does NOT cross-fallback between SIBI and BISINDO because they are distinct languages.
         """
         clean_text = teks.strip().lower()
         kata_list = [k.strip(',.!?"\'') for k in clean_text.split() if k.strip(',.!?"\'')]
@@ -21,37 +22,29 @@ class TranslatorService:
         videos = []
         kata_tidak_tersedia = []
 
+        # Bahasa yang diizinkan: tipe_bahasa yang dipilih ATAU kata bertipe 'BOTH' (keduanya)
+        allowed_types = [tipe_bahasa, 'BOTH']
+
         for kata in kata_list:
-            # 1. Cari video sesuai kata & tipe_bahasa yang dipilih, prioritaskan yang memiliki berkas/URL video aktif
+            # 1. Cari video sesuai kata & tipe_bahasa yang dipilih (atau BOTH), prioritaskan yang memiliki file/URL video aktif
             video = Video.objects.filter(
                 kata__iexact=kata,
-                tipe_bahasa=tipe_bahasa,
+                tipe_bahasa__in=allowed_types,
                 status='active',
             ).exclude(video_url='', video_file='').first()
 
             if not video:
-                # Cari sesuai tipe_bahasa aktif
+                # Cari jika ada entri dengan tipe_bahasa yang cocok
                 video = Video.objects.filter(
                     kata__iexact=kata,
-                    tipe_bahasa=tipe_bahasa,
+                    tipe_bahasa__in=allowed_types,
                     status='active',
                 ).first()
 
-            # 2. Jika tidak ada file video di tipe_bahasa aktif, lakukan fallback cerdas ke video bahasa isyarat mitra
-            if not video or (not video.video_url and not video.video_file):
-                other_video = Video.objects.filter(
-                    kata__iexact=kata,
-                    status='active',
-                ).exclude(video_url='', video_file='').first()
-                if other_video:
-                    video = other_video
-                elif not video:
-                    video = Video.objects.filter(
-                        kata__iexact=kata,
-                        status='active',
-                    ).first()
+            # Hanya gunakan video jika memang cocok dengan tipe bahasa yang dipilih dan memiliki berkas/URL video
+            has_media = video and bool(video.video_url or video.video_file)
 
-            if video:
+            if video and has_media:
                 v_url = video.video_url or (video.video_file.url if video.video_file else None)
                 thumb = video.thumbnail_url or (video.thumbnail.url if video.thumbnail else None)
                 videos.append({

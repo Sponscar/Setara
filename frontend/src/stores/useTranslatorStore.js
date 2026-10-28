@@ -55,9 +55,10 @@ export const useTranslatorStore = create((set, get) => ({
     }
     set({ languageSystem: system });
 
-    const { textInput } = get();
-    if (textInput) {
-      get().translateText(textInput);
+    const { textInput, tokens } = get();
+    const currentText = textInput || (tokens.length > 0 ? tokens.map(t => t.word).join(' ') : '');
+    if (currentText) {
+      get().translateText(currentText);
     }
   },
 
@@ -68,7 +69,7 @@ export const useTranslatorStore = create((set, get) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   /** Mode visual player: 'animation' (Canvas 2D) | 'video' (MP4 Asli) */
-  visualMode: 'animation',
+  visualMode: 'video',
   setVisualMode: (mode) => {
     set({ visualMode: mode });
     const { tokens, textInput } = get();
@@ -214,7 +215,8 @@ export const useTranslatorStore = create((set, get) => ({
   nextWord: () => {
     const { currentWordIndex, tokens } = get();
     if (currentWordIndex < tokens.length - 1) {
-      set({ currentWordIndex: currentWordIndex + 1 });
+      // Pastikan playbackState tetap PLAYING saat berpindah kata
+      set({ currentWordIndex: currentWordIndex + 1, playbackState: 'PLAYING' });
     } else {
       set({ playbackState: 'COMPLETED' });
     }
