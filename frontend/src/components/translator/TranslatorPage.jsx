@@ -159,14 +159,6 @@ export default function TranslatorPage({ onBackToHome, onNavigate }) {
             {/* Subtle Divider */}
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-              <Languages className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Dual Engine:</span> SIBI & BISINDO
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-              <Zap className="w-3.5 h-3.5" />
-              <span>21 Keypoints AI</span>
-            </div>
 
             {/* Toggle Tema Light / Dark */}
             <button

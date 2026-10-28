@@ -225,8 +225,18 @@ export default function Navbar({ onNavigate, currentView }) {
             {/* Subtle Vertical Divider */}
             <div className="h-5 sm:h-6 w-px bg-slate-200/80 dark:bg-slate-700/80 hidden sm:block" />
 
-            {/* Partner / Event Logos (TCC & TRIPLE-C) */}
+            {/* Partner / Event Logos (JACK, TCC & TRIPLE-C) - Samakan dengan Navbar Penerjemah */}
             <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
+              <div
+                className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
+                title="JACK"
+              >
+                <img
+                  src="/JACK 2.png"
+                  alt="Logo JACK"
+                  className="w-full h-full object-contain"
+                />
+              </div>
               <div
                 className="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 transition-all overflow-hidden"
                 title="TCC"
@@ -378,6 +388,12 @@ export default function Navbar({ onNavigate, currentView }) {
               Penyelenggara & Kolaborasi
             </p>
             <div className="flex items-center justify-center gap-2 py-1">
+              <div
+                className="w-8 h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden"
+                title="JACK"
+              >
+                <img src="/JACK 2.png" alt="JACK" className="w-full h-full object-contain" />
+              </div>
               <div
                 className="w-8 h-8 flex items-center justify-center p-1 rounded-xl bg-white border border-slate-200/80 dark:border-white/10 shadow-xs overflow-hidden"
                 title="TCC"
