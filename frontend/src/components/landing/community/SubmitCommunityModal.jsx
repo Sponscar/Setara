@@ -375,7 +375,7 @@ export default function SubmitCommunityModal({ isOpen, onClose, onSubmit }) {
               {/* Tombol Kirim Pengajuan */}
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs shadow-lg shadow-brand-500/25 hover:shadow-xl hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 hover:shadow-xl hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
               >
                 <Send className="w-4 h-4" />
                 <span>Kirim Pengajuan ke Admin</span>

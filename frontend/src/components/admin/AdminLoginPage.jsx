@@ -20,7 +20,7 @@ import {
   EyeOff,
   LogIn,
   AlertCircle,
-  Sparkles,
+  Info,
   ArrowLeft,
   Sun,
   Moon
@@ -79,10 +79,6 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 bg-slate-50 dark:bg-dark-bg transition-colors duration-500 overflow-hidden font-sans bg-grid-pattern selection:bg-brand-600 selection:text-white">
-      {/* Elemen Dekoratif Efek Blur Latar Belakang */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
       {/* Tombol Navigasi Kembali ke Beranda */}
       <div className="absolute top-6 left-6 z-10">
         <button
@@ -117,11 +113,11 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
       <div className="w-full max-w-md animate-page-enter">
         {/* Header Logo & Judul */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-br from-brand-600 to-amber-600 text-white shadow-xl shadow-brand-600/25 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-brand-600 text-white shadow-xl shadow-brand-600/25 mb-4">
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Admin <span className="gradient-text-primary">SETARA</span>
+            Admin <span className="text-brand-600 dark:text-brand-400">SETARA</span>
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
             Masuk ke Dashboard Administrator untuk mengelola konten platform
@@ -190,7 +186,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-500 hover:to-amber-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
+              className="w-full py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-600/25 hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-300 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -209,7 +205,7 @@ export default function AdminLoginPage({ onBackToHome, onLoginSuccess }) {
           {/* Catatan Hint Akun Demo */}
           <div className="mt-5 pt-5 border-t border-slate-200 dark:border-slate-700/60">
             <div className="flex items-start gap-2 text-xs text-slate-400 dark:text-slate-500">
-              <Sparkles className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500/60" />
+              <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500/60" />
               <p>
                 <strong className="text-slate-500 dark:text-slate-400">Akun Admin:</strong> <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-[11px]">admin@setara.id</code> / <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 font-mono text-[11px]">setara2026</code>
               </p>

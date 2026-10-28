@@ -16,7 +16,6 @@ import { useThemeStore } from '../../stores/useThemeStore';
 import TranslatorHub from './TranslatorHub';
 import { 
   ArrowLeft, 
-  Sparkles, 
   Languages, 
   Zap, 
   BookOpen,
@@ -161,7 +160,7 @@ export default function TranslatorPage({ onBackToHome, onNavigate }) {
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
 
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Languages className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Dual Engine:</span> SIBI & BISINDO
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
@@ -216,7 +215,7 @@ export default function TranslatorPage({ onBackToHome, onNavigate }) {
           </div>
 
           <div className="flex items-start gap-3">
-            <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
+            <div className="p-2.5 rounded-2xl bg-slate-500/10 text-slate-600 dark:text-slate-300 shrink-0">
               <HelpCircle className="w-4 h-4" />
             </div>
             <div>

@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Film, Upload, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Save, Film, Upload, Edit3, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function EditVideoModal({
   isOpen,
@@ -124,7 +124,7 @@ export default function EditVideoModal({
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-dark-border bg-slate-50/50 dark:bg-dark-bg/50">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <Sparkles className="w-5 h-5" />
+              <Edit3 className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -215,18 +215,18 @@ export default function EditVideoModal({
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  🎭 Animasi Canvas 2D
+                  Animasi Canvas 2D
                 </button>
                 <button
                   type="button"
                   onClick={() => setVisualMode('video')}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     visualMode === 'video'
-                      ? 'bg-purple-600 text-white shadow'
+                      ? 'bg-slate-700 text-white shadow'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  🎬 Video MP4 Asli (Maks 5 MB)
+                  Video MP4 Asli (Maks 5 MB)
                 </button>
               </div>
             </div>
@@ -293,7 +293,7 @@ export default function EditVideoModal({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <label className="px-4 py-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 font-semibold text-xs flex items-center gap-2 cursor-pointer hover:bg-purple-100 transition-colors">
+                  <label className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center gap-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                     <Upload className="w-4 h-4" />
                     <span>Pilih Berkas MP4</span>
                     <input

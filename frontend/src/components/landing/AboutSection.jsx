@@ -19,7 +19,7 @@ import {
   ShieldCheck, 
   Mail, 
   Globe, 
-  Sparkles, 
+  Cpu, 
   Award, 
   Layers 
 } from 'lucide-react';
@@ -43,7 +43,7 @@ export default function AboutSection() {
     {
       title: "Inovasi Berkelanjutan",
       desc: "Memanfaatkan teknologi AI Computer Vision mutakhir demi latensi terendah dan akurasi tertinggi.",
-      icon: Sparkles
+      icon: Cpu
     },
     {
       title: "Aksesibilitas Terbuka",
@@ -140,7 +140,7 @@ export default function AboutSection() {
         {/* ===================================================================
          * 4. CONTACT STRIP — Ajakan Kolaborasi & Kemitraan
          * =================================================================== */}
-        <div className="p-8 rounded-3xl bg-gradient-to-r from-brand-950/80 via-slate-900/80 to-amber-950/80 border border-slate-800 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div className="p-8 rounded-3xl bg-slate-900 border border-slate-800 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
           <div className="space-y-1 text-center md:text-left">
             <h4 className="text-xl font-bold">Tertarik Berkolaborasi atau Mengajukan Masukan?</h4>
             <p className="text-xs text-slate-400">Tim pengembang SETARA terbuka untuk kemitraan institusi dan relawan.</p>

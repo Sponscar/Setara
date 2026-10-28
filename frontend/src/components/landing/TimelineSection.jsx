@@ -16,7 +16,6 @@ import React, { useEffect } from 'react';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
   Milestone, 
-  Sparkles, 
   Calendar, 
   Rocket, 
   BookOpen, 
@@ -48,7 +47,7 @@ export default function TimelineSection() {
       case 'BookOpen': return BookOpen;
       case 'Users': return Users;
       case 'Cpu': return Cpu;
-      default: return Sparkles;
+      default: return Milestone;
     }
   };
 

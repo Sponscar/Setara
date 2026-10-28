@@ -4,8 +4,8 @@
  * Direktori: src/components/landing/
  * Deskripsi: Section Alur Panduan Penggunaan Platform SETARA (Step-by-step Guide).
  *            Menjelaskan langkah kerja 2 alur utama:
- *            1. Jalur A (Text to Sign): Teks -> Tokenisasi -> Pemutar Video/Canvas Isyarat.
- *            2. Jalur B (Sign to Text AI): Webcam -> YOLO 11 Pose Hand Tracking -> Konversi Teks.
+ *            1. Teks ➔ Video Isyarat: Teks -> Tokenisasi -> Pemutar Video/Canvas Isyarat.
+ *            2. Kamera ➔ Teks (AI): Webcam -> YOLO 11 Pose Hand Tracking -> Konversi Teks.
  * Pattern:
  *   - State Pattern / Workflow Switcher: Pengguna beralih antara 'text-to-sign' dan 'sign-to-text'.
  *   - Stepper / Process Flow Pattern: Penomoran tahapan terstruktur (01, 02, 03).
@@ -21,7 +21,7 @@ import {
   Eye, 
   FileText, 
   ArrowRight, 
-  Sparkles 
+  Layers 
 } from 'lucide-react';
 
 /**
@@ -31,7 +31,7 @@ export default function HowItWorks() {
   /** Alur kerja aktif: 'text-to-sign' | 'sign-to-text' */
   const [activeWorkflow, setActiveWorkflow] = useState('text-to-sign');
 
-  /** Langkah-langkah alur Jalur A: Teks ke Video Isyarat */
+  /** Langkah-langkah alur Teks ➔ Video Isyarat */
   const textToSignSteps = [
     {
       step: "01",
@@ -53,7 +53,7 @@ export default function HowItWorks() {
     }
   ];
 
-  /** Langkah-langkah alur Jalur B: Deteksi Kamera AI ke Teks */
+  /** Langkah-langkah alur Kamera ➔ Teks (AI) */
   const signToTextSteps = [
     {
       step: "01",
@@ -86,7 +86,7 @@ export default function HowItWorks() {
          * =================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Layers className="w-3.5 h-3.5" />
             <span>Alur Penggunaan Platform</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -98,29 +98,29 @@ export default function HowItWorks() {
         </div>
 
         {/* ===================================================================
-         * 2. WORKFLOW SWITCHER — Tombol Pemilih Jalur A atau Jalur B
+         * 2. WORKFLOW SWITCHER — Tombol Pemilih (Harmonis dengan Navbar Utama)
          * =================================================================== */}
         <div className="flex items-center justify-center mb-12">
-          <div className="p-1 rounded-2xl bg-slate-200/80 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 flex items-center gap-1">
+          <div className="inline-flex items-center p-1 sm:p-1.5 rounded-full bg-white/80 dark:bg-[#060911]/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/50 gap-1 sm:gap-1.5">
             <button
               onClick={() => setActiveWorkflow('text-to-sign')}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
                 activeWorkflow === 'text-to-sign'
-                  ? 'bg-brand-600 text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
               }`}
             >
-              Jalur A: Teks ➔ Video Isyarat
+              Teks ➔ Video Isyarat
             </button>
             <button
               onClick={() => setActiveWorkflow('sign-to-text')}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
                 activeWorkflow === 'sign-to-text'
-                  ? 'bg-amber-600 text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
               }`}
             >
-              Jalur B: Kamera ➔ Teks (AI)
+              Kamera ➔ Teks (AI)
             </button>
           </div>
         </div>

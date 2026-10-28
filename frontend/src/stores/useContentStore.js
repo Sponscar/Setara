@@ -54,7 +54,7 @@ function normalizeTimeline(t) {
     id: String(t.id),
     tahun,
     tanggal: t.tanggal || '2026',
-    icon: t.icon || 'Sparkles',
+    icon: t.icon || 'Milestone',
     gambar: t.gambar_url || t.gambar || '',
     gambar_url: t.gambar_url || t.gambar || '',
     urutan: t.urutan || 0,
@@ -86,12 +86,15 @@ function normalizeCommunity(k) {
 function normalizeTestimonial(t) {
   if (!t) return null;
   const avatar = t.avatar_url || t.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80';
+  const text = t.konten || t.komentar || '';
 
   return {
     ...t,
     id: String(t.id),
     avatar,
     avatar_url: avatar,
+    konten: text,
+    komentar: text,
     rating: t.rating || 5
   };
 }
@@ -245,7 +248,7 @@ export const useContentStore = create((set, get) => ({
         tanggal: milestone.tanggal || '2026',
         tahun: milestone.tahun || '',
         kategori: milestone.kategori || 'Pencapaian',
-        icon: milestone.icon || 'Sparkles',
+        icon: milestone.icon || 'Milestone',
         gambar_url: milestone.gambar || milestone.gambar_url || '',
         urutan: milestone.urutan || 0
       };
@@ -417,27 +420,72 @@ export const useContentStore = create((set, get) => ({
   // ============================================================================
 
   fetchTestimonials: async () => {
+    let localSaved = [];
+    try {
+      const stored = localStorage.getItem('setara_local_testimonials');
+      if (stored) localSaved = JSON.parse(stored);
+    } catch {}
+
     try {
       const data = await api.get('/komunitas/testimonials');
       const normalized = (data || []).map(normalizeTestimonial);
-      set({ testimonialList: normalized });
-      return normalized;
+      const existingIds = new Set(normalized.map(item => item.id));
+      const combined = [
+        ...localSaved.filter(item => !existingIds.has(item.id)).map(normalizeTestimonial),
+        ...normalized
+      ];
+      set({ testimonialList: combined });
+      return combined;
     } catch (err) {
-      return [];
+      const fallback = localSaved.map(normalizeTestimonial);
+      set({ testimonialList: fallback });
+      return fallback;
     }
   },
 
   addTestimonial: async (testi) => {
+    const text = testi.konten || testi.komentar || '';
+    const payload = {
+      nama: testi.nama,
+      peran: testi.peran || 'Pengguna SETARA',
+      avatar_url: testi.avatar || testi.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      konten: text,
+      rating: testi.rating || 5
+    };
+
+    let newTesti;
     try {
-      const created = await api.post('/komunitas/testimonials', testi);
-      const normalized = normalizeTestimonial(created);
-      set((state) => ({
-        testimonialList: [normalized, ...state.testimonialList]
-      }));
-      return { success: true, item: normalized };
+      const created = await api.post('/komunitas/testimonials', payload);
+      newTesti = normalizeTestimonial(created);
     } catch (err) {
-      return { success: false, error: err.message };
+      console.warn('Backend addTestimonial failed or offline, saving locally:', err);
+      newTesti = normalizeTestimonial({
+        id: 'testi-' + Date.now(),
+        nama: payload.nama,
+        peran: payload.peran,
+        avatar: payload.avatar_url,
+        avatar_url: payload.avatar_url,
+        konten: text,
+        komentar: text,
+        rating: 5,
+        created_at: new Date().toISOString()
+      });
     }
+
+    set((state) => ({
+      testimonialList: [newTesti, ...state.testimonialList.filter(item => item.id !== newTesti.id)]
+    }));
+
+    try {
+      const stored = localStorage.getItem('setara_local_testimonials');
+      const existing = stored ? JSON.parse(stored) : [];
+      localStorage.setItem(
+        'setara_local_testimonials',
+        JSON.stringify([newTesti, ...existing.filter(i => i.id !== newTesti.id)])
+      );
+    } catch {}
+
+    return { success: true, item: newTesti };
   },
 
   // ============================================================================

@@ -29,7 +29,6 @@ import {
   CameraOff, 
   Copy, 
   Trash2, 
-  Sparkles, 
   Check, 
   AlertCircle, 
   Activity,
@@ -339,7 +338,7 @@ export default function SignToTextCamera() {
   return (
     <div className="space-y-6">
       {/* --- 6A. TOP BANNER: Info mode deteksi + toggle kamera --- */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-brand-600/10 via-amber-600/10 to-transparent border border-brand-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div className="p-4 rounded-2xl bg-brand-600/10 border border-brand-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="p-2.5 rounded-xl bg-brand-500/20 text-brand-400">
             <Scan className="w-5 h-5" />
@@ -366,7 +365,7 @@ export default function SignToTextCamera() {
         ) : (
           <button
             onClick={startCamera}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-amber-600 hover:from-brand-500 hover:to-amber-500 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-brand-600/30 transition-all cursor-pointer shrink-0"
+            className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold flex items-center gap-2 shadow-md shadow-brand-600/30 transition-all cursor-pointer shrink-0"
           >
             <Camera className="w-4 h-4" />
             <span>Aktifkan Webcam</span>
@@ -456,7 +455,7 @@ export default function SignToTextCamera() {
           <div className="mt-3 p-4 rounded-2xl glass-card border border-slate-200 dark:border-dark-border space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-brand-500" />
+                <Hand className="w-3.5 h-3.5 text-brand-500" />
                 Simulasi Input Gestur (Uji Coba Cepat):
               </span>
               <span className="text-[11px] text-slate-400">Klik untuk memicu deteksi</span>
@@ -468,7 +467,7 @@ export default function SignToTextCamera() {
                   onClick={() => handleTriggerGesture(g)}
                   className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer active:scale-95"
                 >
-                  🖐️ "{g.word}"
+                  "{g.word}"
                 </button>
               ))}
             </div>

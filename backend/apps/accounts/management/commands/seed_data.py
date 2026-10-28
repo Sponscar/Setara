@@ -241,37 +241,8 @@ class Command(BaseCommand):
             )
         self.stdout.write(self.style.SUCCESS(f'Seeded {len(community_data)} communities'))
 
-        # 5. Testimonial
-        testi_data = [
-            {
-                "nama": "Andi Pratama",
-                "peran": "Relawan Teman Dengar",
-                "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-                "konten": "Platform SETARA sangat intuitif! Saya bisa belajar BISINDO sekaligus menguji pemahaman saya langsung dengan kamera real-time.",
-                "rating": 5
-            },
-            {
-                "nama": "Rina Mulyani",
-                "peran": "Anggota Komunitas Tuli",
-                "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&q=80",
-                "konten": "Akhirnya ada platform yang menghargai keberadaan BISINDO sebagai bahasa alami kami, bukan sekadar memaksakan SIBI formal.",
-                "rating": 5
-            },
-            {
-                "nama": "Budi Santoso, S.Pd.",
-                "peran": "Guru SLB Negeri",
-                "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80",
-                "konten": "Sangat membantu dalam mengajar murid-murid baru di kelas. Kamus visualnya lengkap dan responsif di berbagai perangkat.",
-                "rating": 5
-            },
-            {
-                "nama": "Dewi Saraswati",
-                "peran": "Mahasiswa Ilmu Komunikasi",
-                "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-                "konten": "Fitur perbandingan SIBI vs BISINDO membuka wawasan saya mengenai linguistik isyarat Nusantara. Keren sekali!",
-                "rating": 5
-            }
-        ]
+        # 5. Testimonial (Mock data dikosongkan agar murni diisi pengguna)
+        testi_data = []
         for t in testi_data:
             KomunitasTestimonial.objects.update_or_create(
                 nama=t['nama'],

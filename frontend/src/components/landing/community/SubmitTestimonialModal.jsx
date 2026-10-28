@@ -14,7 +14,7 @@ import {
   X, 
   Heart, 
   MessageSquare, 
-  Sparkles 
+  Send 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -44,12 +44,22 @@ export default function SubmitTestimonialModal({ isOpen, onClose, onSubmit }) {
   /**
    * Handler submit form testimoni
    */
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nama.trim() || !formData.komentar.trim()) return;
 
+    const payload = {
+      nama: formData.nama.trim(),
+      peran: formData.peran.trim() || 'Pengguna SETARA',
+      avatar: formData.avatar.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      avatar_url: formData.avatar.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+      komentar: formData.komentar.trim(),
+      konten: formData.komentar.trim(),
+      rating: 5
+    };
+
     if (onSubmit) {
-      onSubmit(formData);
+      await onSubmit(payload);
     }
 
     // Efek konfeti celebrasi
@@ -61,12 +71,12 @@ export default function SubmitTestimonialModal({ isOpen, onClose, onSubmit }) {
 
     setSuccess(true);
 
-    // Reset dan tutup modal otomatis setelah 2 detik
+    // Reset dan tutup modal otomatis setelah 1.5 detik
     setTimeout(() => {
       setSuccess(false);
       setFormData({ nama: '', peran: '', avatar: '', komentar: '' });
       onClose();
-    }, 2000);
+    }, 1500);
   };
 
   return createPortal(
@@ -179,9 +189,9 @@ export default function SubmitTestimonialModal({ isOpen, onClose, onSubmit }) {
               {/* Tombol Terbitkan Cerita */}
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-brand-500 hover:from-amber-400 hover:to-brand-400 text-white font-bold text-xs shadow-lg shadow-amber-500/20 hover:shadow-xl hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 hover:shadow-xl hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
               >
-                <Sparkles className="w-4 h-4" />
+                <Send className="w-4 h-4" />
                 <span>Terbitkan Ceritaku</span>
               </button>
             </form>

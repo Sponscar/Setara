@@ -26,7 +26,7 @@ import {
   LogOut,
   Sun,
   Moon,
-  Sparkles,
+  CheckCircle2,
   ExternalLink
 } from 'lucide-react';
 
@@ -335,7 +335,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
       {/* ======================================================================= */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 px-4 py-2.5 rounded-2xl bg-slate-900/90 text-white text-xs font-semibold shadow-2xl backdrop-blur-md border border-slate-700 animate-slide-down flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+          <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}

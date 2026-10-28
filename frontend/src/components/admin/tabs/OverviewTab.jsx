@@ -66,7 +66,7 @@ export default function OverviewTab({
         <div className="p-5 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-1">
           <span className="text-xs text-slate-400 font-medium">Milestone Timeline</span>
           <div className="text-2xl font-black text-slate-900 dark:text-white">{timelineList.length}</div>
-          <div className="text-[11px] text-purple-400 font-semibold">Jejak Perkembangan</div>
+          <div className="text-[11px] text-brand-400 font-semibold">Jejak Perkembangan</div>
         </div>
 
         {/* Metrik Komunitas */}

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ==============================================================================
  * File: NewsSection.jsx
  * Direktori: src/components/landing/
@@ -22,7 +22,6 @@ import {
   Clock, 
   Eye, 
   ArrowRight, 
-  Sparkles, 
   Filter, 
   X, 
   Share2 
@@ -136,16 +135,16 @@ export default function NewsSection() {
             </p>
           </div>
 
-          {/* Filter Pills Kategori */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-slate-200/80 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800">
+          {/* Filter Pills Kategori (Harmonis dengan Navbar Utama) */}
+          <div className="inline-flex flex-wrap items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-full bg-white/80 dark:bg-[#060911]/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/50">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
                 }`}
               >
                 {cat}

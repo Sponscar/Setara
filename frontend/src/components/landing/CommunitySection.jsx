@@ -15,7 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { useContentStore } from '../../stores/useContentStore';
 import { 
   Users, 
-  Sparkles, 
+  MessageCircle, 
   PlusCircle, 
   MessageSquare, 
   Search, 
@@ -103,7 +103,7 @@ export default function CommunitySection() {
               <span>Jembatan Inklusivitas Komunitas</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
-              Bergabung dengan <span className="gradient-text-primary">Komunitas Isyarat</span>
+              Bergabung dengan <span className="text-brand-600 dark:text-brand-400">Komunitas Isyarat</span>
             </h2>
             <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
               SETARA tidak membangun komunitas tertutup, melainkan menjadi gerbang terbuka untuk menghubungkan Anda dengan ribuan Teman Tuli, relawan, dan pegiat bahasa isyarat di seluruh Indonesia.
@@ -114,7 +114,7 @@ export default function CommunitySection() {
           <button
             type="button"
             onClick={() => setShowSubmitModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-brand-600 to-amber-500 hover:from-brand-500 hover:to-amber-400 text-white font-bold text-xs shadow-lg shadow-brand-500/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 self-start md:self-auto shrink-0"
+            className="px-5 py-3 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/25 hover:shadow-xl hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 self-start md:self-auto shrink-0"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Ajukan Komunitas Anda</span>
@@ -126,17 +126,17 @@ export default function CommunitySection() {
         {/* ===================================================================== */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Filter Pills Kategori */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            {/* Filter Pills Kategori (Harmonis dengan Navbar Utama) */}
+            <div className="inline-flex items-center p-1 sm:p-1.5 rounded-full bg-white/80 dark:bg-[#060911]/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/50 gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none max-w-full">
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                  className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
                     selectedCategory === cat
-                      ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20'
-                      : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                      ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
                   }`}
                 >
                   {cat}
@@ -188,7 +188,7 @@ export default function CommunitySection() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 mb-2">
-                <Sparkles className="w-3.5 h-3.5" />
+                <MessageCircle className="w-3.5 h-3.5" />
                 <span>Pengalaman Pengguna</span>
               </div>
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
@@ -211,38 +211,58 @@ export default function CommunitySection() {
           </div>
 
           {/* Grid Testimoni */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonialList.map((item) => (
-              <div
-                key={item.id}
-                className="p-6 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-4 flex flex-col justify-between"
-              >
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed">
-                  "{item.komentar}"
-                </p>
+          {testimonialList && testimonialList.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {testimonialList.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-6 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-4 flex flex-col justify-between hover:border-brand-500/40 transition-all duration-300"
+                >
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed">
+                    "{item.komentar || item.konten}"
+                  </p>
 
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-                  <img
-                    src={item.avatar}
-                    alt={item.nama}
-                    className="w-10 h-10 rounded-full object-cover border border-brand-500/30 shrink-0"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
-                    }}
-                  />
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                      {item.nama}
-                    </h4>
-                    <p className="text-[11px] text-slate-400">
-                      {item.peran}
-                    </p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                    <img
+                      src={item.avatar || item.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                      alt={item.nama}
+                      className="w-10 h-10 rounded-full object-cover border border-brand-500/30 shrink-0"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+                      }}
+                    />
+                    <div>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                        {item.nama}
+                      </h4>
+                      <p className="text-[11px] text-slate-400">
+                        {item.peran || 'Pengguna SETARA'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 p-8 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-3">
+              <MessageCircle className="w-10 h-10 text-slate-400 mx-auto" />
+              <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                Belum Ada Cerita Pengalaman
+              </h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Jadilah yang pertama membagikan pengalaman Anda menggunakan platform SETARA!
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowTestimonialModal(true)}
+                className="mt-2 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs inline-flex items-center gap-1.5 shadow-md shadow-brand-600/20 transition-all cursor-pointer"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Bagikan Ceritamu Sekarang</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -93,7 +93,7 @@ export default function TimelineTab({
       {/* ======================================================================= */}
       <div className="lg:col-span-5 p-6 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-4">
         <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <Plus className="w-4 h-4 text-purple-500" />
+          <Plus className="w-4 h-4 text-brand-500" />
           <span>Tambah Milestone Baru</span>
         </h3>
 
@@ -108,7 +108,7 @@ export default function TimelineTab({
               value={timelineForm.judul}
               onChange={(e) => setTimelineForm({ ...timelineForm, judul: e.target.value })}
               placeholder="Contoh: Rilis Model YOLO 11 v2"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
             />
           </div>
 
@@ -122,7 +122,7 @@ export default function TimelineTab({
                 value={timelineForm.tanggal}
                 onChange={(e) => setTimelineForm({ ...timelineForm, tanggal: e.target.value })}
                 placeholder="Contoh: Oktober 2026"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
               />
             </div>
 
@@ -134,7 +134,7 @@ export default function TimelineTab({
                 value={timelineForm.kategori}
                 onChange={(e) => setTimelineForm({ ...timelineForm, kategori: e.target.value })}
                 placeholder="Contoh: Inovasi AI"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function TimelineTab({
               value={timelineForm.deskripsi}
               onChange={(e) => setTimelineForm({ ...timelineForm, deskripsi: e.target.value })}
               placeholder="Penjelasan pencapaian penting..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-purple-500 disabled:opacity-50"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
             />
           </div>
 
@@ -156,7 +156,7 @@ export default function TimelineTab({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-purple-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-brand-600/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
@@ -197,7 +197,7 @@ export default function TimelineTab({
                     <span className="font-bold text-slate-900 dark:text-white">{t.judul}</span>
                     <span className="text-[10px] text-slate-400 font-mono">({t.tanggal})</span>
                     {t.kategori && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/20 font-medium">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-500 border border-brand-500/20 font-medium">
                         {t.kategori}
                       </span>
                     )}

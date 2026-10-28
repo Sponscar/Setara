@@ -20,7 +20,7 @@ import {
   Camera, 
   History, 
   Check, 
-  Sparkles, 
+  Languages, 
   Trash2,
   Database,
   Film,
@@ -66,7 +66,7 @@ export default function TranslatorHub({ isStandalone = false }) {
         <div className="text-center max-w-3xl mx-auto mb-10 space-y-3">
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
-              <Sparkles className="w-3.5 h-3.5" />
+              <Languages className="w-3.5 h-3.5" />
               <span>Penerjemah Dua Arah Cerdas</span>
             </div>
             <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
@@ -85,7 +85,7 @@ export default function TranslatorHub({ isStandalone = false }) {
               alt="SETARA Logo"
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl object-cover shadow-lg shadow-brand-500/20 border border-slate-200/80 dark:border-white/10"
             />
-            <span>Penerjemah Isyarat <span className="gradient-text-primary">SETARA</span></span>
+            <span>Penerjemah Isyarat <span className="text-brand-600 dark:text-brand-400">SETARA</span></span>
           </h2>
           <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
             Pilih sistem bahasa isyarat dan mode terjemahan yang Anda butuhkan secara instan.
@@ -101,7 +101,7 @@ export default function TranslatorHub({ isStandalone = false }) {
             onClick={() => setLanguageSystem('SIBI')}
             className={`relative p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 border ${
               languageSystem === 'SIBI'
-                ? 'bg-gradient-to-br from-brand-600/15 via-brand-500/5 to-transparent border-brand-500 shadow-xl shadow-brand-500/15 ring-2 ring-brand-500/30'
+                ? 'bg-brand-600/10 border-brand-500 shadow-xl shadow-brand-500/15 ring-2 ring-brand-500/30'
                 : 'glass hover:border-slate-300 dark:hover:border-slate-700 opacity-80 hover:opacity-100'
             }`}
             role="button"
@@ -140,7 +140,7 @@ export default function TranslatorHub({ isStandalone = false }) {
             onClick={() => setLanguageSystem('BISINDO')}
             className={`relative p-5 sm:p-6 rounded-2xl cursor-pointer transition-all duration-300 border ${
               languageSystem === 'BISINDO'
-                ? 'bg-gradient-to-br from-amber-600/15 via-amber-500/5 to-transparent border-amber-500 shadow-xl shadow-amber-500/15 ring-2 ring-amber-500/30'
+                ? 'bg-amber-600/10 border-amber-500 shadow-xl shadow-amber-500/15 ring-2 ring-amber-500/30'
                 : 'glass hover:border-slate-300 dark:hover:border-slate-700 opacity-80 hover:opacity-100'
             }`}
             role="button"
@@ -240,19 +240,19 @@ export default function TranslatorHub({ isStandalone = false }) {
                 }`}
               >
                 <Tv className="w-3.5 h-3.5" />
-                <span>🎭 Animasi Canvas 2D</span>
+                <span>Animasi Canvas 2D</span>
               </button>
               <button
                 type="button"
                 onClick={() => setVisualMode('video')}
                 className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
                   visualMode === 'video'
-                    ? 'bg-purple-600 text-white shadow-md'
+                    ? 'bg-slate-700 text-white shadow-md'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 <Film className="w-3.5 h-3.5" />
-                <span>🎬 Video MP4 Asli</span>
+                <span>Video MP4 Asli</span>
               </button>
             </div>
           </div>

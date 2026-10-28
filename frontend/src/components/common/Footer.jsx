@@ -15,12 +15,17 @@ import React from 'react';
 import { 
   Heart, 
   ShieldCheck, 
-  Sparkles, 
   Github, 
   Instagram, 
   Twitter, 
   Mail, 
-  ArrowUp 
+  Phone,
+  ArrowUp,
+  Home,
+  Languages,
+  BookOpen,
+  Newspaper,
+  Users
 } from 'lucide-react';
 
 /**
@@ -61,11 +66,6 @@ export default function Footer({ onNavigate }) {
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed max-w-sm">
               Platform penerjemah bahasa isyarat dua arah SIBI & BISINDO cerdas berbasis Computer Vision & AI. Menghubungkan dunia tanpa batas komunikasi.
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>WCAG 2.1 AA Accessibility Compliant</span>
-            </div>
-
             {/* Partner & Institution Logos - Sama dengan Navbar */}
             <div className="pt-4 mt-1">
               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2.5">
@@ -134,51 +134,104 @@ export default function Footer({ onNavigate }) {
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
               Navigasi Cepat
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-xs">
               <li>
-                <button onClick={() => onNavigate('home')} className="hover:text-brand-500 cursor-pointer">
-                  Beranda
+                <button
+                  onClick={() => onNavigate('home')}
+                  className="flex items-center gap-2 hover:text-brand-500 transition-colors cursor-pointer group text-left"
+                >
+                  <Home className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>Beranda</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('translator')} className="hover:text-brand-500 cursor-pointer">
-                  Penerjemah Teks & Kamera
+                <button
+                  onClick={() => onNavigate('translator')}
+                  className="flex items-center gap-2 hover:text-brand-500 transition-colors cursor-pointer group text-left"
+                >
+                  <Languages className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>Penerjemah Teks & Kamera</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('edukasi')} className="hover:text-brand-500 cursor-pointer">
-                  Edukasi SIBI vs BISINDO
+                <button
+                  onClick={() => onNavigate('edukasi')}
+                  className="flex items-center gap-2 hover:text-brand-500 transition-colors cursor-pointer group text-left"
+                >
+                  <BookOpen className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>Edukasi SIBI vs BISINDO</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('berita')} className="hover:text-brand-500 cursor-pointer">
-                  Kabar & Berita Terkini
+                <button
+                  onClick={() => onNavigate('berita')}
+                  className="flex items-center gap-2 hover:text-brand-500 transition-colors cursor-pointer group text-left"
+                >
+                  <Newspaper className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>Kabar & Berita Terkini</span>
                 </button>
               </li>
               <li>
-                <button onClick={() => onNavigate('komunitas')} className="hover:text-brand-500 cursor-pointer">
-                  Komunitas & Timeline
+                <button
+                  onClick={() => onNavigate('komunitas')}
+                  className="flex items-center gap-2 hover:text-brand-500 transition-colors cursor-pointer group text-left"
+                >
+                  <Users className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>Komunitas & Timeline</span>
                 </button>
               </li>
             </ul>
           </div>
 
           {/* ===================================================================
-           * 3. SYSTEMS & ARCHITECTURE — Sistem Bahasa & Model AI
+           * 3. SYSTEMS & ARCHITECTURE — Kontak & Media Sosial Resmi
            * =================================================================== */}
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-              Sistem & Kelola
+              Kontak
             </h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-xs">
               <li>
-                <span className="text-slate-500">SIBI (Tata Bahasa Formal)</span>
+                <a
+                  href="mailto:setara@gmail.com"
+                  className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors group"
+                >
+                  <Mail className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>setara@gmail.com</span>
+                </a>
               </li>
               <li>
-                <span className="text-slate-500">BISINDO (Bahasa Alami Tuli)</span>
+                <a
+                  href="tel:+6281952946769"
+                  className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors group"
+                >
+                  <Phone className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-brand-500 transition-colors shrink-0" />
+                  <span>+62819-5294-6769</span>
+                </a>
               </li>
               <li>
-                <span className="text-slate-500">YOLO 11 Hand Pose 21 Keypoints</span>
+                <a
+                  href="https://www.instagram.com/sayauisi?exln=dThwYXB0dmVycWwy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-pink-600 dark:hover:text-pink-400 transition-colors group"
+                  title="Kunjungi Instagram UISI (@sayauisi)"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-pink-500 transition-colors shrink-0" />
+                  <span>@sayauisi</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.instagram.com/uinsa.official?rpxt=MTU3bjZvdDA0bTNjMw=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-pink-600 dark:hover:text-pink-400 transition-colors group"
+                  title="Kunjungi Instagram UINSA (@uinsa.official)"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 group-hover:text-pink-500 transition-colors shrink-0" />
+                  <span>@uinsa.official</span>
+                </a>
               </li>
             </ul>
           </div>

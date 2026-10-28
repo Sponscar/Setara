@@ -19,7 +19,6 @@ import {
   Camera, 
   BookOpen, 
   Users, 
-  Sparkles, 
   ArrowUpRight,
   ShieldCheck,
   Zap,
@@ -42,7 +41,7 @@ export default function BentoFeatures({ onSelectFeature }) {
          * =================================================================== */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Zap className="w-3.5 h-3.5" />
             <span>Fitur Unggulan Platform</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -54,27 +53,31 @@ export default function BentoFeatures({ onSelectFeature }) {
         </div>
 
         {/* ===================================================================
-         * 2. BENTO GRID CONTAINER — 4 Kartu Fitur Interaktif
+         * 2. BENTO GRID CONTAINER — 4 Kartu Fitur Interaktif dengan Efek Hover
          * =================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {/* --- KARTU 1: Text to Sign (Col-Span 2) --- */}
           <div 
             onClick={() => onSelectFeature('translator')}
-            className="md:col-span-2 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-brand-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200/90 dark:border-white/10 hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out group cursor-pointer relative overflow-hidden flex flex-col justify-between"
           >
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+            {/* Ambient hover glow overlay */}
+            <div className="absolute inset-0 bg-linear-to-br from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Decorative Watermark with dynamic hover motion */}
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
               <Type className="w-36 h-36 text-brand-500" />
             </div>
 
             <div className="space-y-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-500 flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-2xl bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-brand-500/20 transition-all duration-500">
                 <Type className="w-6 h-6" />
               </div>
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-500 uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
                   Text to Sign
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-brand-500 transition-colors">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
                   Pemutar Video Isyarat Kata Demi Kata
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed max-w-md">
@@ -83,30 +86,34 @@ export default function BentoFeatures({ onSelectFeature }) {
               </div>
             </div>
 
-            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-brand-500 group-hover:translate-x-1 transition-transform">
-              <span>Buka Modul Teks ke Isyarat</span>
-              <ArrowUpRight className="w-4 h-4" />
+            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-brand-600 dark:text-brand-400 relative z-10">
+              <span className="group-hover:underline underline-offset-4">Buka Modul Teks ke Isyarat</span>
+              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
             </div>
           </div>
 
           {/* --- KARTU 2: Sign to Text AI (Col-Span 2) --- */}
           <div 
             onClick={() => onSelectFeature('translator')}
-            className="md:col-span-1 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-amber-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+            className="md:col-span-1 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200/90 dark:border-white/10 hover:border-amber-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/15 dark:hover:shadow-amber-950/50 transition-all duration-500 ease-out group cursor-pointer relative overflow-hidden flex flex-col justify-between"
           >
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+            {/* Ambient hover glow overlay */}
+            <div className="absolute inset-0 bg-linear-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Decorative Watermark with dynamic hover motion */}
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
               <Camera className="w-36 h-36 text-amber-500" />
             </div>
 
             <div className="space-y-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-amber-500/20 transition-all duration-500">
                 <Camera className="w-6 h-6" />
               </div>
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                   Sign to Text AI
                 </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
                   Kamera Real-Time dengan YOLO 11 Pose
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed max-w-md">
@@ -115,26 +122,34 @@ export default function BentoFeatures({ onSelectFeature }) {
               </div>
             </div>
 
-            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-amber-500 group-hover:translate-x-1 transition-transform">
-              <span>Coba Kamera Deteksi Isyarat</span>
-              <ArrowUpRight className="w-4 h-4" />
+            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400 relative z-10">
+              <span className="group-hover:underline underline-offset-4">Coba Kamera Deteksi Isyarat</span>
+              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
             </div>
           </div>
 
-          {/* --- KARTU 3: Edukasi Komparasi SIBI vs BISINDO --- */}
+          {/* --- KARTU 3: Edukasi Komparasi SIBI vs BISINDO (Warna Sama dengan Card Text to Sign) --- */}
           <div 
             onClick={() => onSelectFeature('edukasi')}
-            className="md:col-span-2 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-purple-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+            className="md:col-span-2 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200/90 dark:border-white/10 hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out group cursor-pointer relative overflow-hidden flex flex-col justify-between"
           >
+            {/* Ambient hover glow overlay */}
+            <div className="absolute inset-0 bg-linear-to-br from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Decorative Watermark */}
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
+              <Layers className="w-36 h-36 text-brand-500" />
+            </div>
+
             <div className="space-y-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-500 flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-2xl bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-brand-500/20 transition-all duration-500">
                 <Layers className="w-6 h-6" />
               </div>
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-500 uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">
                   Komparasi Edukatif
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-purple-500 transition-colors">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
                   Edukasi Mendalam SIBI vs BISINDO
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
@@ -143,26 +158,34 @@ export default function BentoFeatures({ onSelectFeature }) {
               </div>
             </div>
 
-            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-purple-500 group-hover:translate-x-1 transition-transform">
-              <span>Pelajari Perbedaan Sistem</span>
-              <ArrowUpRight className="w-4 h-4" />
+            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-brand-600 dark:text-brand-400 relative z-10">
+              <span className="group-hover:underline underline-offset-4">Pelajari Perbedaan Sistem</span>
+              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
             </div>
           </div>
 
           {/* --- KARTU 4: Komunitas & Edukasi Inklusif --- */}
           <div 
             onClick={() => onSelectFeature('komunitas')}
-            className="md:col-span-1 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border hover:border-amber-500/60 transition-all duration-300 group cursor-pointer relative overflow-hidden flex flex-col justify-between"
+            className="md:col-span-1 lg:col-span-2 rounded-3xl p-6 sm:p-8 glass-card border border-slate-200/90 dark:border-white/10 hover:border-amber-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/15 dark:hover:shadow-amber-950/50 transition-all duration-500 ease-out group cursor-pointer relative overflow-hidden flex flex-col justify-between"
           >
+            {/* Ambient hover glow overlay */}
+            <div className="absolute inset-0 bg-linear-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Decorative Watermark */}
+            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
+              <Users className="w-36 h-36 text-amber-500" />
+            </div>
+
             <div className="space-y-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-amber-500/20 transition-all duration-500">
                 <Users className="w-6 h-6" />
               </div>
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-500 uppercase tracking-wider">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
                   Komunitas & Edukasi
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
                   Ruang Komunitas Inklusif
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
@@ -171,9 +194,9 @@ export default function BentoFeatures({ onSelectFeature }) {
               </div>
             </div>
 
-            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-amber-500 group-hover:translate-x-1 transition-transform">
-              <span>Jelajahi Aktivitas Komunitas</span>
-              <ArrowUpRight className="w-4 h-4" />
+            <div className="pt-6 flex items-center gap-2 text-xs font-bold text-amber-600 dark:text-amber-400 relative z-10">
+              <span className="group-hover:underline underline-offset-4">Jelajahi Aktivitas Komunitas</span>
+              <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
             </div>
           </div>
         </div>

@@ -138,7 +138,7 @@ export const INITIAL_TIMELINE = [
     judul: "Lahirnya Gagasan SETARA",
     deskripsi: "Riset awal kolaborasi antara mahasiswa teknik informatika dan komunitas Tuli untuk mengidentifikasi tantangan komunikasi dua arah.",
     kategori: "Pondasi",
-    icon: "Sparkles"
+    icon: "Milestone"
   },
   {
     id: "tm-2",
@@ -265,29 +265,7 @@ export const INITIAL_COMMUNITIES = [
   }
 ];
 
-export const INITIAL_TESTIMONIALS = [
-  {
-    id: "testi-1",
-    nama: "Rian Aditya",
-    peran: "Teman Tuli & Desainer Grafis",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80",
-    komentar: "SETARA sangat membantu saat saya berdiskusi dengan klien dengar. Mereka bisa mengetik apa saja dan langsung melihat peragaan isyarat BISINDO yang akurat!"
-  },
-  {
-    id: "testi-2",
-    nama: "Dr. Farida Utami",
-    peran: "Dokter Umum Puskesmas",
-    avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=200&q=80",
-    komentar: "Fitur pemutar kata per kata sangat jelas. Pelayanan pasien Tuli di klinik kami menjadi jauh lebih cepat, ramah, dan manusiawi."
-  },
-  {
-    id: "testi-3",
-    nama: "Dimas Prasetyo",
-    peran: "Mahasiswa & Relawan SLB",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80",
-    komentar: "Pilihan mode SIBI dan BISINDO yang terpisah membuat proses belajar jadi sangat terarah. Sangat direkomendasikan untuk siapa saja yang ingin belajar isyarat!"
-  }
-];
+export const INITIAL_TESTIMONIALS = [];
 
 /**
  * Sign Language Video Dictionary Database
