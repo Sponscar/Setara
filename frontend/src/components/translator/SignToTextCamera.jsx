@@ -36,7 +36,6 @@ import {
   RefreshCw,
   Hand
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { api } from '../../services/api';
 
 /**
@@ -151,116 +150,6 @@ export default function SignToTextCamera() {
     };
   }, []);
 
-  /* ===================================================================
-   * 4. OVERLAY ANIMATION LOOP — Render 21 keypoint landmark di canvas
-   * =================================================================== */
-
-  /**
-   * Effect: Canvas Animation Loop untuk landmark overlay.
-   * Menggambar bounding box dengan corner targeting, 21 titik keypoint
-   * tangan beranimasi, dan hub center node — semuanya dengan glow effect.
-   * Berjalan ~60fps via requestAnimationFrame selama isDetecting aktif.
-   */
-  useEffect(() => {
-    const canvas = overlayCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let animId;
-    let t = 0;
-
-    const renderOverlay = () => {
-      t += 0.05;
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      if (isDetecting || hasPermission) {
-        // Draw Hand Bounding Box
-        const boxX = w * 0.25 + Math.sin(t) * 10;
-        const boxY = h * 0.2 + Math.cos(t) * 8;
-        const boxW = w * 0.5;
-        const boxH = h * 0.55;
-
-        // Glowing targeting corners
-        ctx.strokeStyle = '#F97316';
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = '#F97316';
-        ctx.shadowBlur = 8;
-
-        const cornerLen = 24;
-        // Top-Left
-        ctx.beginPath();
-        ctx.moveTo(boxX, boxY + cornerLen);
-        ctx.lineTo(boxX, boxY);
-        ctx.lineTo(boxX + cornerLen, boxY);
-        ctx.stroke();
-
-        // Top-Right
-        ctx.beginPath();
-        ctx.moveTo(boxX + boxW - cornerLen, boxY);
-        ctx.lineTo(boxX + boxW, boxY);
-        ctx.lineTo(boxX + boxW, boxY + cornerLen);
-        ctx.stroke();
-
-        // Bottom-Left
-        ctx.beginPath();
-        ctx.moveTo(boxX, boxY + boxH - cornerLen);
-        ctx.lineTo(boxX, boxY + boxH);
-        ctx.lineTo(boxX + cornerLen, boxY + boxH);
-        ctx.stroke();
-
-        // Bottom-Right
-        ctx.beginPath();
-        ctx.moveTo(boxX + boxW - cornerLen, boxY + boxH);
-        ctx.lineTo(boxX + boxW, boxY + boxH);
-        ctx.lineTo(boxX + boxW, boxY + boxH - cornerLen);
-        ctx.stroke();
-
-        ctx.shadowBlur = 0;
-
-        // Draw 21 Landmark Keypoints
-        const handCenterX = boxX + boxW / 2;
-        const handCenterY = boxY + boxH / 2 + 20;
-
-        for (let i = 0; i < 21; i++) {
-          const angle = (i / 21) * Math.PI * 2 + t * 0.5;
-          const dist = 35 + (i % 5) * 12 + Math.sin(t * 2 + i) * 6;
-          const kx = handCenterX + Math.cos(angle) * dist;
-          const ky = handCenterY + Math.sin(angle) * dist * 0.8;
-
-          // Connect to center
-          if (i % 4 === 0) {
-            ctx.strokeStyle = 'rgba(249, 115, 22, 0.4)';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(handCenterX, handCenterY);
-            ctx.lineTo(kx, ky);
-            ctx.stroke();
-          }
-
-          // Dot
-          ctx.fillStyle = i === 0 ? '#FB923C' : '#F59E0B';
-          ctx.beginPath();
-          ctx.arc(kx, ky, 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Center hub
-        ctx.fillStyle = '#EA580C';
-        ctx.beginPath();
-        ctx.arc(handCenterX, handCenterY, 5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      animId = requestAnimationFrame(renderOverlay);
-    };
-
-    renderOverlay();
-
-    return () => {
-      cancelAnimationFrame(animId);
-    };
-  }, [isDetecting, hasPermission]);
 
   /* ===================================================================
    * 5. EVENT HANDLERS — Aksi simulasi gestur & clipboard
@@ -279,16 +168,6 @@ export default function SignToTextCamera() {
 
     // If camera wasn't on, activate detection state
     if (!isDetecting) setIsDetecting(true);
-
-    try {
-      confetti({
-        particleCount: 20,
-        spread: 40,
-        origin: { y: 0.8 }
-      });
-    } catch (e) {
-      // ignore
-    }
 
     // Kirim data deteksi ke backend API (async, non-blocking)
     api.post('/translator/sign-to-text', {
@@ -416,23 +295,13 @@ export default function SignToTextCamera() {
               </div>
             )}
 
-            {/* Overlay Landmark Canvas */}
-            <canvas
-              ref={overlayCanvasRef}
-              width={640}
-              height={480}
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            />
-
             {/* Top HUD Badges */}
             <div className="absolute top-4 left-4 flex items-center gap-2">
               <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-900/80 backdrop-blur-md text-amber-400 border border-amber-500/30 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                 AI Inference 30 FPS
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-slate-900/80 backdrop-blur-md text-brand-400 border border-brand-500/30">
-                Confidence: {(liveConfidence * 100).toFixed(1)}%
-              </span>
+
             </div>
 
             {/* Live Detected Word Banner */}

@@ -33,10 +33,6 @@ export default function EditVideoModal({
     video_url: video.video_url || ''
   });
 
-  const [visualMode, setVisualMode] = useState(
-    video.video_url || video.video_file ? 'video' : 'animation'
-  );
-
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(video.video_url || video.video_file || '');
   const [fileError, setFileError] = useState('');
@@ -56,7 +52,6 @@ export default function EditVideoModal({
       setFilePreview(video.video_url || video.video_file || '');
       setSelectedFile(null);
       setFileError('');
-      setVisualMode(video.video_url || video.video_file ? 'video' : 'animation');
     }
   }, [video]);
 
@@ -96,11 +91,11 @@ export default function EditVideoModal({
       // 1. Simpan metadata kata
       const saveRes = await onSave(video.id, {
         ...formData,
-        video_url: visualMode === 'animation' ? '' : formData.video_url
+        video_url: formData.video_url
       });
 
       // 2. Jika ada berkas MP4 baru yang diunggah
-      if (visualMode === 'video' && selectedFile && onUploadFile) {
+      if (selectedFile && onUploadFile) {
         const uploadRes = await onUploadFile(video.id, selectedFile);
         if (!uploadRes.success) {
           if (showToast) showToast(uploadRes.error || 'Gagal mengunggah berkas video.');
@@ -198,155 +193,70 @@ export default function EditVideoModal({
             </div>
           </div>
 
-          {/* OPSI VISUALISASI: Switcher Animasi vs Video */}
+          {/* UNGGAH VIDEO MP4 */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-dark-bg/60 border border-slate-200 dark:border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                <Film className="w-4 h-4 text-brand-500" />
-                <span>Pilihan Mode Visualisasi Utama:</span>
+            <label className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <Film className="w-4 h-4 text-brand-500" />
+              <span>Video Isyarat MP4:</span>
+              <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 ml-auto">
+                Maks 5 MB
+              </span>
+            </label>
+
+            {/* Tombol Pilih Berkas */}
+            <div className="flex items-center gap-3">
+              <label className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center gap-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <Upload className="w-4 h-4" />
+                <span>Pilih Berkas MP4</span>
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </label>
-              <div className="flex rounded-xl bg-slate-200 dark:bg-slate-800 p-1">
-                <button
-                  type="button"
-                  onClick={() => setVisualMode('animation')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    visualMode === 'animation'
-                      ? 'bg-emerald-600 text-white shadow'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Animasi Canvas 2D
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setVisualMode('video')}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    visualMode === 'video'
-                      ? 'bg-slate-700 text-white shadow'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  Video MP4 Asli (Maks 5 MB)
-                </button>
+              {selectedFile && (
+                <span className="text-xs text-slate-600 dark:text-slate-300 truncate max-w-xs">
+                  {selectedFile.name} ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
+                </span>
+              )}
+            </div>
+
+            {fileError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{fileError}</span>
               </div>
-            </div>
+            )}
 
-            {/* Sub-form Animasi Canvas 2D */}
+            {/* Input URL Video Eksternal */}
             <div>
-              <label className="font-semibold block mb-1">Pola Animasi Gestur (Engine Kinematics) *</label>
-              <select
-                value={formData.gesture_pattern}
-                onChange={(e) => setFormData({ ...formData, gesture_pattern: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-slate-700 font-mono text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-              >
-                <optgroup label="Sapaan & Waktu">
-                  <option value="hand_wave_forehead">hand_wave_forehead (Melambai / Halo)</option>
-                  <option value="sun_rise_horizon">sun_rise_horizon (Matahari Terbit / Pagi)</option>
-                  <option value="arm_vertical_up">arm_vertical_up (Lengan Tegak / Siang)</option>
-                  <option value="sun_set_down">sun_set_down (Matahari Terbenam / Malam)</option>
-                  <option value="thumbs_up_chest">thumbs_up_chest (Ibu Jari Terangkat / Selamat)</option>
-                </optgroup>
-                <optgroup label="Kata Ganti & Penunjuk">
-                  <option value="point_chest">point_chest (Menunjuk Dada / Aku)</option>
-                  <option value="palm_chest">palm_chest (Telapak di Dada / Saya Sopan)</option>
-                  <option value="point_forward">point_forward (Menunjuk Lawan Bicara / Kamu)</option>
-                  <option value="point_side">point_side (Menunjuk ke Samping / Dia)</option>
-                </optgroup>
-                <optgroup label="Keluarga, Emosi & Nilai">
-                  <option value="thumb_chin">thumb_chin (Ibu Jari di Dagu / Ibu)</option>
-                  <option value="thumb_forehead">thumb_forehead (Ibu Jari di Dahi / Ayah)</option>
-                  <option value="cross_chest_hug">cross_chest_hug (Menyilang di Dada / Sayang, Cinta)</option>
-                  <option value="equal_parallel_hands">equal_parallel_hands (Telapak Sejajar / Setara, Adil)</option>
-                  <option value="palms_brush_chest_up">palms_brush_chest_up (Menyapu Dada ke Atas / Senang)</option>
-                  <option value="fist_pump_down">fist_pump_down (Mengepal Bertenaga / Semangat)</option>
-                </optgroup>
-                <optgroup label="Sosial & Kesopanan">
-                  <option value="fingers_chin_forward">fingers_chin_forward (Jari Dagu ke Depan / Terima Kasih)</option>
-                  <option value="receive_motion">receive_motion (Tangan Terbuka Mendekat / Terima)</option>
-                  <option value="give_motion">give_motion (Tangan Maju Keluar / Kasih)</option>
-                  <option value="palms_down_spread">palms_down_spread (Telapak Melebar / Sama-sama)</option>
-                  <option value="pray_hands">pray_hands (Kedua Telapak Rapat / Tolong)</option>
-                  <option value="support_motion">support_motion (Menopang Lengan / Bantu)</option>
-                  <option value="hook_index_fingers">hook_index_fingers (Mengaitkan Telunjuk / Teman)</option>
-                </optgroup>
-                <optgroup label="Aktivitas & Identitas">
-                  <option value="learn_forehead">learn_forehead (Menyerap Ilmu / Belajar)</option>
-                  <option value="rotate_index_fingers">rotate_index_fingers (Telunjuk Berputar / Isyarat)</option>
-                  <option value="b_hands_wave">b_hands_wave (Huruf B / Bahasa)</option>
-                  <option value="i_hand_flutter">i_hand_flutter (Huruf I / Indonesia)</option>
-                  <option value="ear_to_mouth_touch">ear_to_mouth_touch (Telinga ke Bibir / Tuli)</option>
-                  <option value="cup_ear">cup_ear (Tangan di Telinga / Dengar)</option>
-                </optgroup>
-              </select>
+              <label className="font-medium block mb-1 text-slate-500 dark:text-slate-400 text-[11px]">
+                Atau Masukkan URL Video Eksternal:
+              </label>
+              <input
+                type="url"
+                value={formData.video_url}
+                onChange={(e) => {
+                  setFormData({ ...formData, video_url: e.target.value });
+                  setFilePreview(e.target.value);
+                }}
+                placeholder="https://.../video.mp4"
+                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-slate-700 font-mono text-[11px] text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+              />
             </div>
 
-            {/* Sub-form Unggah Berkas Video MP4 */}
-            {visualMode === 'video' && (
-              <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700/60">
-                <div className="flex items-center justify-between">
-                  <label className="font-semibold block">
-                    Unggah Berkas Video MP4 / WebM (Batas Maksimal 5 MB)
-                  </label>
-                  <span className="text-[11px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                    Maks 5 MB
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <label className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center gap-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                    <Upload className="w-4 h-4" />
-                    <span>Pilih Berkas MP4</span>
-                    <input
-                      type="file"
-                      accept="video/mp4,video/webm,video/quicktime"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                  {selectedFile && (
-                    <span className="text-xs text-slate-600 dark:text-slate-300 truncate max-w-xs">
-                      {selectedFile.name} ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
-                    </span>
-                  )}
-                </div>
-
-                {fileError && (
-                  <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    <span>{fileError}</span>
-                  </div>
-                )}
-
-                {/* Input URL Video Eksternal Opsional */}
-                <div>
-                  <label className="font-medium block mb-1 text-slate-500 dark:text-slate-400 text-[11px]">
-                    Atau Masukkan URL Video Eksternal:
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.video_url}
-                    onChange={(e) => {
-                      setFormData({ ...formData, video_url: e.target.value });
-                      setFilePreview(e.target.value);
-                    }}
-                    placeholder="https://.../video.mp4"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-slate-700 font-mono text-[11px] text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-
-                {/* Live Preview Player */}
-                {filePreview && (
-                  <div className="p-3 rounded-xl bg-black/5 dark:bg-black/40 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
-                      Live Video Preview:
-                    </span>
-                    <video
-                      src={filePreview}
-                      controls
-                      className="w-full max-h-48 rounded-lg object-contain bg-black"
-                    />
-                  </div>
-                )}
+            {/* Live Preview Player */}
+            {filePreview && (
+              <div className="p-3 rounded-xl bg-black/5 dark:bg-black/40 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
+                  Live Video Preview:
+                </span>
+                <video
+                  src={filePreview}
+                  controls
+                  className="w-full max-h-48 rounded-lg object-contain bg-black"
+                />
               </div>
             )}
           </div>
