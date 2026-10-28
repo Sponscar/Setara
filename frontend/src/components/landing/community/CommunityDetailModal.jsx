@@ -17,7 +17,7 @@ import {
   Mail, 
   ArrowUpRight 
 } from 'lucide-react';
-import { getPlatformMeta } from '../../helpers/communityHelpers';
+import { getPlatformMeta } from '../../helpers/communityHelpers.jsx';
 
 /**
  * Komponen Modal Dialog Detail Komunitas.
@@ -72,8 +72,8 @@ export default function CommunityDetailModal({ community, onClose }) {
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
                 {community.kategori}
               </span>
-              <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${meta.badgeClass}`}>
-                <PlatformIcon className="w-3 h-3" />
+              <span className={`inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${meta.badgeClass}`}>
+                <PlatformIcon className="w-3.5 h-3.5 shrink-0" />
                 <span>{community.platform}</span>
               </span>
             </div>

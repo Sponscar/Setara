@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { Users, ShieldCheck, ArrowUpRight } from 'lucide-react';
-import { getPlatformMeta } from '../../helpers/communityHelpers';
+import { getPlatformMeta } from '../../helpers/communityHelpers.jsx';
 
 /**
  * Komponen Kartu Komunitas.
@@ -60,8 +60,8 @@ export default function CommunityCard({ community, onClick }) {
           </div>
 
           <div className="flex flex-col items-end gap-1.5">
-            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${meta.badgeClass}`}>
-              <PlatformIcon className="w-3 h-3" />
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${meta.badgeClass}`}>
+              <PlatformIcon className="w-3.5 h-3.5 shrink-0" />
               <span>{community.platform || 'Komunitas'}</span>
             </span>
             <span className="text-[10px] font-semibold text-slate-400">
