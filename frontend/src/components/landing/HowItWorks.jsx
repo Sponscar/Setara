@@ -23,13 +23,34 @@ import {
   ArrowRight, 
   Layers 
 } from 'lucide-react';
+import { LiquidNavbar } from '../ui/liquid-glass-navbar';
+import { useThemeStore } from '../../stores/useThemeStore';
 
 /**
  * Komponen Alur Panduan Penggunaan Platform SETARA.
  */
 export default function HowItWorks() {
+  /** Store tema global (light/dark) */
+  const { theme } = useThemeStore();
+
   /** Alur kerja aktif: 'text-to-sign' | 'sign-to-text' */
   const [activeWorkflow, setActiveWorkflow] = useState('text-to-sign');
+
+  /** Item workflow untuk Liquid Glass Navbar Switcher */
+  const workflowItems = [
+    {
+      label: 'Teks ➔ Video Isyarat',
+      id: 'text-to-sign',
+      icon: <Keyboard className="w-4 h-4" />,
+      fx: 'pop'
+    },
+    {
+      label: 'Kamera ➔ Teks (AI)',
+      id: 'sign-to-text',
+      icon: <Camera className="w-4 h-4" />,
+      fx: 'glow'
+    }
+  ];
 
   /** Langkah-langkah alur Teks ➔ Video Isyarat */
   const textToSignSteps = [
@@ -64,7 +85,7 @@ export default function HowItWorks() {
     {
       step: "02",
       icon: Eye,
-      title: "YOLO 11 Hand Pose Tracking",
+      title: "AI Detection",
       desc: "Kecerdasan buatan mendeteksi 21 titik koordinat sendi tangan dan gerakan spasial secara real-time."
     },
     {
@@ -77,6 +98,7 @@ export default function HowItWorks() {
 
   /** Daftar langkah yang saat ini aktif berdasarkan toggle */
   const currentSteps = activeWorkflow === 'text-to-sign' ? textToSignSteps : signToTextSteps;
+  const activeIndex = workflowItems.findIndex(it => it.id === activeWorkflow);
 
   return (
     <section className="py-16 md:py-20 relative">
@@ -98,31 +120,15 @@ export default function HowItWorks() {
         </div>
 
         {/* ===================================================================
-         * 2. WORKFLOW SWITCHER — Tombol Pemilih (Harmonis dengan Navbar Utama)
+         * 2. WORKFLOW SWITCHER — Liquid Glass Waterline Switcher
          * =================================================================== */}
-        <div className="flex items-center justify-center mb-12">
-          <div className="inline-flex items-center p-1 sm:p-1.5 rounded-full bg-white/80 dark:bg-[#060911]/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/50 gap-1 sm:gap-1.5">
-            <button
-              onClick={() => setActiveWorkflow('text-to-sign')}
-              className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
-                activeWorkflow === 'text-to-sign'
-                  ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
-              }`}
-            >
-              Teks ➔ Video Isyarat
-            </button>
-            <button
-              onClick={() => setActiveWorkflow('sign-to-text')}
-              className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all duration-300 cursor-pointer ${
-                activeWorkflow === 'sign-to-text'
-                  ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
-              }`}
-            >
-              Kamera ➔ Teks (AI)
-            </button>
-          </div>
+        <div className="flex items-center justify-center mb-12 py-2.5 px-3 max-w-full overflow-x-auto no-scrollbar">
+          <LiquidNavbar
+            items={workflowItems}
+            active={activeIndex >= 0 ? activeIndex : 0}
+            onChange={(idx, item) => setActiveWorkflow(item.id)}
+            tone={theme === 'dark' ? 'dark' : 'light'}
+          />
         </div>
 
         {/* ===================================================================
@@ -134,24 +140,34 @@ export default function HowItWorks() {
             return (
               <div
                 key={idx}
-                className="relative rounded-3xl p-6 sm:p-8 glass-card border border-slate-200 dark:border-dark-border space-y-4 hover:border-brand-500/50 transition-all duration-300 group"
+                className="relative rounded-3xl p-6 sm:p-8 glass-card border border-slate-200/90 dark:border-white/10 hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out group cursor-pointer overflow-hidden flex flex-col justify-between"
               >
-                <div className="flex items-center justify-between">
-                  <div className="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-500 flex items-center justify-center font-bold">
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <span className="text-3xl font-black text-slate-200 dark:text-slate-800 group-hover:text-brand-500/30 transition-colors font-mono">
-                    {item.step}
-                  </span>
+                {/* Ambient hover glow overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                {/* Decorative Watermark with dynamic hover motion */}
+                <div className="absolute -top-4 -right-4 p-8 opacity-5 dark:opacity-10 group-hover:opacity-20 dark:group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
+                  <Icon className="w-32 h-32 text-brand-500" />
                 </div>
 
-                <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                    {item.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
-                    {item.desc}
-                  </p>
+                <div className="space-y-4 relative z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-brand-500/20 transition-all duration-500">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-3xl sm:text-4xl font-black text-slate-300 dark:text-slate-700 group-hover:text-brand-500/40 group-hover:scale-110 transition-all duration-500 font-mono select-none">
+                      {item.step}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
+                      {item.title}
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
               </div>
             );

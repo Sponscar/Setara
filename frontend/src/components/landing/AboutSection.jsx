@@ -76,31 +76,51 @@ export default function AboutSection() {
          * =================================================================== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Vision Card */}
-          <div className="p-8 rounded-3xl glass-card border border-brand-500/30 space-y-4 shadow-xl relative overflow-hidden">
-            <div className="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-500 flex items-center justify-center font-bold">
-              <Eye className="w-6 h-6" />
+          <div className="p-8 rounded-3xl glass-card border border-brand-500/30 hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out group cursor-pointer space-y-4 shadow-xl relative overflow-hidden flex flex-col justify-between">
+            {/* Ambient hover glow overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Decorative Watermark with dynamic hover motion */}
+            <div className="absolute -top-4 -right-4 p-8 opacity-5 dark:opacity-10 group-hover:opacity-20 dark:group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
+              <Eye className="w-36 h-36 text-brand-500" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Visi Kami
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              Mewujudkan ekosistem digital Indonesia yang ramah disabilitas, inklusif, dan bebas hambatan komunikasi di mana setiap individu memiliki kesempatan yang setara untuk belajar, berkolaborasi, dan berdaya.
-            </p>
+
+            <div className="space-y-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-500 border border-brand-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-brand-500/20 transition-all duration-500">
+                <Eye className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
+                Visi Kami
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                Mewujudkan ekosistem digital Indonesia yang ramah disabilitas, inklusif, dan bebas hambatan komunikasi di mana setiap individu memiliki kesempatan yang setara untuk belajar, berkolaborasi, dan berdaya.
+              </p>
+            </div>
           </div>
 
           {/* Mission Card */}
-          <div className="p-8 rounded-3xl glass-card border border-amber-500/30 space-y-4 shadow-xl relative overflow-hidden">
-            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
-              <Target className="w-6 h-6" />
+          <div className="p-8 rounded-3xl glass-card border border-amber-500/30 hover:border-amber-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/15 dark:hover:shadow-amber-950/50 transition-all duration-500 ease-out group cursor-pointer space-y-4 shadow-xl relative overflow-hidden flex flex-col justify-between">
+            {/* Ambient hover glow overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+            {/* Decorative Watermark with dynamic hover motion */}
+            <div className="absolute -top-4 -right-4 p-8 opacity-5 dark:opacity-10 group-hover:opacity-20 dark:group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
+              <Target className="w-36 h-36 text-amber-500" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Misi Kami
-            </h3>
-            <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed list-disc list-inside">
-              <li>Menyediakan penerjemah dua arah (Teks ➔ Isyarat & Kamera ➔ Teks) yang akurat dan berkecepatan tinggi.</li>
-              <li>Mendukung pelestarian dan standarisasi bahasa isyarat SIBI dan BISINDO.</li>
-              <li>Membangun jembatan empati dan literasi bahasa isyarat di kalangan institusi publik, medis, dan pendidikan.</li>
-            </ul>
+
+            <div className="space-y-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-500 border border-amber-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-amber-500/20 transition-all duration-500">
+                <Target className="w-6 h-6" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
+                Misi Kami
+              </h3>
+              <ul className="text-sm text-slate-600 dark:text-slate-300 space-y-2 leading-relaxed list-disc list-inside">
+                <li>Menyediakan penerjemah dua arah (Teks ➔ Isyarat & Kamera ➔ Teks) yang akurat dan berkecepatan tinggi.</li>
+                <li>Mendukung pelestarian dan standarisasi bahasa isyarat SIBI dan BISINDO.</li>
+                <li>Membangun jembatan empati dan literasi bahasa isyarat di kalangan institusi publik, medis, dan pendidikan.</li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -120,17 +140,27 @@ export default function AboutSection() {
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-3 shadow-md"
+                  className="p-6 rounded-3xl glass-card border border-slate-200/90 dark:border-white/10 hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out group cursor-pointer space-y-3 relative overflow-hidden flex flex-col justify-between"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-brand-500/15 text-brand-500 flex items-center justify-center font-bold">
-                    <Icon className="w-5 h-5" />
+                  {/* Ambient hover glow overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                  {/* Decorative Watermark with dynamic hover motion */}
+                  <div className="absolute -top-3 -right-3 p-6 opacity-5 dark:opacity-10 group-hover:opacity-20 dark:group-hover:opacity-25 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500 pointer-events-none">
+                    <Icon className="w-24 h-24 text-brand-500" />
                   </div>
-                  <h4 className="text-base font-bold text-slate-900 dark:text-white">
-                    {val.title}
-                  </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                    {val.desc}
-                  </p>
+
+                  <div className="space-y-3 relative z-10">
+                    <div className="w-10 h-10 rounded-xl bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/25 flex items-center justify-center font-bold group-hover:scale-110 group-hover:shadow-md group-hover:shadow-brand-500/20 transition-all duration-500">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <h4 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
+                      {val.title}
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      {val.desc}
+                    </p>
+                  </div>
                 </div>
               );
             })}

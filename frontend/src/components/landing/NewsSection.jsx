@@ -16,6 +16,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useContentStore } from '../../stores/useContentStore';
+import { useThemeStore } from '../../stores/useThemeStore';
+import { LiquidNavbar } from '../ui/liquid-glass-navbar';
 import { api } from '../../services/api';
 import { 
   Newspaper, 
@@ -43,6 +45,9 @@ export default function NewsSection() {
    * 1. ZUSTAND STORE SELECTORS & LOCAL STATE
    * =================================================================== */
 
+  /** Store tema global (light/dark) */
+  const { theme } = useThemeStore();
+
   /** Daftar artikel berita dari CMS global store */
   const { newsList, fetchNews, isLoading } = useContentStore();
 
@@ -58,6 +63,15 @@ export default function NewsSection() {
 
   /** Daftar kategori artikel yang tersedia */
   const categories = ['Semua', 'Edukasi', 'Teknologi', 'Komunitas', 'Event'];
+
+  /** Item menu untuk Liquid Glass Navbar */
+  const categoryNavItems = categories.map((cat) => ({
+    label: cat,
+    id: cat,
+    fx: 'pop',
+  }));
+
+  const activeCatIndex = categoryNavItems.findIndex(it => it.id === selectedCategory);
 
   /* ===================================================================
    * 2. SIDE EFFECTS - Body Scroll Lock & Keyboard Handler (ESC)
@@ -119,9 +133,9 @@ export default function NewsSection() {
     <section id="berita" className="py-16 md:py-20 relative scroll-mt-28">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ===================================================================
-         * 4. SECTION HEADER & CATEGORY FILTER PILLS
+         * 4. SECTION HEADER & CATEGORY FILTER LIQUID NAVBAR
          * =================================================================== */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
               <Newspaper className="w-3.5 h-3.5" />
@@ -135,21 +149,14 @@ export default function NewsSection() {
             </p>
           </div>
 
-          {/* Filter Pills Kategori (Harmonis dengan Navbar Utama) */}
-          <div className="inline-flex flex-wrap items-center gap-1 sm:gap-1.5 p-1 sm:p-1.5 rounded-full bg-white/80 dark:bg-[#060911]/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/50">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold transition-all duration-300 cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+          {/* Filter Pills Kategori dengan Animasi Liquid Glass */}
+          <div className="py-2.5 px-3 flex items-center justify-start lg:justify-end max-w-full overflow-x-auto no-scrollbar">
+            <LiquidNavbar
+              items={categoryNavItems}
+              active={activeCatIndex >= 0 ? activeCatIndex : 0}
+              onChange={(idx, item) => setSelectedCategory(item.id)}
+              tone={theme === 'dark' ? 'dark' : 'light'}
+            />
           </div>
         </div>
 
@@ -175,7 +182,7 @@ export default function NewsSection() {
               <div
                 key={news.id}
                 onClick={() => handleOpenNewsModal(news)}
-                className="rounded-3xl glass-card border border-slate-200 dark:border-dark-border overflow-hidden hover:border-brand-500/60 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer group"
+                className="rounded-3xl glass-card border border-slate-200/90 dark:border-white/10 overflow-hidden hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out flex flex-col cursor-pointer group relative"
               >
                 {/* Thumbnail */}
                 <div className="aspect-[16/10] w-full overflow-hidden relative">

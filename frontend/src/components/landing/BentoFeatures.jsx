@@ -114,10 +114,10 @@ export default function BentoFeatures({ onSelectFeature }) {
                   Sign to Text AI
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors duration-300">
-                  Kamera Real-Time dengan YOLO 11 Pose
+                  Kamera Real-Time
                 </h3>
                 <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed max-w-md">
-                  Deteksi 21 titik sendi tangan berkecepatan 30 FPS secara real-time langsung melalui browser laptop atau smartphone tanpa lag.
+                  Mendeteksi gerakan bahasa isyarat berbasis kamera real-time (Berbasis Deteksi AI yang sedang dalam tahap pengujian dan pengembangan).
                 </p>
               </div>
             </div>

@@ -13,6 +13,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useContentStore } from '../../stores/useContentStore';
+import { useThemeStore } from '../../stores/useThemeStore';
+import { LiquidNavbar } from '../ui/liquid-glass-navbar';
 import { 
   Users, 
   MessageCircle, 
@@ -43,6 +45,9 @@ const CATEGORIES = [
  * Komponen Section Komunitas & Testimoni pada Beranda.
  */
 export default function CommunitySection() {
+  /** Store tema global (light/dark) */
+  const { theme } = useThemeStore();
+
   // --- 1. GLOBAL STATE DARI ZUSTAND STORE ---
   const { 
     communityList, 
@@ -63,15 +68,19 @@ export default function CommunitySection() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // --- 3. LOCAL STATE MODAL DIALOGS ---
-  // Objek komunitas yang dipilih untuk modal detail
   const [selectedCommunity, setSelectedCommunity] = useState(null);
-  // Status visibilitas modal ajukan komunitas baru
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  // Status visibilitas modal formulir testimoni
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
 
+  // Nav items untuk Liquid Navbar
+  const categoryNavItems = CATEGORIES.map((cat) => ({
+    label: cat,
+    id: cat,
+    fx: 'pop',
+  }));
+  const activeCatIndex = categoryNavItems.findIndex(it => it.id === selectedCategory);
+
   // --- 4. FILTERING DATA KOMUNITAS ---
-  // Hanya tampilkan komunitas dengan status 'approved' yang sesuai dengan kategori dan query pencarian
   const filteredCommunities = communityList
     .filter((c) => c.status === 'approved')
     .filter((c) => {
@@ -122,37 +131,29 @@ export default function CommunitySection() {
         </div>
 
         {/* ===================================================================== */}
-        {/* 2. FILTER KATEGORI & BILAH PENCARIAN                                 */}
+        {/* 2. FILTER KATEGORI LIQUID NAVBAR & BILAH PENCARIAN                    */}
         {/* ===================================================================== */}
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            {/* Filter Pills Kategori (Harmonis dengan Navbar Utama) */}
-            <div className="inline-flex items-center p-1 sm:p-1.5 rounded-full bg-white/80 dark:bg-[#060911]/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-lg shadow-slate-900/5 dark:shadow-black/50 gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none max-w-full">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 cursor-pointer ${
-                    selectedCategory === cat
-                      ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/30 shadow-xs dark:shadow-[0_0_15px_-3px_rgba(234,88,12,0.3)]'
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/70 dark:hover:bg-white/5 border border-transparent font-medium'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+        <div className="space-y-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            {/* Filter Pills Kategori Liquid Glass */}
+            <div className="py-2.5 px-3 flex items-center justify-start max-w-full overflow-x-auto no-scrollbar">
+              <LiquidNavbar
+                items={categoryNavItems}
+                active={activeCatIndex >= 0 ? activeCatIndex : 0}
+                onChange={(idx, item) => setSelectedCategory(item.id)}
+                tone={theme === 'dark' ? 'dark' : 'light'}
+              />
             </div>
 
             {/* Input Pencarian Komunitas */}
-            <div className="relative w-full sm:w-64">
+            <div className="relative w-full lg:w-72 shrink-0">
               <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari komunitas atau platform..."
-                className="w-full pl-10 pr-4 py-2 rounded-xl text-xs bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-brand-500"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl text-xs bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-brand-500 shadow-xs"
               />
             </div>
           </div>
@@ -216,24 +217,27 @@ export default function CommunitySection() {
               {testimonialList.map((item) => (
                 <div
                   key={item.id}
-                  className="p-6 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-4 flex flex-col justify-between hover:border-brand-500/40 transition-all duration-300"
+                  className="p-6 rounded-3xl glass-card border border-slate-200/90 dark:border-white/10 space-y-4 flex flex-col justify-between hover:border-brand-500/60 hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-500/15 dark:hover:shadow-brand-950/50 transition-all duration-500 ease-out group cursor-pointer relative overflow-hidden"
                 >
-                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed">
+                  {/* Ambient hover glow overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 italic leading-relaxed relative z-10">
                     "{item.komentar || item.konten}"
                   </p>
 
-                  <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                  <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80 relative z-10">
                     <img
                       src={item.avatar || item.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
                       alt={item.nama}
-                      className="w-10 h-10 rounded-full object-cover border border-brand-500/30 shrink-0"
+                      className="w-10 h-10 rounded-full object-cover border border-brand-500/30 shrink-0 group-hover:scale-105 transition-transform"
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
                       }}
                     />
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                         {item.nama}
                       </h4>
                       <p className="text-[11px] text-slate-400">
@@ -269,20 +273,17 @@ export default function CommunitySection() {
       {/* ======================================================================= */}
       {/* 4. MODAL DIALOGS (PORTAL PATTERN)                                      */}
       {/* ======================================================================= */}
-      {/* Modal Dialog Detail Komunitas */}
       <CommunityDetailModal
         community={selectedCommunity}
         onClose={() => setSelectedCommunity(null)}
       />
 
-      {/* Modal Dialog Ajukan Komunitas Baru */}
       <SubmitCommunityModal
         isOpen={showSubmitModal}
         onClose={() => setShowSubmitModal(false)}
         onSubmit={submitCommunity}
       />
 
-      {/* Modal Dialog Tulis Testimoni Pengguna */}
       <SubmitTestimonialModal
         isOpen={showTestimonialModal}
         onClose={() => setShowTestimonialModal(false)}

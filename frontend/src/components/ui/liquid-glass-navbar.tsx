@@ -85,6 +85,11 @@ const NIMBUS_CSS = `
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.nimbus-nav::-webkit-scrollbar{
+  display: none;
 }
 .nimbus-nav[data-tone="dark"]{
   --n-tint: rgba(6, 9, 17, 0.7);

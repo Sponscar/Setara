@@ -7,6 +7,7 @@
 import React, { useEffect, useRef } from 'react';
 import { ArrowRight, CheckCircle2, Layers } from 'lucide-react';
 import ParticleSlider from './ParticleSlider';
+import TypewriterLoop from '@/components/ui/typewriter-loop';
 
 // ─── Interactive Particle Logo Slider ─────────────────────────────────────────
 function ParticleLogoInteractive() {
@@ -75,17 +76,24 @@ export default function HeroSection({ onStartTranslate, onExploreEducation }) {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]">
-              Komunikasi Tanpa Batas,{' '}
-              <span className="text-brand-600 dark:text-brand-400">
-                Setara untuk Semua.
-              </span>
+              Komunikasi Tanpa Batas,
             </h1>
+
+            {/* TypewriterLoop: "Setara" tetap putih, morphing text berubah warna */}
+            <TypewriterLoop
+              LeadText="Setara"
+              morphingText={["Untuk Tuli.", "Untuk Belajar.", "Untuk Semua."]}
+              className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] justify-center lg:justify-start"
+              LeadTextClassName="text-slate-900 dark:text-white"
+              interval={3000}
+              staticColor="orange"
+            />
 
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 font-normal max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Platform penerjemah bahasa isyarat dua arah berbasis kecerdasan buatan.
               Menerjemahkan <strong>Teks ke Video Peragaan Isyarat</strong> dan{' '}
               <strong>Kamera ke Teks Real-Time</strong> yang mendukung sistem{' '}
-              <strong>SIBI</strong> dan <strong>BISINDO</strong>.
+              <strong>(Sistem Isyarat Bahasa Indonesia) SIBI</strong> dan <strong>(Bahasa Isyarat Indonesia) BISINDO</strong>.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
