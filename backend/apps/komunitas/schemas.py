@@ -1,4 +1,4 @@
-﻿"""
+"""
 Ninja schemas for Komunitas app.
 Request and response validation schemas.
 """
@@ -103,6 +103,15 @@ class TestimonialCreateIn(Schema):
     avatar_url: Optional[str] = ''
     konten: str
     rating: int = 5
+
+
+class TestimonialUpdateIn(Schema):
+    nama: Optional[str] = None
+    peran: Optional[str] = None
+    avatar_url: Optional[str] = None
+    konten: Optional[str] = None
+    rating: Optional[int] = None
+    is_active: Optional[bool] = None
 
 
 class TestimonialOut(Schema):

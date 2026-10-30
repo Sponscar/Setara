@@ -12,11 +12,9 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   X, 
-  Heart, 
   MessageSquare, 
   Send 
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
 /**
  * Komponen Modal Formulir Testimoni / Pengalaman Pengguna.
@@ -35,54 +33,45 @@ export default function SubmitTestimonialModal({ isOpen, onClose, onSubmit }) {
     komentar: ''
   });
 
-  // State status sukses submit
-  const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Cegah render jika modal ditutup atau lingkungan non-browser
   if (!isOpen || typeof document === 'undefined') return null;
 
   /**
-   * Handler submit form testimoni
+   * Handler submit form testimoni (langsung tutup tanpa efek/delay berhasil)
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nama.trim() || !formData.komentar.trim()) return;
 
-    const payload = {
-      nama: formData.nama.trim(),
-      peran: formData.peran.trim() || 'Pengguna SETARA',
-      avatar: formData.avatar.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      avatar_url: formData.avatar.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
-      komentar: formData.komentar.trim(),
-      konten: formData.komentar.trim(),
-      rating: 5
-    };
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        nama: formData.nama.trim(),
+        peran: formData.peran.trim() || 'Pengguna SETARA',
+        avatar: formData.avatar.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        avatar_url: formData.avatar.trim() || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+        komentar: formData.komentar.trim(),
+        konten: formData.komentar.trim(),
+        rating: 5
+      };
 
-    if (onSubmit) {
-      await onSubmit(payload);
-    }
+      if (onSubmit) {
+        await onSubmit(payload);
+      }
 
-    // Efek konfeti celebrasi
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 }
-    });
-
-    setSuccess(true);
-
-    // Reset dan tutup modal otomatis setelah 1.5 detik
-    setTimeout(() => {
-      setSuccess(false);
       setFormData({ nama: '', peran: '', avatar: '', komentar: '' });
       onClose();
-    }, 1500);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return createPortal(
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-fade-in"
-      onClick={() => !success && onClose()}
+      onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="testimonial-form-title"
@@ -93,110 +82,92 @@ export default function SubmitTestimonialModal({ isOpen, onClose, onSubmit }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Tombol Tutup X */}
-        {!success && (
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-            aria-label="Tutup formulir testimoni"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-5 right-5 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+          aria-label="Tutup formulir testimoni"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-        {/* Tampilan Kondisional: Sukses vs Form Input */}
-        {success ? (
-          <div className="text-center py-8 space-y-3 animate-scale-up">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/20">
-              <Heart className="w-7 h-7 fill-amber-500" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              Cerita Anda Telah Ditambahkan!
-            </h3>
-            <p className="text-xs text-slate-500 max-w-xs mx-auto">
-              Terima kasih telah berbagi pengalaman bersama SETARA.
-            </p>
+        {/* Header Formulir */}
+        <div className="space-y-1 pr-6">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Bagikan Pengalaman</span>
           </div>
-        ) : (
-          <>
-            {/* Header Formulir */}
-            <div className="space-y-1 pr-6">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                <MessageSquare className="w-3 h-3" />
-                <span>Bagikan Pengalaman</span>
-              </div>
-              <h3 id="testimonial-form-title" className="text-lg font-bold text-slate-900 dark:text-white">
-                Tulis Cerita & Suaramu
-              </h3>
-              <p className="text-xs text-slate-500">
-                Ceritakan bagaimana SETARA membantu komunikasi atau proses belajarmu.
-              </p>
-            </div>
+          <h3 id="testimonial-form-title" className="text-lg font-bold text-slate-900 dark:text-white">
+            Tulis Cerita & Suaramu
+          </h3>
+          <p className="text-xs text-slate-500">
+            Ceritakan bagaimana SETARA membantu komunikasi atau proses belajarmu.
+          </p>
+        </div>
 
-            {/* Form Input Testimoni */}
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs text-slate-700 dark:text-slate-300">
-              {/* Nama Lengkap */}
-              <div>
-                <label className="font-semibold block mb-1">Nama Lengkap *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.nama}
-                  onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                  placeholder="Contoh: Siti Aisyah"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
-                />
-              </div>
+        {/* Form Input Testimoni */}
+        <form onSubmit={handleSubmit} className="space-y-3.5 text-xs text-slate-700 dark:text-slate-300">
+          {/* Nama Lengkap */}
+          <div>
+            <label className="font-semibold block mb-1">Nama Lengkap *</label>
+            <input
+              type="text"
+              required
+              value={formData.nama}
+              onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+              placeholder="Contoh: Siti Aisyah"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+            />
+          </div>
 
-              {/* Peran / Latar Belakang */}
-              <div>
-                <label className="font-semibold block mb-1">Peran / Latar Belakang *</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.peran}
-                  onChange={(e) => setFormData({ ...formData, peran: e.target.value })}
-                  placeholder="Contoh: Teman Tuli & Desainer Grafis / Mahasiswa"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
-                />
-              </div>
+          {/* Peran / Latar Belakang */}
+          <div>
+            <label className="font-semibold block mb-1">Peran / Latar Belakang *</label>
+            <input
+              type="text"
+              required
+              value={formData.peran}
+              onChange={(e) => setFormData({ ...formData, peran: e.target.value })}
+              placeholder="Contoh: Teman Tuli & Desainer Grafis / Mahasiswa"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+            />
+          </div>
 
-              {/* URL Avatar Opsional */}
-              <div>
-                <label className="font-semibold block mb-1">URL Avatar / Foto (Opsional)</label>
-                <input
-                  type="url"
-                  value={formData.avatar}
-                  onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]"
-                />
-              </div>
+          {/* URL Avatar Opsional */}
+          <div>
+            <label className="font-semibold block mb-1">URL Avatar / Foto (Opsional)</label>
+            <input
+              type="url"
+              value={formData.avatar}
+              onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+              placeholder="https://..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono text-[11px]"
+            />
+          </div>
 
-              {/* Komentar / Cerita */}
-              <div>
-                <label className="font-semibold block mb-1">Cerita / Kesan *</label>
-                <textarea
-                  rows="3"
-                  required
-                  value={formData.komentar}
-                  onChange={(e) => setFormData({ ...formData, komentar: e.target.value })}
-                  placeholder="Tuliskan pengalaman Anda menggunakan SETARA..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
-                />
-              </div>
+          {/* Komentar / Cerita */}
+          <div>
+            <label className="font-semibold block mb-1">Cerita / Kesan *</label>
+            <textarea
+              rows="3"
+              required
+              value={formData.komentar}
+              onChange={(e) => setFormData({ ...formData, komentar: e.target.value })}
+              placeholder="Tuliskan pengalaman Anda menggunakan SETARA..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+            />
+          </div>
 
-              {/* Tombol Terbitkan Cerita */}
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 hover:shadow-xl hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>Terbitkan Ceritaku</span>
-              </button>
-            </form>
-          </>
-        )}
+          {/* Tombol Terbitkan Cerita */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs shadow-lg shadow-brand-500/20 hover:shadow-xl hover:scale-[1.02] active:scale-98 transition-all cursor-pointer flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
+          >
+            <Send className="w-4 h-4" />
+            <span>{isSubmitting ? 'Mengirim...' : 'Terbitkan Ceritaku'}</span>
+          </button>
+        </form>
       </div>
     </div>,
     document.body

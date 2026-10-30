@@ -27,7 +27,8 @@ import {
   Sun,
   Moon,
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  MessageSquareQuote
 } from 'lucide-react';
 
 // Sub-komponen Tabs
@@ -36,6 +37,7 @@ import NewsTab from './tabs/NewsTab';
 import VideoTab from './tabs/VideoTab';
 import TimelineTab from './tabs/TimelineTab';
 import CommunityTab from './tabs/CommunityTab';
+import TestimonialTab from './tabs/TestimonialTab';
 
 // Sub-komponen Modals
 import LogoutConfirmModal from './modals/LogoutConfirmModal';
@@ -77,7 +79,9 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
     rejectCommunity,
     updateCommunity,
     deleteCommunity,
-    fetchTestimonials
+    fetchTestimonials,
+    testimonialList,
+    deleteTestimonial
   } = useContentStore();
 
   useEffect(() => {
@@ -205,6 +209,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
       icon: Users,
       pendingCount: communityList.filter((c) => c.status === 'pending').length 
     },
+    { id: 'cerita', label: 'Cerita Komunitas', icon: MessageSquareQuote, count: (testimonialList || []).length },
   ];
 
   return (
@@ -387,6 +392,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
               customVideos={customVideos}
               timelineList={timelineList}
               communityList={communityList}
+              testimonialList={testimonialList}
               setActiveTab={setActiveTab}
               approveCommunity={approveCommunity}
               rejectCommunity={rejectCommunity}
@@ -432,6 +438,13 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
               rejectCommunity={rejectCommunity}
               deleteCommunity={deleteCommunity}
               onOpenEditModal={handleOpenEditModal}
+              showToast={showToast}
+            />
+          )}
+          {activeTab === 'cerita' && (
+            <TestimonialTab
+              testimonialList={testimonialList}
+              deleteTestimonial={deleteTestimonial}
               showToast={showToast}
             />
           )}

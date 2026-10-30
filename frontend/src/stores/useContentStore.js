@@ -443,6 +443,66 @@ export const useContentStore = create((set, get) => ({
     }
   },
 
+  fetchAllTestimonials: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const data = await api.get('/komunitas/testimonials/all');
+      const normalized = (data || []).map(normalizeTestimonial);
+      set({ testimonialList: normalized, isLoading: false });
+      return normalized;
+    } catch (err) {
+      set({ isLoading: false, error: err.message });
+      return [];
+    }
+  },
+
+  updateTestimonial: async (id, updatedData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const payload = {
+        nama: updatedData.nama,
+        peran: updatedData.peran,
+        avatar_url: updatedData.avatar || updatedData.avatar_url || '',
+        konten: updatedData.konten || updatedData.komentar,
+        rating: updatedData.rating,
+        is_active: updatedData.is_active
+      };
+      const updated = await api.put(`/komunitas/testimonials/${id}`, payload);
+      const normalized = normalizeTestimonial(updated);
+      set((state) => ({
+        testimonialList: state.testimonialList.map((t) => (t.id === String(id) ? normalized : t)),
+        isLoading: false
+      }));
+      return { success: true, item: normalized };
+    } catch (err) {
+      set({ isLoading: false, error: err.message });
+      return { success: false, error: err.message };
+    }
+  },
+
+  deleteTestimonial: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.delete(`/komunitas/testimonials/${id}`);
+      set((state) => ({
+        testimonialList: state.testimonialList.filter((t) => t.id !== String(id)),
+        isLoading: false
+      }));
+      // Hapus juga dari localStorage jika ada
+      try {
+        const stored = localStorage.getItem('setara_local_testimonials');
+        if (stored) {
+          const parsed = JSON.parse(stored).filter((t) => t.id !== String(id));
+          localStorage.setItem('setara_local_testimonials', JSON.stringify(parsed));
+        }
+      } catch {}
+      return { success: true };
+    } catch (err) {
+      set({ isLoading: false, error: err.message });
+      return { success: false, error: err.message };
+    }
+  },
+
   addTestimonial: async (testi) => {
     const text = testi.konten || testi.komentar || '';
     const payload = {

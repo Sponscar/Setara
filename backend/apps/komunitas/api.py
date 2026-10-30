@@ -1,4 +1,4 @@
-﻿"""
+"""
 API endpoints for Komunitas app.
 Mencakup direktori organisasi/komunitas, aktivitas, testimoni, dan keanggotaan.
 """
@@ -18,7 +18,7 @@ from apps.komunitas.models import (
 from apps.komunitas.schemas import (
     KomunitasDirectoryOut, KomunitasDirectoryIn, KomunitasDirectoryUpdateIn,
     ActivityOut, ActivityCreateIn, ActivityUpdateIn,
-    TestimonialOut, TestimonialCreateIn,
+    TestimonialOut, TestimonialCreateIn, TestimonialUpdateIn,
     JoinKomunitasIn, PublicMemberOut, AdminMemberOut,
 )
 
@@ -323,3 +323,37 @@ def join_komunitas(request: HttpRequest, data: JoinKomunitasIn):
         status='pending'
     )
     return 201, {'message': 'Pendaftaran berhasil diajukan, menunggu persetujuan'}
+
+
+
+@router.get('/testimonials/all', response={200: list, 403: ErrorOut}, auth=auth)
+def list_all_testimonials(request: HttpRequest):
+    """List semua testimonial untuk admin (termasuk yang is_active=False)."""
+    if not is_admin(request):
+        return 403, {'detail': 'Hanya admin yang dapat melihat semua testimonial'}
+    qs = KomunitasTestimonial.objects.all()
+    return 200, [_testimonial_to_out(t) for t in qs]
+
+
+@router.put('/testimonials/{id}', response={200: TestimonialOut, 403: ErrorOut, 404: ErrorOut}, auth=auth)
+def update_testimonial(request: HttpRequest, id: UUID, data: TestimonialUpdateIn):
+    """Update testimoni (Admin only)."""
+    if not is_admin(request):
+        return 403, {'detail': 'Hanya admin yang dapat mengupdate testimonial'}
+    testimonial = KomunitasTestimonial.objects.filter(id=id).first()
+    if not testimonial:
+        return 404, {'detail': 'Testimonial tidak ditemukan'}
+    if data.nama is not None:
+        testimonial.nama = data.nama
+    if data.peran is not None:
+        testimonial.peran = data.peran
+    if data.avatar_url is not None:
+        testimonial.avatar_url = data.avatar_url
+    if data.konten is not None:
+        testimonial.konten = data.konten
+    if data.rating is not None:
+        testimonial.rating = max(1, min(5, data.rating))
+    if data.is_active is not None:
+        testimonial.is_active = data.is_active
+    testimonial.save()
+    return 200, _testimonial_to_out(testimonial)

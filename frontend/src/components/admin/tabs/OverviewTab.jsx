@@ -31,6 +31,7 @@ export default function OverviewTab({
   customVideos = [],
   timelineList = [],
   communityList = [],
+  testimonialList = [],
   setActiveTab,
   approveCommunity,
   rejectCommunity,
@@ -45,7 +46,7 @@ export default function OverviewTab({
       {/* ========================================================================= */}
       {/* 1. KARTU STATISTIK METRIK UTAMA                                          */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Metrik Berita */}
         <div className="p-5 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-1">
           <span className="text-xs text-slate-400 font-medium">Total Berita Terbit</span>
@@ -77,6 +78,21 @@ export default function OverviewTab({
           </div>
           <div className="text-[11px] text-amber-400 font-semibold">
             {pendingCommunities.length} Menunggu Persetujuan
+          </div>
+        </div>
+
+        {/* Metrik Cerita Komunitas */}
+        <div 
+          onClick={() => setActiveTab && setActiveTab('cerita')}
+          className="p-5 rounded-3xl glass-card border border-slate-200 dark:border-dark-border space-y-1 cursor-pointer hover:border-brand-500/40 transition-colors"
+          title="Klik untuk kelola cerita & suara komunitas"
+        >
+          <span className="text-xs text-slate-400 font-medium">Cerita Komunitas</span>
+          <div className="text-2xl font-black text-slate-900 dark:text-white">
+            {testimonialList.length}
+          </div>
+          <div className="text-[11px] text-brand-400 font-semibold">
+            Sharing Pengalaman
           </div>
         </div>
       </div>
