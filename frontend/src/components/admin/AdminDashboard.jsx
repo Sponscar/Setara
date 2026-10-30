@@ -201,7 +201,7 @@ export default function AdminDashboard({ onBackToHome, onLogout }) {
   const navTabs = [
     { id: 'overview', label: 'Ringkasan', icon: LayoutDashboard },
     { id: 'berita', label: 'Kelola Berita', icon: Newspaper, count: newsList.length },
-    { id: 'video', label: 'Kamus Isyarat', icon: Video, count: 24 + customVideos.length },
+    { id: 'video', label: 'Kamus Isyarat', icon: Video, count: customVideos.length },
     { id: 'timeline', label: 'Milestone', icon: Milestone, count: timelineList.length },
     { 
       id: 'komunitas', 

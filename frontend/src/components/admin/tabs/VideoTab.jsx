@@ -250,7 +250,7 @@ export default function VideoTab({
           </h3>
           <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1.5">
             <Database className="w-3 h-3" />
-            PostgreSQL Active (35+ Kata)
+            {customVideos.length} Kosakata Aktif
           </span>
         </div>
 
