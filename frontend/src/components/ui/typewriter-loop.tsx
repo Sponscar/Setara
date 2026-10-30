@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence, Transition } from "motion/react";
+import React, { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 interface TypewriterLoopProps {
@@ -9,13 +8,13 @@ interface TypewriterLoopProps {
   morphingText?: string[];
   className?: string;
   interval?: number;
-  transition?: Transition;
+  transition?: any;
   LeadTextClassName?: string;
   morphingTextClassName?: string;
   backgroundClassName?: string;
   cursorClassName?: string;
   staticColor?: "violet" | "blue" | "emerald" | "amber" | "rose" | "fuchsia" | "orange";
-  darkGradientBackgroundLock?: boolean; // New prop
+  darkGradientBackgroundLock?: boolean;
 }
 
 const TypewriterLoop = ({
@@ -23,17 +22,16 @@ const TypewriterLoop = ({
   morphingText = ["Limitless", "Timeless", "Flawless"],
   className,
   interval = 4000,
-  transition = { duration: 0.8, ease: "easeInOut" },
   LeadTextClassName,
   morphingTextClassName,
   backgroundClassName,
   cursorClassName,
   staticColor,
-  darkGradientBackgroundLock = false, // New prop with default false
+  darkGradientBackgroundLock = false,
 }: TypewriterLoopProps) => {
   const [index, setIndex] = useState(0);
   const [colorIndex, setColorIndex] = useState(0);
-  const [nextIndex, setNextIndex] = useState(1);
+  const [isVisible, setIsVisible] = useState(true);
 
   const gradientColors = [
     "from-violet-400 to-violet-800 dark:from-violet-400 dark:to-violet-600",
@@ -53,7 +51,6 @@ const TypewriterLoop = ({
     "from-transparent via-fuchsia-200/30 to-fuchsia-200 dark:from-transparent dark:via-fuchsia-950/30 dark:to-fuchsia-950/60",
   ];
 
-  // Dark-only background colors (no light mode variants)
   const darkOnlyBackgroundColors = [
     "from-transparent via-violet-950/30 to-violet-950/60",
     "from-transparent via-blue-950/30 to-blue-950/60",
@@ -72,37 +69,26 @@ const TypewriterLoop = ({
     "bg-fuchsia-500",
   ];
 
-  // Color mapping for static colors
   const staticGradientMap = {
-    violet:
-      "from-violet-400 to-violet-800 dark:from-violet-400 dark:to-violet-600",
+    violet: "from-violet-400 to-violet-800 dark:from-violet-400 dark:to-violet-600",
     blue: "from-blue-400 to-blue-800 dark:from-blue-400 dark:to-blue-600",
-    emerald:
-      "from-emerald-400 to-emerald-800 dark:from-emerald-400 dark:to-emerald-600",
+    emerald: "from-emerald-400 to-emerald-800 dark:from-emerald-400 dark:to-emerald-600",
     amber: "from-amber-400 to-amber-800 dark:from-amber-400 dark:to-amber-600",
     rose: "from-rose-400 to-rose-800 dark:from-rose-400 dark:to-rose-600",
-    fuchsia:
-      "from-fuchsia-400 to-fuchsia-800 dark:from-fuchsia-400 dark:to-fuchsia-600",
-    orange:
-      "from-orange-400 to-orange-700 dark:from-orange-400 dark:to-orange-600",
+    fuchsia: "from-fuchsia-400 to-fuchsia-800 dark:from-fuchsia-400 dark:to-fuchsia-600",
+    orange: "from-orange-500 to-amber-500 dark:from-orange-400 dark:to-amber-400",
   };
 
   const staticBackgroundMap = {
-    violet:
-      "from-transparent via-purple-200/30 to-purple-200 dark:from-transparent dark:via-violet-950/30 dark:to-violet-950/60",
+    violet: "from-transparent via-purple-200/30 to-purple-200 dark:from-transparent dark:via-violet-950/30 dark:to-violet-950/60",
     blue: "from-transparent via-blue-200/30 to-blue-200 dark:from-transparent dark:via-blue-950/30 dark:to-blue-950/60",
-    emerald:
-      "from-transparent via-emerald-200/30 to-emerald-200 dark:from-transparent dark:via-emerald-950/30 dark:to-emerald-950/60",
-    amber:
-      "from-transparent via-amber-200/30 to-amber-200 dark:from-transparent dark:via-amber-950/30 dark:to-amber-950/60",
+    emerald: "from-transparent via-emerald-200/30 to-emerald-200 dark:from-transparent dark:via-emerald-950/30 dark:to-emerald-950/60",
+    amber: "from-transparent via-amber-200/30 to-amber-200 dark:from-transparent dark:via-amber-950/30 dark:to-amber-950/60",
     rose: "from-transparent via-rose-200/30 to-rose-200 dark:from-transparent dark:via-rose-950/30 dark:to-rose-950/60",
-    fuchsia:
-      "from-transparent via-fuchsia-200/30 to-fuchsia-200 dark:from-transparent dark:via-fuchsia-950/30 dark:to-fuchsia-950/60",
-    orange:
-      "from-transparent via-orange-200/30 to-orange-200 dark:from-transparent dark:via-orange-950/30 dark:to-orange-950/60",
+    fuchsia: "from-transparent via-fuchsia-200/30 to-fuchsia-200 dark:from-transparent dark:via-fuchsia-950/30 dark:to-fuchsia-950/60",
+    orange: "from-transparent via-orange-200/30 to-orange-200 dark:from-transparent dark:via-orange-950/30 dark:to-orange-950/60",
   };
 
-  // Dark-only static background map
   const staticDarkOnlyBackgroundMap = {
     violet: "from-transparent via-violet-950/30 to-violet-950/60",
     blue: "from-transparent via-blue-950/30 to-blue-950/60",
@@ -123,61 +109,55 @@ const TypewriterLoop = ({
     orange: "bg-orange-500",
   };
 
-  // Determine which gradient to use
   const getGradientColor = () => {
-    if (staticColor) {
+    if (staticColor && staticGradientMap[staticColor]) {
       return staticGradientMap[staticColor];
     }
-    return gradientColors[colorIndex];
+    return gradientColors[colorIndex % gradientColors.length];
   };
 
   const getBackgroundColor = () => {
-    // If dark lock is enabled, use dark-only backgrounds
     if (darkGradientBackgroundLock) {
-      if (staticColor) {
+      if (staticColor && staticDarkOnlyBackgroundMap[staticColor]) {
         return staticDarkOnlyBackgroundMap[staticColor];
       }
-      return darkOnlyBackgroundColors[colorIndex];
+      return darkOnlyBackgroundColors[colorIndex % darkOnlyBackgroundColors.length];
     }
 
-    // Otherwise use normal backgrounds with both light and dark variants
-    if (staticColor) {
+    if (staticColor && staticBackgroundMap[staticColor]) {
       return staticBackgroundMap[staticColor];
     }
-    return backgroundColors[colorIndex];
+    return backgroundColors[colorIndex % backgroundColors.length];
   };
 
   const getCursorColor = () => {
-    if (staticColor) {
+    if (staticColor && staticCursorMap[staticColor]) {
       return staticCursorMap[staticColor];
     }
-    return cursorColors[colorIndex];
+    return cursorColors[colorIndex % cursorColors.length];
   };
-
-  // Pre-calculate next index
-  useEffect(() => {
-    setNextIndex((index + 1) % morphingText.length);
-  }, [index, morphingText.length]);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % morphingText.length);
+      // Fade out
+      setIsVisible(false);
+      setTimeout(() => {
+        setIndex((prev) => (prev + 1) % morphingText.length);
+        if (!staticColor) {
+          setColorIndex((prev) => (prev + 1) % gradientColors.length);
+        }
+        setIsVisible(true);
+      }, 350);
     }, interval);
-    return () => clearInterval(timer);
-  }, [morphingText.length, interval]);
 
-  const handleExitComplete = useCallback(() => {
-    // Only cycle colors if staticColor is not provided
-    if (!staticColor) {
-      setColorIndex((prev) => (prev + 1) % gradientColors.length);
-    }
-  }, [gradientColors.length, staticColor]);
+    return () => clearInterval(timer);
+  }, [morphingText.length, interval, staticColor, gradientColors.length]);
 
   return (
     <div
       className={cn(
         "flex flex-wrap items-center justify-start w-fit gap-x-2 md:gap-x-3 gap-y-1 text-3xl md:text-7xl font-medium tracking-tight",
-        className,
+        className
       )}
     >
       <span
@@ -186,53 +166,41 @@ const TypewriterLoop = ({
         {LeadText}
       </span>
       <div className="relative flex items-center">
-        <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
-          <motion.div
-            key={morphingText[index]}
-            initial={{ width: 0, opacity: 0 }}
-            animate={{ width: "auto", opacity: 1 }}
-            exit={{ width: 0, opacity: 0 }}
-            transition={transition}
-            className="overflow-hidden whitespace-nowrap relative"
-          >
-            {/* Background gradient box */}
-            <div
-              className={cn(
-                "absolute inset-0",
-                "bg-gradient-to-r",
-                getBackgroundColor(),
-                backgroundClassName,
-              )}
-            />
-
-            <span
-              className={cn(
-                "relative bg-clip-text text-transparent",
-                "bg-gradient-to-r",
-                getGradientColor(),
-                "pr-1",
-                morphingTextClassName,
-              )}
-            >
-              {morphingText[index]}
-            </span>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Cursor Line */}
-        <motion.div
-          key={staticColor ? `cursor-${staticColor}` : `cursor-${colorIndex}`}
+        <div
           className={cn(
-            "w-[3px] md:w-[4px] h-[1.10em] sm:h-[1em]",
-            getCursorColor(),
-            cursorClassName,
+            "overflow-hidden whitespace-nowrap relative transition-all duration-300 ease-in-out transform",
+            isVisible
+              ? "opacity-100 translate-y-0 scale-100 max-w-[600px]"
+              : "opacity-0 -translate-y-1 scale-95 max-w-0"
           )}
-          animate={{ opacity: [1, 0.5] }}
-          transition={{
-            duration: 0.8,
-            repeat: Infinity,
-            repeatType: "reverse",
-          }}
+        >
+          {/* Background gradient box */}
+          <div
+            className={cn(
+              "absolute inset-0 bg-gradient-to-r pointer-events-none",
+              getBackgroundColor(),
+              backgroundClassName
+            )}
+          />
+
+          <span
+            className={cn(
+              "relative bg-clip-text text-transparent bg-gradient-to-r pr-1 inline-block",
+              getGradientColor(),
+              morphingTextClassName
+            )}
+          >
+            {morphingText[index]}
+          </span>
+        </div>
+
+        {/* Blinking Cursor Line */}
+        <div
+          className={cn(
+            "w-[3px] md:w-[4px] h-[1.10em] sm:h-[1em] animate-pulse rounded-full transition-colors duration-300 ml-0.5",
+            getCursorColor(),
+            cursorClassName
+          )}
         />
       </div>
     </div>
@@ -240,4 +208,3 @@ const TypewriterLoop = ({
 };
 
 export default TypewriterLoop;
-
