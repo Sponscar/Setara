@@ -141,9 +141,6 @@ export default function VideoTab({
             <Plus className="w-4 h-4 text-emerald-500" />
             <span>Tambah Isyarat Kamus Baru</span>
           </h3>
-          <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-            PostgreSQL
-          </span>
         </div>
 
         <form onSubmit={handleCreateVideo} className="space-y-3.5 text-xs text-slate-700 dark:text-slate-300">
@@ -160,31 +157,17 @@ export default function VideoTab({
             />
           </div>
 
-          {/* Grid Tipe Bahasa & Kategori */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="font-semibold block mb-1">Tipe Bahasa *</label>
-              <select
-                value={videoForm.tipe_bahasa}
-                onChange={(e) => setVideoForm({ ...videoForm, tipe_bahasa: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-              >
-                <option value="BISINDO">BISINDO</option>
-                <option value="SIBI">SIBI</option>
-                <option value="BOTH">Keduanya (BOTH)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="font-semibold block mb-1">Kategori</label>
-              <input
-                type="text"
-                value={videoForm.kategori}
-                onChange={(e) => setVideoForm({ ...videoForm, kategori: e.target.value })}
-                placeholder="Contoh: Sapaan"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
+          {/* Tipe Bahasa */}
+          <div>
+            <label className="font-semibold block mb-1">Tipe Bahasa *</label>
+            <select
+              value={videoForm.tipe_bahasa}
+              onChange={(e) => setVideoForm({ ...videoForm, tipe_bahasa: e.target.value })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+            >
+              <option value="BISINDO">BISINDO</option>
+              <option value="SIBI">SIBI</option>
+            </select>
           </div>
 
           {/* UNGGAH VIDEO MP4 */}
@@ -238,18 +221,6 @@ export default function VideoTab({
                 />
               </div>
             )}
-          </div>
-
-          {/* Deskripsi Gerakan */}
-          <div>
-            <label className="font-semibold block mb-1">Deskripsi Panduan Gerakan</label>
-            <textarea
-              rows="2"
-              value={videoForm.deskripsi_gerakan}
-              onChange={(e) => setVideoForm({ ...videoForm, deskripsi_gerakan: e.target.value })}
-              placeholder="Panduan visual gerakan tangan untuk pengguna..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-            />
           </div>
 
           {/* Tombol Simpan */}

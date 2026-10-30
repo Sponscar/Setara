@@ -356,9 +356,6 @@ export default function TextToSignPlayer() {
                     <Film className="w-3 h-3" />
                     Video MP4 Asli
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-600/80 backdrop-blur-md text-white border border-emerald-400/30">
-                    PostgreSQL
-                  </span>
                 </div>
               </div>
             )}
@@ -505,11 +502,7 @@ export default function TextToSignPlayer() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase flex items-center gap-1.5">
                     Kamus {languageSystem}
-                    {currentToken?.fromPostgres && (
-                      <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-500 font-bold normal-case">
-                        PostgreSQL
-                      </span>
-                    )}
+                    
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
                     Durasi: ~{currentToken.matchedData?.durasi || 2}s

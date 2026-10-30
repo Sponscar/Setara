@@ -163,34 +163,21 @@ export default function EditVideoModal({
               >
                 <option value="BISINDO">BISINDO</option>
                 <option value="SIBI">SIBI</option>
-                <option value="BOTH">Keduanya (BOTH)</option>
               </select>
             </div>
           </div>
 
-          {/* Row 2: Kategori & Durasi */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="font-semibold block mb-1">Kategori</label>
-              <input
-                type="text"
-                value={formData.kategori}
-                onChange={(e) => setFormData({ ...formData, kategori: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="font-semibold block mb-1">Estimasi Durasi (Detik)</label>
-              <input
-                type="number"
-                min="1"
-                max="10"
-                value={formData.durasi}
-                onChange={(e) => setFormData({ ...formData, durasi: parseInt(e.target.value) || 2 })}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
+          {/* Durasi */}
+          <div>
+            <label className="font-semibold block mb-1">Estimasi Durasi (Detik)</label>
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={formData.durasi}
+              onChange={(e) => setFormData({ ...formData, durasi: parseInt(e.target.value) || 2 })}
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
+            />
           </div>
 
           {/* UNGGAH VIDEO MP4 */}

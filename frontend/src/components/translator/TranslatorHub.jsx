@@ -13,6 +13,8 @@
 
 import React, { useEffect } from 'react';
 import { useTranslatorStore } from '../../stores/useTranslatorStore';
+import { useThemeStore } from '../../stores/useThemeStore';
+import LiquidNavbar from '../ui/liquid-glass-navbar';
 import TextToSignPlayer from './TextToSignPlayer';
 import SignToTextCamera from './SignToTextCamera';
 import { 
@@ -22,7 +24,6 @@ import {
   Check, 
   Languages, 
   Trash2,
-  Database
 } from 'lucide-react';
 
 /**
@@ -42,9 +43,36 @@ export default function TranslatorHub({ isStandalone = false }) {
     clearHistory,
     fetchDictionary,
     dbStatus,
-    dictionary,
+    dictionary,
+
     fetchHistory
   } = useTranslatorStore();
+  const { theme } = useThemeStore();
+
+  /** Tab navigasi Liquid Glass Penerjemah */
+  const translatorTabs = [
+    {
+      id: 'text-to-sign',
+      label: 'Teks ke Isyarat',
+      icon: <Type className="w-4 h-4" />,
+      fx: 'glow'
+    },
+    {
+      id: 'sign-to-text',
+      label: 'Kamera ke Teks (AI)',
+      icon: <Camera className="w-4 h-4" />,
+      fx: 'spin'
+    },
+    {
+      id: 'history',
+      label: 'Riwayat',
+      icon: <History className="w-4 h-4" />,
+      fx: 'pop'
+    }
+  ];
+
+  const activeTabIndex = translatorTabs.findIndex((t) => t.id === activeTab);
+
   // Fetch dictionary dan riwayat saat halaman dimuat
   useEffect(() => {
     fetchDictionary();
@@ -64,15 +92,6 @@ export default function TranslatorHub({ isStandalone = false }) {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-600 dark:text-brand-400 border border-brand-500/20">
               <Languages className="w-3.5 h-3.5" />
               <span>Penerjemah Dua Arah Cerdas</span>
-            </div>
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-              dbStatus === 'connected'
-                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
-            }`}>
-              <Database className="w-3.5 h-3.5" />
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{background: dbStatus === 'connected' ? '#10b981' : '#ef4444'}}></span>
-              <span>{dbStatus === 'connected' ? `PostgreSQL (${dictionary.length}+ Kata)` : 'Offline'}</span>
             </div>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
@@ -172,52 +191,15 @@ export default function TranslatorHub({ isStandalone = false }) {
         </div>
 
         {/* ===================================================================== */}
-        {/* 3. TAB MODE PENERJEMAH (TEXT-TO-SIGN / CAMERA / RIWAYAT)              */}
+        {/* 3. TAB MODE PENERJEMAH (LIQUID GLASS NAVBAR INTERACTION)             */}
         {/* ===================================================================== */}
         <div className="flex items-center justify-center mb-8">
-          <div className="p-1.5 rounded-2xl bg-slate-200/80 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 flex items-center gap-1 shadow-inner">
-            {/* Tab Teks ke Isyarat */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('text-to-sign')}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeTab === 'text-to-sign'
-                  ? 'bg-white dark:bg-dark-card text-brand-600 dark:text-brand-400 shadow-md'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <Type className="w-4 h-4" />
-              <span>Teks ke Isyarat</span>
-            </button>
-
-            {/* Tab Kamera ke Teks */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('sign-to-text')}
-              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeTab === 'sign-to-text'
-                  ? 'bg-white dark:bg-dark-card text-amber-600 dark:text-amber-400 shadow-md'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <Camera className="w-4 h-4" />
-              <span>Kamera ke Teks (AI)</span>
-            </button>
-
-            {/* Tab Riwayat */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('history')}
-              className={`px-3 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeTab === 'history'
-                  ? 'bg-white dark:bg-dark-card text-slate-900 dark:text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <History className="w-4 h-4" />
-              <span className="hidden sm:inline">Riwayat</span>
-            </button>
-          </div>
+          <LiquidNavbar
+            items={translatorTabs}
+            active={activeTabIndex >= 0 ? activeTabIndex : 0}
+            onChange={(idx, item) => setActiveTab(item.id)}
+            tone={theme === 'dark' ? 'dark' : 'light'}
+          />
         </div>
 
 {/* ===================================================================== */}
