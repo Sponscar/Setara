@@ -4,14 +4,15 @@
  * Direktori: src/components/admin/modals/
  * Deskripsi: Modal Dialog Pengeditan Kosakata & Pengelolaan Video Isyarat SETARA.
  * Fitur:
- *   - Edit kata, tipe bahasa, kategori, durasi, dan deskripsi gerakan.
- *   - Pemilihan opsi visualisasi: Pola Animasi Canvas 2D vs Unggah Video MP4 (Maks 5 MB) vs URL Eksternal.
- *   - Live preview video MP4 dengan validasi batas file maksimal 5 MB di browser.
+ *   - Edit kata dan tipe bahasa (BISINDO / SIBI).
+ *   - Estimasi durasi otomatis terdeteksi dari metadata berkas video.
+ *   - Status video pintar: Mempertahankan video yang sudah diunggah jika admin tidak menggantinya.
+ *   - Opsi upload file pengganti (Maks 5 MB) dengan live preview dan validasi.
  * ==============================================================================
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Film, Upload, Edit3, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Save, Film, Upload, Edit3, AlertCircle, CheckCircle2, RotateCcw } from 'lucide-react';
 
 export default function EditVideoModal({
   isOpen,
@@ -23,37 +24,44 @@ export default function EditVideoModal({
 }) {
   if (!isOpen || !video) return null;
 
+  const existingVideoUrl = video.video_file || video.video_url || '';
+  const hasExistingVideo = Boolean(existingVideoUrl);
+
   const [formData, setFormData] = useState({
     kata: video.kata || '',
     tipe_bahasa: video.tipe_bahasa || 'BISINDO',
-    kategori: video.kategori || 'Umum',
     durasi: video.durasi || 2,
-    gesture_pattern: video.gesture_pattern || 'hand_wave_forehead',
-    deskripsi_gerakan: video.deskripsi_gerakan || '',
-    video_url: video.video_url || ''
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [filePreview, setFilePreview] = useState(video.video_url || video.video_file || '');
+  const [filePreview, setFilePreview] = useState(existingVideoUrl);
+  const [calculatedDuration, setCalculatedDuration] = useState(video.durasi || 2);
   const [fileError, setFileError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (video) {
+      const initialVideoUrl = video.video_file || video.video_url || '';
       setFormData({
         kata: video.kata || '',
         tipe_bahasa: video.tipe_bahasa || 'BISINDO',
-        kategori: video.kategori || 'Umum',
         durasi: video.durasi || 2,
-        gesture_pattern: video.gesture_pattern || 'hand_wave_forehead',
-        deskripsi_gerakan: video.deskripsi_gerakan || '',
-        video_url: video.video_url || video.video_file || ''
       });
-      setFilePreview(video.video_url || video.video_file || '');
+      setFilePreview(initialVideoUrl);
+      setCalculatedDuration(video.durasi || 2);
       setSelectedFile(null);
       setFileError('');
     }
   }, [video]);
+
+  // Deteksi durasi video secara otomatis saat metadata video selesai dimuat
+  const handleVideoLoadedMetadata = (e) => {
+    const durationSec = Math.round(e.target.duration);
+    if (durationSec && durationSec > 0) {
+      setCalculatedDuration(durationSec);
+      setFormData((prev) => ({ ...prev, durasi: durationSec }));
+    }
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -65,15 +73,13 @@ export default function EditVideoModal({
     if (file.size > MAX_SIZE) {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
       setFileError(`Ukuran berkas (${sizeMb} MB) melebihi batas maksimal 5 MB.`);
-      setSelectedFile(null);
       return;
     }
 
-    // Validasi tipe file
+    // Validasi format file video
     const validTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
     if (!validTypes.includes(file.type) && !file.name.match(/\.(mp4|webm|mov)$/i)) {
       setFileError('Format tidak didukung. Harap pilih video MP4 atau WebM.');
-      setSelectedFile(null);
       return;
     }
 
@@ -82,23 +88,36 @@ export default function EditVideoModal({
     setFilePreview(objUrl);
   };
 
+  // Batalkan pemilihan berkas baru dan kembalikan ke video yang sudah ada di database
+  const handleCancelNewFile = () => {
+    setSelectedFile(null);
+    setFilePreview(existingVideoUrl);
+    setCalculatedDuration(video.durasi || 2);
+    setFormData((prev) => ({ ...prev, durasi: video.durasi || 2 }));
+    setFileError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.kata.trim()) return;
 
     setIsSubmitting(true);
     try {
-      // 1. Simpan metadata kata
-      const saveRes = await onSave(video.id, {
-        ...formData,
-        video_url: formData.video_url
-      });
+      // 1. Simpan metadata kata (durasi otomatis terhitung)
+      // Jika tidak ada berkas baru, data video yang sudah diunggah tetap dipertahankan
+      const updateData = {
+        kata: formData.kata.toLowerCase().trim(),
+        tipe_bahasa: formData.tipe_bahasa,
+        durasi: calculatedDuration || formData.durasi || 2,
+      };
 
-      // 2. Jika ada berkas MP4 baru yang diunggah
+      await onSave(video.id, updateData);
+
+      // 2. Hanya upload berkas baru jika admin secara eksplisit memilih berkas baru
       if (selectedFile && onUploadFile) {
         const uploadRes = await onUploadFile(video.id, selectedFile);
         if (!uploadRes.success) {
-          if (showToast) showToast(uploadRes.error || 'Gagal mengunggah berkas video.');
+          if (showToast) showToast(uploadRes.error || 'Gagal mengunggah berkas video baru.');
         }
       }
 
@@ -126,7 +145,7 @@ export default function EditVideoModal({
                 Edit Kosakata Isyarat
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Sesuaikan metadata kata dan preferensi tampilan visualisasi
+                Sesuaikan kata, tipe bahasa, dan video peragaan isyarat
               </p>
             </div>
           </div>
@@ -167,34 +186,87 @@ export default function EditVideoModal({
             </div>
           </div>
 
-          {/* Durasi */}
-          <div>
-            <label className="font-semibold block mb-1">Estimasi Durasi (Detik)</label>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={formData.durasi}
-              onChange={(e) => setFormData({ ...formData, durasi: parseInt(e.target.value) || 2 })}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-            />
+          {/* Estimasi Durasi Otomatis (Tanpa Input Manual) */}
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-dark-bg/60 border border-slate-200 dark:border-slate-800">
+            <div>
+              <span className="font-bold text-slate-900 dark:text-white block text-xs">
+                Estimasi Durasi Video
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Terdeteksi otomatis dari panjang berkas video peragaan
+              </span>
+            </div>
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              {calculatedDuration || formData.durasi || 2} Detik (Otomatis)
+            </span>
           </div>
 
-          {/* UNGGAH VIDEO MP4 */}
+          {/* PENGELOLAAN VIDEO MP4 */}
           <div className="p-4 rounded-2xl bg-slate-50 dark:bg-dark-bg/60 border border-slate-200 dark:border-slate-800 space-y-3">
-            <label className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-              <Film className="w-4 h-4 text-brand-500" />
-              <span>Video Isyarat MP4:</span>
-              <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20 ml-auto">
-                Maks 5 MB
+            <div className="flex items-center justify-between">
+              <label className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 text-xs">
+                <Film className="w-4 h-4 text-brand-500" />
+                <span>Berkas Video Isyarat:</span>
+              </label>
+              <span className="text-[10px] font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                Maks 5 MB (MP4 / WebM)
               </span>
-            </label>
+            </div>
 
-            {/* Tombol Pilih Berkas */}
-            <div className="flex items-center gap-3">
-              <label className="px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center gap-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                <Upload className="w-4 h-4" />
-                <span>Pilih Berkas MP4</span>
+            {/* Status Video Saat Ini */}
+            {selectedFile ? (
+              <div className="p-3 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Upload className="w-4 h-4 text-brand-500 shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-bold text-brand-600 dark:text-brand-400 text-xs truncate">
+                      Berkas baru dipilih: {selectedFile.name}
+                    </p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                      Ukuran: {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB &bull; Akan menggantikan video lama saat disimpan.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCancelNewFile}
+                  className="px-2.5 py-1 text-[11px] font-semibold text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors shrink-0 flex items-center gap-1"
+                  title="Batalkan berkas baru dan gunakan video lama"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Batal Ganti</span>
+                </button>
+              </div>
+            ) : hasExistingVideo ? (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                <div className="min-w-0">
+                  <p className="font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                    Menggunakan video yang sudah diunggah
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                    Video lama tetap aktif secara otomatis. Anda tidak perlu mengunggah ulang jika tidak ingin menggantinya.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-500 shrink-0" />
+                <p className="text-[11px] text-amber-600 dark:text-amber-400">
+                  Belum ada berkas video terunggah untuk kata ini.
+                </p>
+              </div>
+            )}
+
+            {/* Tombol Pilih Berkas (Ganti atau Unggah) */}
+            <div>
+              <label className="w-full px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                <Upload className="w-4 h-4 text-brand-500" />
+                <span>
+                  {hasExistingVideo && !selectedFile
+                    ? 'Ganti Berkas Video (Opsional)'
+                    : 'Pilih Berkas Video MP4'}
+                </span>
                 <input
                   type="file"
                   accept="video/mp4,video/webm,video/quicktime"
@@ -202,13 +274,9 @@ export default function EditVideoModal({
                   className="hidden"
                 />
               </label>
-              {selectedFile && (
-                <span className="text-xs text-slate-600 dark:text-slate-300 truncate max-w-xs">
-                  {selectedFile.name} ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
-                </span>
-              )}
             </div>
 
+            {/* Pesan Kesalahan File */}
             {fileError && (
               <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -216,48 +284,20 @@ export default function EditVideoModal({
               </div>
             )}
 
-            {/* Input URL Video Eksternal */}
-            <div>
-              <label className="font-medium block mb-1 text-slate-500 dark:text-slate-400 text-[11px]">
-                Atau Masukkan URL Video Eksternal:
-              </label>
-              <input
-                type="url"
-                value={formData.video_url}
-                onChange={(e) => {
-                  setFormData({ ...formData, video_url: e.target.value });
-                  setFilePreview(e.target.value);
-                }}
-                placeholder="https://.../video.mp4"
-                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-slate-700 font-mono text-[11px] text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
             {/* Live Preview Player */}
             {filePreview && (
               <div className="p-3 rounded-xl bg-black/5 dark:bg-black/40 border border-slate-200 dark:border-slate-700/60 space-y-1.5">
                 <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
-                  Live Video Preview:
+                  {selectedFile ? 'Pratinjau Berkas Baru:' : 'Pratinjau Video Saat Ini:'}
                 </span>
                 <video
                   src={filePreview}
                   controls
+                  onLoadedMetadata={handleVideoLoadedMetadata}
                   className="w-full max-h-48 rounded-lg object-contain bg-black"
                 />
               </div>
             )}
-          </div>
-
-          {/* Deskripsi Gerakan */}
-          <div>
-            <label className="font-semibold block mb-1">Deskripsi Panduan Gerakan</label>
-            <textarea
-              rows="2"
-              value={formData.deskripsi_gerakan}
-              onChange={(e) => setFormData({ ...formData, deskripsi_gerakan: e.target.value })}
-              placeholder="Deskripsi panduan peragaan isyarat..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-            />
           </div>
 
           {/* Footer Actions */}

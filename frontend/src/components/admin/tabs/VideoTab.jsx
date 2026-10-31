@@ -199,24 +199,18 @@ export default function VideoTab({
               </div>
             )}
 
-            {/* Alternatif URL Eksternal */}
-            <input
-              type="url"
-              value={videoForm.video_url}
-              onChange={(e) => {
-                setVideoForm({ ...videoForm, video_url: e.target.value });
-                setFilePreview(e.target.value);
-              }}
-              placeholder="Atau URL video: https://.../video.mp4"
-              className="w-full px-3 py-1.5 rounded-xl bg-white dark:bg-dark-card border border-slate-200 dark:border-slate-700 font-mono text-[10px] text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
-            />
-
             {/* Live Preview Player */}
             {filePreview && (
               <div className="p-2 rounded-xl bg-black/10 dark:bg-black/50 border border-slate-200 dark:border-slate-700/60">
                 <video
                   src={filePreview}
                   controls
+                  onLoadedMetadata={(e) => {
+                    const sec = Math.round(e.target.duration);
+                    if (sec && sec > 0) {
+                      setVideoForm((prev) => ({ ...prev, durasi: sec }));
+                    }
+                  }}
                   className="w-full max-h-36 rounded-lg object-contain bg-black"
                 />
               </div>
