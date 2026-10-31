@@ -163,7 +163,7 @@ def update_video(request: HttpRequest, id: UUID, data: VideoUpdateIn):
 
 @router.delete('/{id}', response={200: MessageOut, 403: ErrorOut, 404: ErrorOut}, auth=auth)
 def delete_video(request: HttpRequest, id: UUID):
-    """Delete a video (Admin only)."""
+    """Delete a video (Admin only). Juga menghapus file lokal dari disk."""
     if not is_admin(request):
         return 403, {'detail': 'Hanya admin yang dapat menghapus video'}
 
@@ -171,8 +171,22 @@ def delete_video(request: HttpRequest, id: UUID):
     if not video:
         return 404, {'detail': 'Video tidak ditemukan'}
 
+    kata = video.kata  # simpan sebelum delete
+
+    # Hapus file video dari disk jika ada
+    if video.video_file:
+        file_path = video.video_file.path
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+
+    # Hapus file thumbnail dari disk jika ada
+    if video.thumbnail:
+        thumb_path = video.thumbnail.path
+        if os.path.isfile(thumb_path):
+            os.remove(thumb_path)
+
     video.delete()
-    return 200, {'message': f'Video "{video.kata}" berhasil dihapus'}
+    return 200, {'message': f'Video "{kata}" berhasil dihapus'}
 
 
 @router.post('/{id}/upload', response={200: VideoOut, 400: ErrorOut, 403: ErrorOut, 404: ErrorOut}, auth=auth)
